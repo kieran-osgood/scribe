@@ -5,8 +5,6 @@ D
 configs/.eslintrc.js,3/f/3fd93e78f5c7e5d6dfe06678873c7c091809e6b4
 K
 configs/jest/jest.config.ts,4/6/46c72c1abf13e134ad82a73c518b36322dabc0cb
-F
-src/generator/index.ts,8/e/8ead39ecb94b7707292db2f38dfb4cf85a85afb1
 C
 configs/.prettierrc,4/b/4b374aa6715d7162d490639c8e5c8c9b04773191
 9

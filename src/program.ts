@@ -1,12 +1,13 @@
 
-// import { readConfig } from './reader/config';
-// import { readFlags } from './reader/arguments';
-// import { readPrompt } from './reader/prompt';
+import { readConfig } from './reader/config.js';
+import { readFlags } from './reader/arguments.js';
+import { readPrompt } from './reader/prompt.js';
 
 export async function run() {
-  console.log('abc')
-  // const choices = readConfig();
-  // const flags = await readFlags(choices);
-  //
-  // readPrompt(choices, flags);
+  const choices = readConfig();
+  const flags = await readFlags(choices);
+
+  const selections = await readPrompt(choices, flags);
+  console.log(selections)
 }
+

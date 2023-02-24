@@ -23,8 +23,7 @@ function createQuestions(choices: string[], flags: Awaited<ReturnType<typeof rea
   ];
 }
 
-export function readPrompt(choices: string[], flags: Awaited<ReturnType<typeof readFlags>>) {
+export async function readPrompt(choices: string[], flags: Awaited<ReturnType<typeof readFlags>>) {
   const questions = createQuestions(choices, flags);
-  const abc = inquirer.prompt(questions);
-  console.log({ abc });
+  return inquirer.prompt(questions);
 }
