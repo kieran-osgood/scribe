@@ -2,15 +2,19 @@
   "name": "scribe",
   "version": "1.0.0",
   "description": "",
-  "main": "src/program.ts",
+  "type": "module",
   "scripts": {
-    "start": "ts-node src/program.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "configs/jest --config configs/jest/jest.config.ts",
+    "start": "npm run start:dev",
+    "start:dev": "ts-node-esm -T src/program.ts",
+    "start:dev:template": "ts-node-esm -T src/program.ts --template screen",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@total-typescript/ts-reset": "^0.3.7",
     "chalk": "^5.2.0",
     "commander": "^10.0.0",
     "ejs": "^3.1.8",
