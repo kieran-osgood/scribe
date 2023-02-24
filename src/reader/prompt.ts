@@ -1,6 +1,6 @@
 import inquirer from "inquirer";
-import { Flags } from "./arguments.js";
 import { z } from "zod";
+import { Flags } from "./arguments.js";
 
 function createQuestions(choices: string[], flags: Flags) {
   return [

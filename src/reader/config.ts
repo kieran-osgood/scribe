@@ -1,3 +1,3 @@
-export async function readConfig(): Promise<string[]> {
+export async function readUserConfig(): Promise<string[]> {
   return ["abc", "123"];
 }
