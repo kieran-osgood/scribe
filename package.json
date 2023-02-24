@@ -2,8 +2,9 @@
   "name": "scribe",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/program.ts",
   "scripts": {
+    "start": "ts-node src/program.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -27,6 +28,7 @@
     "@types/node": "^18.14.0",
     "@types/shelljs": "^0.8.11",
     "@types/yargs": "^17.0.22",
+    "jest": "^29.4.3",
     "shx": "^0.3.4",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.5"
