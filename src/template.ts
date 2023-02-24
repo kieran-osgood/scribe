@@ -24,29 +24,46 @@ type Config = {
      * Sets the root for pathing on relative paths
      */
     rootOutDir: string
+
+    templatesDirectories: string[]
   },
   // List of templates for the CLI to render
-  templates: Record<string, TemplateSettings>
+  templateOptions: Record<string, TemplateSettings>
 }
 
 const config: Config = {
-  global: { rootOutDir: '' },
-  templates: {
-    view: {
-      output: {
-        directory: 'src/screens'
-      },
+  global: {
+    rootOutDir: '.',
+    templatesDirectories: ['./templates']
+  },
+  templateOptions: {
+    screen: {
+      output: { directory: './src/screens' },
       outputs: [
         {
-          template: 'templates/view.ejs',
+          template: 'view.ejs',
           output: { fileName: '$NAME$View' }
         },
         {
-          template: 'templates/view-model.ejs',
+          template: 'view-model.ejs',
           output: { fileName: 'use$NAME$ViewModel' }
+        },
+        {
+          template: 'styles.ejs',
+          output: { fileName: '$NAME$.styles.ts', directory: './styles' }
+        }
+      ]
+    },
+    hook: {
+      output: { directory: './src/hooks' },
+      outputs: [
+        {
+          template: 'hooks.ejs',
+          output: { fileName: 'use$NAME$' }
         }
       ]
     }
+
   }
 };
 
