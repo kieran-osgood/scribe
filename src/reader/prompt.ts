@@ -1,29 +1,37 @@
-import inquirer from 'inquirer';
-import { readFlags } from './arguments';
+import inquirer from "inquirer";
+import { Flags } from "./arguments.js";
+import { z } from "zod";
 
-function createQuestions(choices: string[], flags: Awaited<ReturnType<typeof readFlags>>) {
+function createQuestions(choices: string[], flags: Flags) {
   return [
     {
-      name: 'template',
-      type: 'list',
-      message: 'Pick your template',
+      name: "template",
+      type: "list",
+      message: "Pick your template",
       choices,
-      when: () => Boolean(flags.template) === false
-    }
-    // {
-    //   name: 'name',
-    //   type: 'input',
-    //   message: 'Project name:',
-    //   // when: () => !yargs.argv['name'],
-    //   validate: (input: string) => {
-    //     if (/^([A-Za-z\-\_\d])+$/.test(input)) return true;
-    //     else return 'Project name may only include letters, numbers, underscores and hashes.';
-    //   }
-    // }
+      when: () => Boolean(flags.template) === false,
+    },
+    {
+      name: "name",
+      type: "input",
+      message: "Project name:",
+      when: () => Boolean(flags.name) === false,
+      validate: (s: string) => {
+        if (/^([A-Za-z\-\_\d])+$/.test(s)) return true;
+        else
+          return "Project name may only include letters, numbers, underscores and hashes.";
+      },
+    },
   ];
 }
 
-export async function readPrompt(choices: string[], flags: Awaited<ReturnType<typeof readFlags>>) {
+const promptSchema = z.object({
+  template: z.string(),
+  name: z.string(),
+});
+
+export async function readPrompt(choices: string[], flags: Flags) {
   const questions = createQuestions(choices, flags);
-  return inquirer.prompt(questions);
+  const answers = await inquirer.prompt(questions);
+  return promptSchema.safeParse(answers);
 }

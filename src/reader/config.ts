@@ -1,4 +1,3 @@
-export function readConfig(): string[] {
-
-  return ['abc', '123'];
+export async function readConfig(): Promise<string[]> {
+  return ["abc", "123"];
 }

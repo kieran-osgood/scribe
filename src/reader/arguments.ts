@@ -6,6 +6,8 @@ const yargInstance = yargs(processArgs);
 
 export async function readFlags(choices: string[]) {
   return yargInstance.options({
-    template: { type: 'string', choices, alias: 't' }
+    template: { type: 'string', choices, alias: 't' },
+    name: { type: 'string', alias: 'n' }
   }).argv;
 }
+export type Flags = Awaited<ReturnType<typeof readFlags>>
