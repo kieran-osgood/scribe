@@ -1,14 +1,9 @@
-import { readUserTemplateOptions } from "./reader/config.js";
-import { readFlags } from "./reader/arguments.js";
-import { readPrompt } from "./reader/prompt.js";
-
 import { pipe } from "fp-ts/lib/function.js";
 import * as TE from "fp-ts/lib/TaskEither.js";
 
-function exit(err: unknown) {
-  console.log(err);
-  return process.exit(1);
-}
+import { readUserTemplateOptions } from "./reader/config.js";
+import { readFlags } from "./reader/arguments.js";
+import { readPrompt } from "./reader/prompt.js";
 
 export async function run() {
   const RunProgramInit = pipe(
@@ -27,4 +22,9 @@ export async function run() {
   //   selections.data.template,
   //   selections.data.name
   // );
+}
+
+function exit(err: unknown) {
+  console.log(err);
+  return process.exit(1);
 }

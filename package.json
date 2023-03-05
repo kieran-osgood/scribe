@@ -6,7 +6,7 @@
   "scripts": {
     "test": "configs/jest --config configs/jest/jest.config.ts",
     "start": "npm run start:dev",
-    "start:dev": "ts-node-esm index.ts",
+    "start:dev": "ts-node --esm index.ts",
     "start:dev:template": "ts-node-esm index.ts --template screen",
     "start:dev:name": "ts-node-esm index.ts --name LoginScreen",
     "start:dev:template:name": "ts-node-esm index.ts --template screen --name LoginScreen"
