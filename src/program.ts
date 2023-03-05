@@ -10,7 +10,7 @@ export async function run() {
     TE.Do,
     TE.bindW("choices", getUserTemplateOptions),
     TE.bindW("flags", ({ choices }) => readFlags(choices)),
-    TE.bindW("selections", (opts) => TE.of(readPrompt(opts)))
+    TE.bindW("selections", (opts) => readPrompt(opts))
   );
 
   const result = await program();
