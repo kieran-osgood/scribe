@@ -30,7 +30,7 @@ function parseYargs(choices: string[]) {
     .parseSync();
 }
 
-export function readFlags(choices: string[]) {
+export function readFlags({ choices }: { choices: string[] }) {
   return TE.tryCatch(
     async () => parseYargs(choices),
     (e) => e

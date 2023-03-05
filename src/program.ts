@@ -4,18 +4,26 @@ import { readPrompt } from "./reader/prompt.js";
 
 import { pipe } from "fp-ts/lib/function.js";
 import * as TE from "fp-ts/lib/TaskEither.js";
+import * as E from "fp-ts/lib/Either.js";
+
+function exit(err: unknown) {
+  console.log(err);
+  return process.exit(1);
+}
 
 export async function run() {
-  const program = pipe(
+  const runProgram = pipe(
     TE.Do,
     TE.bindW("choices", getUserTemplateOptions),
-    TE.bindW("flags", ({ choices }) => readFlags(choices)),
-    TE.bindW("selections", (opts) => readPrompt(opts))
+    TE.bindW("flags", readFlags),
+    TE.bindW("selections", readPrompt)
   );
 
-  const result = await program();
-  console.log(result);
-
+  const result = await runProgram();
+  pipe(
+    result,
+    E.fold(exit, (args) => console.log(args))
+  );
   // // Write files based on selections.template option
   // const fileName = fileNameFormatter(
   //   selections.data.template,
