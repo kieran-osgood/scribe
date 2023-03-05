@@ -1,4 +1,4 @@
-#!/usr/bin/env npx ts-node --esm
+#!/usr/bin/env ts-node
 
 import { run } from "./src/program.js";
 

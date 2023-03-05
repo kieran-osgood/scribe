@@ -1,20 +1,24 @@
-import { readUserConfig } from "./reader/config.js";
+import { getUserTemplateOptions } from "./reader/config.js";
 import { readFlags } from "./reader/arguments.js";
 import { readPrompt } from "./reader/prompt.js";
-import { fileNameFormatter } from "./writer/string.js";
+
+import { pipe } from "fp-ts/lib/function.js";
+import * as TE from "fp-ts/lib/TaskEither.js";
 
 export async function run() {
-  const choices = await readUserConfig();
-  const flags = await readFlags(choices);
-  const selections = await readPrompt(choices, flags);
-
-  if (selections.success === false) {
-    throw new Error("Failed!");
-  }
-  // Write files based on selections.template option
-  const fileName = fileNameFormatter(
-    selections.data.template,
-    selections.data.name
+  const program = pipe(
+    TE.Do,
+    TE.bindW("choices", getUserTemplateOptions),
+    TE.bindW("flags", ({ choices }) => readFlags(choices)),
+    TE.bindW("selections", (opts) => TE.of(readPrompt(opts)))
   );
-  console.log(fileName);
+
+  const result = await program();
+  console.log(result);
+
+  // // Write files based on selections.template option
+  // const fileName = fileNameFormatter(
+  //   selections.data.template,
+  //   selections.data.name
+  // );
 }

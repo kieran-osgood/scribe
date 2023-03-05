@@ -1,8 +1,15 @@
 import inquirer from "inquirer";
 import { z } from "zod";
 import { Flags } from "./arguments.js";
+import { pipe } from "fp-ts/lib/function.js";
 
-function createQuestions(choices: string[], flags: Flags) {
+function createQuestions({
+  choices,
+  flags,
+}: {
+  choices: string[];
+  flags: Flags;
+}) {
   return [
     {
       name: "template",
@@ -30,8 +37,11 @@ const promptSchema = z.object({
   name: z.string(),
 });
 
-export async function readPrompt(choices: string[], flags: Flags) {
-  const questions = createQuestions(choices, flags);
-  const answers = await inquirer.prompt(questions);
-  return promptSchema.safeParse(answers);
+export function readPrompt(opts: { choices: string[]; flags: Flags }) {
+  return pipe(
+    opts, //
+    createQuestions,
+    inquirer.prompt,
+    promptSchema.safeParse
+  );
 }
