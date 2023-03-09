@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
+  "main": "index.ts",
   "scripts": {
     "test": "configs/jest --config configs/jest/jest.config.ts",
     "start": "npm run start:dev",
     "start:dev": "ts-node --esm index.ts",
     "start:dev:template": "ts-node-esm index.ts --template screen",
     "start:dev:name": "ts-node-esm index.ts --name LoginScreen",
-    "start:dev:template:name": "ts-node-esm index.ts --template screen --name LoginScreen"
+    "start:dev:template:name": "ts-node-esm index.ts --template screen --name LoginScreen",
+    "postinstall": "patch-package"
   },
   "keywords": [],
   "author": "Kieran Osgood",
@@ -20,11 +22,13 @@
     "commander": "^10.0.0",
     "ejs": "^3.1.8",
     "fp-ts": "^2.13.1",
+    "fp-ts-std": "^0.15.1",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.1.0",
     "inquirer": "^9.1.4",
     "io-ts": "^2.2.20",
     "load-json-file": "^7.0.1",
+    "postinstall-postinstall": "^2.1.0",
     "shelljs": "^0.8.5",
     "yargs": "^17.7.1",
     "zod": "^3.20.6"
@@ -40,6 +44,7 @@
     "eslint": "^8.34.0",
     "jest": "^29.4.3",
     "nodemon": "^2.0.20",
+    "patch-package": "^6.5.1",
     "prettier": "^2.8.4",
     "shx": "^0.3.4",
     "ts-node": "^10.9.1",
