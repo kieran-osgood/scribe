@@ -1,6 +1,6 @@
 import inquirer, { QuestionCollection } from "inquirer";
 import { z } from "zod";
-import { Flags } from "./arguments.js";
+import { Flags } from "./arguments";
 import { pipe } from "fp-ts/lib/function.js";
 import * as TE from "fp-ts/lib/TaskEither.js";
 import * as E from "fp-ts/lib/Either.js";
@@ -46,7 +46,7 @@ function parsePrompt(res: unknown): TE.TaskEither<Error, Prompt> {
   return TE.tryCatch(
     async () => promptSchema.parse(res),
     (error) =>
-      new Error(`Parsing prompt failed: ${formatErrorMessage(error)}}`, {
+      new Error(`Parsing prompt failed: ${formatErrorMessage(error)}`, {
         cause: error,
       })
   );
