@@ -1,5 +1,11 @@
 # @ko/scribe
 
+## 0.0.3
+
+### Patch Changes
+
+- 2031d1a: Testing a patch release
+
 ## 0.0.2
 
 ### Patch Changes
