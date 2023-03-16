@@ -1,10 +1,10 @@
 import inquirer, { QuestionCollection } from "inquirer";
 import { z } from "zod";
-import { Flags } from "./arguments";
 import { pipe } from "fp-ts/lib/function.js";
 import * as TE from "fp-ts/lib/TaskEither.js";
 import * as E from "fp-ts/lib/Either.js";
 import { formatErrorMessage } from "../error/index.js";
+import { Flags } from "./arguments.js";
 
 type CreateQuestionsOptions = {
   templates: string[];
@@ -27,7 +27,7 @@ function createQuestions(options: CreateQuestionsOptions): QuestionCollection {
       message: "File name:",
       when: () => Boolean(flags.name) === false,
       validate: (s: string) => {
-        if (/^([A-Za-z\-\_\d])+$/.test(s)) return true;
+        if (/^([A-Za-z\-_\d])+$/.test(s)) return true;
         return "File name may only include letters, numbers & underscores.";
       },
     },
