@@ -19,7 +19,8 @@
     "postinstall": "patch-package",
     "lint": "tsc",
     "build": "tsup index.ts --dts --format cjs,esm",
-    "ci": "pnpm run lint && pnpm run test && pnpm run build && changeset publish"
+    "ci": "pnpm run lint && pnpm run test && pnpm run build",
+    "release": "pnpm run lint && pnpm run test && pnpm run build && changeset publish"
   },
   "keywords": [],
   "author": "Kieran Osgood",
