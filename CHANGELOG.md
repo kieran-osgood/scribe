@@ -1,4 +1,4 @@
-# kieran-osgood/scribe
+# @kieran-osgood/scribe
 
 ## 0.0.3
 
