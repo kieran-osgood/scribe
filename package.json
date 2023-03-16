@@ -1,7 +1,8 @@
 {
   "name": "scribe",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
+  "private": false,
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -35,7 +36,7 @@
     "fp-ts-std": "^0.15.1",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.1.0",
-    "inquirer": "8.0.1",
+    "inquirer": "8.0.0",
     "io-ts": "^2.2.20",
     "load-json-file": "^7.0.1",
     "postinstall-postinstall": "^2.1.0",
@@ -44,6 +45,7 @@
     "zod": "^3.20.6"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.26.0",
     "@tsconfig/node18": "^1.0.1",
     "@types/ejs": "^3.1.2",
     "@types/fs-extra": "^11.0.1",
@@ -51,6 +53,7 @@
     "@types/node": "^18.14.0",
     "@types/shelljs": "^0.8.11",
     "@types/yargs": "^17.0.22",
+    "changeset": "^0.2.6",
     "eslint": "^8.34.0",
     "nodemon": "^2.0.20",
     "patch-package": "^6.5.1",

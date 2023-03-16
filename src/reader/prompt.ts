@@ -5,6 +5,7 @@ import * as TE from "fp-ts/lib/TaskEither.js";
 import * as E from "fp-ts/lib/Either.js";
 import * as S from "fp-ts-std/Struct";
 import { formatErrorMessage } from "../error";
+// @ts-ignore
 import inquirer, { QuestionCollection } from "inquirer";
 
 type CreateQuestionsOptions = {

@@ -1,7 +1,6 @@
 import * as TE from "fp-ts/lib/TaskEither.js";
 import * as B from "fp-ts/lib/boolean.js";
 import { pipe } from "fp-ts/lib/function.js";
-import { formatErrorMessage } from "../error";
 import { cosmiconfig } from "cosmiconfig";
 import { TypeScriptLoader } from "cosmiconfig-typescript-loader";
 
@@ -11,9 +10,9 @@ const explorer = cosmiconfig("test", {
   },
 });
 
-function throwFormattedError(error: unknown) {
-  return new Error(formatErrorMessage(error));
-}
+// function throwFormattedError(error: unknown) {
+//   return new Error(formatErrorMessage(error));
+// }
 
 // const isEmptyPredicate = TE.fromPredicate(
 //   (isEmpty: undefined | boolean) => isEmpty === false || isEmpty === undefined,
