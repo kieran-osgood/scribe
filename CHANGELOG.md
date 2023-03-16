@@ -1,5 +1,11 @@
 # @kieran-osgood/scribe
 
+## 0.0.4
+
+### Patch Changes
+
+- 29e48e5: Another test release
+
 ## 0.0.3
 
 ### Patch Changes
