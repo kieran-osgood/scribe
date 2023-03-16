@@ -1,3 +1,7 @@
-import * as program from './src/program';
+#!/bin/env node
 
-await program.run();
+import { run } from "./src/program.js";
+
+(async () => {
+  await run();
+})();
