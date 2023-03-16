@@ -1,10 +1,11 @@
-import inquirer, { QuestionCollection } from "inquirer";
 import { z } from "zod";
+import { Flags } from "./arguments.js";
 import { pipe } from "fp-ts/lib/function.js";
 import * as TE from "fp-ts/lib/TaskEither.js";
 import * as E from "fp-ts/lib/Either.js";
-import { formatErrorMessage } from "../error/index.js";
-import { Flags } from "./arguments.js";
+import * as S from "fp-ts-std/Struct";
+import { formatErrorMessage } from "../error";
+import inquirer, { QuestionCollection } from "inquirer";
 
 type CreateQuestionsOptions = {
   templates: string[];
@@ -13,6 +14,7 @@ type CreateQuestionsOptions = {
 
 function createQuestions(options: CreateQuestionsOptions): QuestionCollection {
   const { templates, flags } = options;
+
   return [
     {
       name: "template",
@@ -58,6 +60,7 @@ export function readPrompt(opts: { templates: string[]; flags: Flags }) {
       () => inquirer.prompt(createQuestions(opts)), //
       E.toError
     ),
+    TE.map(S.merge(opts.flags)),
     TE.chainW(parsePrompt)
   );
 }

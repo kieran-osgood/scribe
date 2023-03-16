@@ -2,27 +2,25 @@ import { flow, pipe } from "fp-ts/lib/function.js";
 import * as TE from "fp-ts/lib/TaskEither.js";
 import * as O from "fp-ts/lib/Option.js";
 import * as IO from "fp-ts/lib/IO.js";
-
-import { readUserTemplateOptions } from "./reader/config.js";
-import { readFlags } from "./reader/arguments.js";
-import { readPrompt } from "./reader/prompt.js";
+import * as C from "fp-ts/lib/Console.js";
+import { readConfigFlag, readFlags } from "./reader/arguments.js";
+import { readUserConfig, readUserTemplateOptions } from "./reader/config.js";
+import { readPrompt } from "./reader/prompt";
 import { curry2 } from "fp-ts-std/Function";
 
 export async function run() {
   const RunProgramInit = pipe(
     TE.Do,
+    TE.bindW("configPath", readConfigFlag),
+    TE.bindW("config", ({ configPath }) => readUserConfig(configPath)),
     TE.bindW("templates", readUserTemplateOptions),
     TE.bindW("flags", readFlags),
     TE.bindW("input", readPrompt),
-    TE.fold(
-      curry2(exit)("error"), //
-      TE.right
-    )
-    // TE.map(console.log)
+    TE.getOrElse(curry2(exit)("error"))
   );
 
-  await RunProgramInit();
-
+  const a = await RunProgramInit();
+  console.log(a);
   // // Write files based on selections.template option
   // const fileName = fileNameFormatter(
   //   selections.data.template,
@@ -43,9 +41,8 @@ function exit(exitStatusKey: ExitStatusKey, error?: unknown): IO.IO<never> {
     IO.map(
       flow(
         O.fold(
-          // Error missing
-          () => {},
-          console.error
+          C.error("An unknown error occurred"), //
+          (e) => C.error(e)()
         ),
         () => process.exit(ExitStatus[exitStatusKey])
       )

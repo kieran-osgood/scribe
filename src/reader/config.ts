@@ -1,33 +1,57 @@
 import * as TE from "fp-ts/lib/TaskEither.js";
-import * as fs from "fs-extra";
+import * as B from "fp-ts/lib/boolean.js";
 import { pipe } from "fp-ts/lib/function.js";
-import { formatErrorMessage } from "../error/index.js";
+import { formatErrorMessage } from "../error";
+import { cosmiconfig } from "cosmiconfig";
+import { TypeScriptLoader } from "cosmiconfig-typescript-loader";
 
-// https://github.com/gcanti/fp-ts/discussions/1426
+const explorer = cosmiconfig("test", {
+  loaders: {
+    ".ts": TypeScriptLoader(),
+  },
+});
 
-const readConfigPromise = async (filePath: string): Promise<string> =>
-  fs.readFile(filePath).then((buffer) => buffer.toString());
+function throwFormattedError(error: unknown) {
+  return new Error(formatErrorMessage(error));
+}
 
-const readConfigTask = TE.tryCatchK(
-  readConfigPromise,
-  (error) => new Error(formatErrorMessage(error))
-);
+// const isEmptyPredicate = TE.fromPredicate(
+//   (isEmpty: undefined | boolean) => isEmpty === false || isEmpty === undefined,
+//   () => "invalid config"
+// );
+
+const readConfigTask = (
+  path: string
+): TE.TaskEither<ReadUserConfigError, ReadUserConfigValue> =>
+  pipe(
+    TE.tryCatch(
+      () => explorer.load(path),
+      (err) => `[read config failed] ${err}` as const
+    ),
+    TE.chainW((result) =>
+      pipe(
+        Boolean(result?.isEmpty),
+        B.match(
+          () => TE.right(result?.config as ReadUserConfigValue),
+          () => TE.left("Empty Config" as const)
+        )
+      )
+    )
+  );
 
 type ReadUserConfigValue = {
   templateOptions: Record<string, unknown>;
 };
-type ReadUserConfigError = "invalid config";
-type ReadUserConfig = () => TE.TaskEither<
-  ReadUserConfigError,
-  ReadUserConfigValue
->;
-export const readUserConfig: ReadUserConfig = () => {
-  return TE.of<ReadUserConfigError, ReadUserConfigValue>({
-    templateOptions: {
-      screen: {},
-      hook: {},
-    },
-  });
+type ReadUserConfigError =
+  | `[read config failed] ${string}`
+  | "invalid config"
+  | "Empty Config"
+  | "No template options found";
+type ReadUserConfig = (
+  path: string
+) => TE.TaskEither<ReadUserConfigError, ReadUserConfigValue>;
+export const readUserConfig: ReadUserConfig = (path: string) => {
+  return readConfigTask(path);
 };
 
 /**
@@ -35,16 +59,22 @@ export const readUserConfig: ReadUserConfig = () => {
  * which are valid options
  */
 type UserTemplateOptionsValue = string[];
-type UserTemplateOptionsError = "invalid config";
-type GetUserTemplateOptions = () => TE.TaskEither<
-  UserTemplateOptionsError,
-  UserTemplateOptionsValue
->;
-export const readUserTemplateOptions: GetUserTemplateOptions = () =>
+type UserTemplateOptionsError = ReadUserConfigError;
+
+type GetUserTemplateOptions = (opts: {
+  configPath: string;
+}) => TE.TaskEither<UserTemplateOptionsError, UserTemplateOptionsValue>;
+export const readUserTemplateOptions: GetUserTemplateOptions = (opts) =>
   pipe(
-    readUserConfig(), //
-    TE.map(getTemplateKeys)
+    opts.configPath, //
+    readUserConfig,
+    TE.map(getTemplateKeys),
+    TE.chain((keys) =>
+      keys.length > 0
+        ? TE.right(keys)
+        : TE.left("No template options found" as const)
+    )
   );
 
-const getTemplateKeys = (config: ReadUserConfigValue) =>
+const getTemplateKeys = (config: ReadUserConfigValue): string[] =>
   Object.keys(config.templateOptions);

@@ -1,5 +1,7 @@
-#!/usr/bin/env ts-node
+#!/bin/env node
 
 import { run } from "./src/program.js";
 
-await run();
+(async () => {
+  await run();
+})();
