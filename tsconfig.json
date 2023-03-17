@@ -13,12 +13,18 @@
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
     "outDir": "dist",
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "esModuleInterop": true, // Eases ESM support
-    "types": ["node"],
+    "esModuleInterop": true,
+    // Eases ESM support
+    "types": [
+      "node",
+      "vitest/globals"
+    ],
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true
   },
