@@ -6,7 +6,6 @@ import * as C from "fp-ts/lib/Console.js";
 import { readConfigFlag, readFlags } from "./reader/arguments.js";
 import { readUserConfig, readUserTemplateOptions } from "./reader/config.js";
 import { readPrompt } from "./reader/prompt";
-import { curry2 } from "fp-ts-std/Function";
 
 export async function run() {
   const RunProgramInit = pipe(
@@ -16,7 +15,7 @@ export async function run() {
     TE.bindW("templates", readUserTemplateOptions),
     TE.bindW("flags", readFlags),
     TE.bindW("input", readPrompt),
-    TE.getOrElse(curry2(exit)("error"))
+    TE.getOrElse(exit("error"))
   );
 
   const a = await RunProgramInit();
@@ -34,18 +33,23 @@ const ExitStatus = {
 } as const;
 type ExitStatusKey = keyof typeof ExitStatus;
 
-function exit(exitStatusKey: ExitStatusKey, error?: unknown): IO.IO<never> {
-  return pipe(
-    O.fromNullable(error), //
-    IO.of,
-    IO.map(
-      flow(
-        O.fold(
-          C.error("An unknown error occurred"), //
-          (e) => C.error(e)()
-        ),
-        () => process.exit(ExitStatus[exitStatusKey])
+const exit =
+  (exitStatusKey: ExitStatusKey) =>
+  (error?: unknown): IO.IO<never> =>
+    pipe(
+      O.fromNullable(error),
+      IO.of,
+      IO.map(
+        flow(
+          exitLogToConsole, //
+          () => process.exit(ExitStatus[exitStatusKey])
+        )
       )
-    )
-  );
-}
+    );
+
+// prettier-ignore
+const CError = (prefix = '') => (error: unknown = '') => {
+  return C.error(prefix + error)();
+};
+
+const exitLogToConsole = O.fold(CError("An unknown error occurred"), CError());
