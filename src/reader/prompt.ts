@@ -1,9 +1,6 @@
 import { z } from "zod";
+import { E, pipe, S, TE } from "../common/fp";
 import { Flags } from "./arguments.js";
-import { pipe } from "fp-ts/lib/function.js";
-import * as TE from "fp-ts/lib/TaskEither.js";
-import * as E from "fp-ts/lib/Either.js";
-import * as S from "fp-ts-std/Struct";
 import { formatErrorMessage } from "../error";
 // @ts-expect-error
 import inquirer, { QuestionCollection } from "inquirer";

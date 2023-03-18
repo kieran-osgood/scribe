@@ -1,8 +1,6 @@
-import * as TE from "fp-ts/lib/TaskEither.js";
-import * as B from "fp-ts/lib/boolean.js";
-import { pipe } from "fp-ts/lib/function.js";
 import { cosmiconfig } from "cosmiconfig";
 import { TypeScriptLoader } from "cosmiconfig-typescript-loader";
+import { B, pipe, TE } from "../common/fp";
 
 const explorer = cosmiconfig("test", {
   loaders: {

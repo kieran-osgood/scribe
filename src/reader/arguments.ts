@@ -1,8 +1,7 @@
 import yargs, { Options } from "yargs";
 import { hideBin } from "yargs/helpers";
-import * as TE from "fp-ts/lib/TaskEither.js";
-import { pipe } from "fp-ts/lib/function.js";
-import * as E from "fp-ts/lib/Either.js";
+
+import { E, pipe, TE } from "../common/fp";
 
 const processArgs = hideBin(process.argv);
 const yargInstance = yargs(processArgs);

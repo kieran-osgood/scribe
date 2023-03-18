@@ -1,11 +1,7 @@
-import { flow, pipe } from "fp-ts/lib/function.js";
-import * as TE from "fp-ts/lib/TaskEither.js";
-import * as O from "fp-ts/lib/Option.js";
-import * as IO from "fp-ts/lib/IO.js";
-import * as C from "fp-ts/lib/Console.js";
 import { readConfigFlag, readFlags } from "./reader/arguments.js";
 import { readUserConfig, readUserTemplateOptions } from "./reader/config.js";
 import { readPrompt } from "./reader/prompt";
+import { C, flow, IO, O, pipe, TE } from "./common/fp";
 
 export async function run() {
   const RunProgramInit = pipe(

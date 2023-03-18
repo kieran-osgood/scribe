@@ -1,5 +1,5 @@
 import { formatErrorMessage } from "./error";
-import { pipe } from "fp-ts/lib/function.js";
+import { pipe } from "../common/fp";
 import { ZodError } from "zod";
 import { describe } from "vitest";
 
