@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { E, pipe, S, TE } from "../common/fp";
+import { identity, pipe, SStd, TE } from "../common/fp";
 import { Flags } from "./arguments.js";
 import { formatErrorMessage } from "../error";
 // @ts-expect-error
@@ -56,9 +56,9 @@ export function readPrompt(opts: { templates: string[]; flags: Flags }) {
   return pipe(
     TE.tryCatch(
       () => inquirer.prompt(createQuestions(opts)), //
-      E.toError
+      identity
     ),
-    TE.map(S.merge(opts.flags)),
+    TE.map(SStd.merge(opts.flags)),
     TE.chainW(parsePrompt)
   );
 }

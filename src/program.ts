@@ -48,4 +48,4 @@ const CError = (prefix = '') => (error: unknown = '') => {
   return C.error(prefix + error)();
 };
 
-const exitLogToConsole = O.fold(CError("An unknown error occurred"), CError());
+const exitLogToConsole = O.match(CError("An unknown error occurred"), CError());

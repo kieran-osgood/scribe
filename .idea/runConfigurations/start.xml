@@ -5,7 +5,8 @@
     <scripts>
       <script value="start" />
     </scripts>
-    <node-interpreter value="project" />
+    <node-interpreter value="node" />
+    <package-manager value="pnpm" />
     <envs />
     <method v="2" />
   </configuration>

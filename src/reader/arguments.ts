@@ -1,7 +1,7 @@
 import yargs, { Options } from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import { E, pipe, TE } from "../common/fp";
+import { identity, pipe, TE } from "../common/fp";
 
 const processArgs = hideBin(process.argv);
 const yargInstance = yargs(processArgs);
@@ -34,7 +34,7 @@ function parseYargs(choices: string[]) {
 }
 
 export function readFlags({ templates }: { templates: string[] }) {
-  return TE.tryCatch(async () => parseYargs(templates), E.toError);
+  return TE.tryCatch(async () => parseYargs(templates), identity);
 }
 
 function parseConfig() {
@@ -44,7 +44,7 @@ function parseConfig() {
 export function readConfigFlag() {
   return TE.tryCatch(
     async () => pipe(parseConfig(), (s) => s as string),
-    E.toError
+    identity
   );
 }
 
