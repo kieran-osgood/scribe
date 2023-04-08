@@ -1,9 +1,9 @@
-import { z } from "zod";
-import { identity, pipe, SStd, TE } from "../common/fp";
-import { Flags } from "./arguments.js";
-import { formatErrorMessage } from "../error";
-// @ts-expect-error
-import inquirer, { QuestionCollection } from "inquirer";
+import { z } from 'zod';
+import { identity, pipe, SStd } from '../common/fp';
+import { Flags } from './arguments.js';
+import { formatErrorMessage } from '../error';
+import inquirer, { QuestionCollection } from 'inquirer';
+import * as Effect from '@effect/io/Effect';
 
 type CreateQuestionsOptions = {
   templates: string[];
@@ -15,20 +15,20 @@ function createQuestions(options: CreateQuestionsOptions): QuestionCollection {
 
   return [
     {
-      name: "template",
-      type: "list",
-      message: "Pick your template",
+      name: 'template',
+      type: 'list',
+      message: 'Pick your template',
       choices: templates,
       when: () => Boolean(flags.template) === false,
     },
     {
-      name: "name",
-      type: "input",
-      message: "File name:",
+      name: 'name',
+      type: 'input',
+      message: 'File name:',
       when: () => Boolean(flags.name) === false,
       validate: (s: string) => {
         if (/^([A-Za-z\-_\d])+$/.test(s)) return true;
-        return "File name may only include letters, numbers & underscores.";
+        return 'File name may only include letters, numbers & underscores.';
       },
     },
   ];
@@ -39,13 +39,13 @@ const promptSchema = z
     template: z.string(),
     name: z.string(),
   })
-  .brand<"Prompt">();
+  .brand<'Prompt'>();
 type Prompt = z.infer<typeof promptSchema>;
 
-function parsePrompt(res: unknown): TE.TaskEither<Error, Prompt> {
-  return TE.tryCatch(
+function parsePrompt(res: unknown): Effect.Effect<never, Error, Prompt> {
+  return Effect.tryCatchPromise(
     async () => promptSchema.parse(res),
-    (error) =>
+    error =>
       new Error(`Parsing prompt failed: ${formatErrorMessage(error)}`, {
         cause: error,
       })
@@ -54,11 +54,11 @@ function parsePrompt(res: unknown): TE.TaskEither<Error, Prompt> {
 
 export function readPrompt(opts: { templates: string[]; flags: Flags }) {
   return pipe(
-    TE.tryCatch(
+    Effect.tryCatchPromise(
       () => inquirer.prompt(createQuestions(opts)), //
       identity
     ),
-    TE.map(SStd.merge(opts.flags)),
-    TE.chainW(parsePrompt)
+    Effect.map(SStd.merge(opts.flags)),
+    Effect.flatMap(parsePrompt)
   );
 }

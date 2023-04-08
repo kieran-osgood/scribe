@@ -34,16 +34,15 @@
     "release": "pnpm run lint && pnpm run test && pnpm run build && changeset publish"
   },
   "dependencies": {
-    "@effect/core": "^0.0.16",
-    "@effect/data": "^0.5.0",
-    "@effect/io": "^0.10.0",
-    "@effect/schema": "^0.2.1",
+    "@effect/data": "^0.11.5",
+    "@effect/io": "^0.19.2",
+    "@effect/match": "^0.12.1",
+    "@effect/schema": "^0.11.1",
     "case-anything": "^2.1.10",
     "chalk": "^5.2.0",
     "commander": "^10.0.0",
     "cosmiconfig": "^8.1.0",
     "cosmiconfig-typescript-loader": "^4.3.0",
-    "effect": "2.0.0-next.13",
     "ejs": "^3.1.8",
     "fast-check": "^3.8.0",
     "fp-ts": "^2.13.1",
@@ -74,6 +73,7 @@
     "patch-package": "^6.5.1",
     "prettier": "^2.8.4",
     "shx": "^0.3.4",
+    "ts-node": "^10.9.1",
     "tsup": "^6.6.3",
     "typescript": "^4.9.5",
     "vitest": "0.25.0"

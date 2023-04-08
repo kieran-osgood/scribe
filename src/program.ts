@@ -1,21 +1,24 @@
-import { readConfigFlag, readFlags } from "./reader/arguments.js";
-import { readUserConfig, readUserTemplateOptions } from "./reader/config.js";
-import { readPrompt } from "./reader/prompt";
-import { C, flow, IO, O, pipe, TE } from "./common/fp";
+import { readConfigFlag, readFlags } from './reader/arguments.js';
+import { C, flow, IO, O, pipe } from './common/fp';
+import * as Effect from '@effect/io/Effect';
+import { readConfig, readUserTemplateOptions } from './reader/config';
+import { readPrompt } from './reader/prompt';
+
+const program = Effect.gen(function* ($) {
+  const configPath = yield* $(readConfigFlag());
+  const config = yield* $(readConfig(configPath));
+  const templates = yield* $(readUserTemplateOptions(configPath));
+  const flags = yield* $(readFlags(templates));
+  const input = yield* $(readPrompt({ templates, flags }));
+
+  return { configPath, config, templates, input, flags };
+});
 
 export async function run() {
-  const RunProgramInit = pipe(
-    TE.Do,
-    TE.bindW("configPath", readConfigFlag),
-    TE.bindW("config", ({ configPath }) => readUserConfig(configPath)),
-    TE.bindW("templates", readUserTemplateOptions),
-    TE.bindW("flags", readFlags),
-    TE.bindW("input", readPrompt),
-    TE.getOrElse(exit("error"))
-  );
+  Effect.runPromise(program).then(abc => {
+    console.log('123', abc);
+  });
 
-  const a = await RunProgramInit();
-  console.log(a);
   // // Write files based on selections.template option
   // const fileName = fileNameFormatter(
   //   selections.data.template,
@@ -38,6 +41,7 @@ const exit =
       IO.map(
         flow(
           exitLogToConsole, //
+          // import * as Exit from "@effect/io/Exit";
           () => process.exit(ExitStatus[exitStatusKey])
         )
       )
@@ -48,4 +52,4 @@ const CError = (prefix = '') => (error: unknown = '') => {
   return C.error(prefix + error)();
 };
 
-const exitLogToConsole = O.match(CError("An unknown error occurred"), CError());
+const exitLogToConsole = O.match(CError('An unknown error occurred'), CError());

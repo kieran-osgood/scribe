@@ -1,13 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@tsconfig/node18/tsconfig.json",
-  "ts-node": {
-    "transpileOnly": true,
-    "moduleTypes": {
-      // Globs are also supported with the same behavior as tsconfig "include"
-      "fp-ts/**/*": "cjs"
-    }
-  },
   "compilerOptions": {
     "strict": true,
     "strictNullChecks": true,
@@ -16,9 +9,13 @@
     "lib": [
       "ESNext"
     ],
+    "baseUrl": ".",
+    "paths": {
+      "@effect/data/Data": ["../../node_modules/@effect/data/Data"]
+    },
     "target": "ES2022",
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     // Eases ESM support
     "types": [
@@ -27,9 +24,5 @@
     ],
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true
-  },
-  "include": [
-    "./src/**/*",
-    "./index.ts"
-  ]
+  }
 }

@@ -1,11 +1,26 @@
-import { Config } from "./index.js";
+import { Config } from './index.js';
 
 const config: Config = {
   global: {
-    rootOutDir: ".",
-    templatesDirectories: ["."],
+    rootOutDir: '.',
+    templatesDirectories: ['.'],
   },
-  templateOptions: {},
+  templateOptions: {
+    screen: {
+      output: {
+        directory: '',
+      },
+      outputs: [
+        {
+          template: 'screen',
+          output: {
+            directory: '',
+            fileName: '',
+          },
+        },
+      ],
+    },
+  },
 };
 
 export default config;

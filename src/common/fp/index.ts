@@ -1,8 +1,7 @@
 // effect
-export * from 'effect';
-export * from '@effect/core';
 export * as B from '@effect/data/Boolean';
 export * as E from '@effect/data/Either';
+export * from '@effect/data/Function';
 export * as O from '@effect/data/Option';
 //
 export * as Effect from '@effect/io/Effect';
