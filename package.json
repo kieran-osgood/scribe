@@ -45,6 +45,7 @@
     "cosmiconfig-typescript-loader": "^4.3.0",
     "effect": "2.0.0-next.13",
     "ejs": "^3.1.8",
+    "fast-check": "^3.8.0",
     "fp-ts": "^2.13.1",
     "fp-ts-std": "^0.15.1",
     "fs": "^0.0.1-security",
@@ -54,6 +55,7 @@
     "load-json-file": "^7.0.1",
     "postinstall-postinstall": "^2.1.0",
     "shelljs": "^0.8.5",
+    "vite-node": "^0.29.8",
     "yargs": "^17.7.1",
     "zod": "^3.20.6"
   },
@@ -74,6 +76,6 @@
     "shx": "^0.3.4",
     "tsup": "^6.6.3",
     "typescript": "^4.9.5",
-    "vitest": "^0.29.3"
+    "vitest": "0.25.0"
   }
 }
