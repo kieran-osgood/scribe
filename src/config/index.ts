@@ -9,7 +9,7 @@ type Template = {
 };
 
 type TemplateSettings = {
-  output?: {
+  output: {
     directory?: string;
   };
   outputs: Template[];

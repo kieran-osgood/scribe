@@ -1,7 +1,8 @@
 import yargs, { Options } from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import { identity, pipe, TE } from "../common/fp";
+import { identity, TE } from "../common/fp";
+import { TaggedClass } from "@effect/data/Data";
 
 const processArgs = hideBin(process.argv);
 const yargInstance = yargs(processArgs);
@@ -37,15 +38,19 @@ export function readFlags({ templates }: { templates: string[] }) {
   return TE.tryCatch(async () => parseYargs(templates), identity);
 }
 
-function parseConfig() {
-  return yargInstance.options({ config }).parseSync().config;
+class YargError extends TaggedClass("YargError")<{
+  readonly error: Error;
+}> {}
+
+async function parseConfig() {
+  return yargInstance
+    .options({ config })
+    .parseAsync()
+    .then((args) => args.config as string);
 }
 
 export function readConfigFlag() {
-  return TE.tryCatch(
-    async () => pipe(parseConfig(), (s) => s as string),
-    identity
-  );
+  return TE.tryCatch(parseConfig, identity);
 }
 
 export type Flags = Awaited<ReturnType<typeof parseYargs>>;
