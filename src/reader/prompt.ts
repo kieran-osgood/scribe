@@ -1,9 +1,23 @@
 import { z } from 'zod';
-import { identity, pipe, SStd } from '../common/fp';
+import { pipe, SStd } from '../common/fp';
 import { Flags } from './arguments.js';
 import { formatErrorMessage } from '../error';
 import inquirer, { QuestionCollection } from 'inquirer';
 import * as Effect from '@effect/io/Effect';
+import { TaggedClass } from '@effect/data/Data';
+
+class PromptError extends TaggedClass('PromptError')<{
+  readonly error: string;
+  readonly cause?: unknown;
+}> {}
+
+const promptSchema = z
+  .object({
+    template: z.string(),
+    name: z.string(),
+  })
+  .brand<'Prompt'>();
+type Prompt = z.infer<typeof promptSchema>;
 
 type CreateQuestionsOptions = {
   templates: string[];
@@ -34,31 +48,28 @@ function createQuestions(options: CreateQuestionsOptions): QuestionCollection {
   ];
 }
 
-const promptSchema = z
-  .object({
-    template: z.string(),
-    name: z.string(),
-  })
-  .brand<'Prompt'>();
-type Prompt = z.infer<typeof promptSchema>;
-
-function parsePrompt(res: unknown): Effect.Effect<never, Error, Prompt> {
-  return Effect.tryCatchPromise(
-    async () => promptSchema.parse(res),
-    error =>
-      new Error(`Parsing prompt failed: ${formatErrorMessage(error)}`, {
-        cause: error,
-      })
+export function readPrompt(options: { templates: string[]; flags: Flags }) {
+  return pipe(
+    Effect.tryCatchPromise(
+      () => inquirer.prompt(createQuestions(options)),
+      error =>
+        new PromptError({
+          error: `Prompt failed: ${formatErrorMessage(error)}`,
+          cause: error,
+        })
+    ),
+    Effect.map(SStd.merge(options.flags)),
+    Effect.flatMap(parsePrompt)
   );
 }
 
-export function readPrompt(opts: { templates: string[]; flags: Flags }) {
-  return pipe(
-    Effect.tryCatchPromise(
-      () => inquirer.prompt(createQuestions(opts)), //
-      identity
-    ),
-    Effect.map(SStd.merge(opts.flags)),
-    Effect.flatMap(parsePrompt)
+function parsePrompt(response: unknown) {
+  return Effect.tryCatch(
+    () => promptSchema.parse(response),
+    error =>
+      new PromptError({
+        error: `Parsing prompt failed: ${formatErrorMessage(error)}`,
+        cause: error,
+      })
   );
 }

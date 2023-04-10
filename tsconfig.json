@@ -10,9 +10,6 @@
       "ESNext"
     ],
     "baseUrl": ".",
-    "paths": {
-      "@effect/data/Data": ["../../node_modules/@effect/data/Data"]
-    },
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "Node",
