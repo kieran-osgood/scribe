@@ -2,29 +2,46 @@ import { z } from 'zod';
 import { pipe, SStd } from '../common/fp';
 import { Flags } from './arguments.js';
 import { fmtError } from '../error';
-import inquirer, { QuestionCollection } from 'inquirer';
+import inquirer, { Answers, QuestionCollection } from 'inquirer';
 import * as Effect from '@effect/io/Effect';
 import { TaggedClass } from '@effect/data/Data';
+
+type LaunchPromptInterface = {
+  templates: string[];
+  flags: Flags;
+};
+
+export function launchPromptInterface(
+  options: LaunchPromptInterface
+): Effect.Effect<never, PromptError, Prompt> {
+  return pipe(
+    options,
+    makeQuestionCollection,
+    tryInquirerPrompt,
+    Effect.map(SStd.merge(options.flags)),
+    Effect.flatMap(tryParsePrompt)
+  );
+}
 
 class PromptError extends TaggedClass('PromptError')<{
   readonly error: string;
   readonly cause?: unknown;
 }> {}
 
-const promptSchema = z
-  .object({
-    template: z.string(),
-    name: z.string(),
-  })
+const prompt = z
+  .object({ template: z.string(), name: z.string() })
   .brand<'Prompt'>();
-type Prompt = z.infer<typeof promptSchema>;
+type Prompt = z.infer<typeof prompt>;
 
-type CreateQuestionsOptions = {
+// We should just be passing the full context?
+type MakeQuestionsOptions = {
   templates: string[];
   flags: Flags;
 };
 
-function createQuestions(options: CreateQuestionsOptions): QuestionCollection {
+function makeQuestionCollection(
+  options: MakeQuestionsOptions
+): QuestionCollection {
   const { templates, flags } = options;
 
   return [
@@ -48,28 +65,25 @@ function createQuestions(options: CreateQuestionsOptions): QuestionCollection {
   ];
 }
 
-export function readPrompt(options: { templates: string[]; flags: Flags }) {
-  return pipe(
-    Effect.tryCatchPromise(
-      () => inquirer.prompt(createQuestions(options)),
-      error =>
-        new PromptError({
-          error: `Prompt failed: ${fmtError(error)}`,
-          cause: error,
-        })
-    ),
-    Effect.map(SStd.merge(options.flags)),
-    Effect.flatMap(parsePrompt)
-  );
-}
-
-function parsePrompt(response: unknown) {
-  return Effect.tryCatch(
-    () => promptSchema.parse(response),
+const tryInquirerPrompt = (
+  questions: QuestionCollection,
+  initialAnswers?: Partial<Answers>
+) =>
+  Effect.tryCatchPromise(
+    () => inquirer.prompt(questions, initialAnswers),
     error =>
       new PromptError({
-        error: `Parsing prompt failed: ${fmtError(error)}`,
+        error: `Prompt failed: ${fmtError(error)}`,
         cause: error,
       })
   );
-}
+
+const tryParsePrompt = (response: unknown) =>
+  Effect.tryCatch(
+    () => prompt.parse(response),
+    _ =>
+      new PromptError({
+        error: `Parsing prompt failed: ${fmtError(_)}`,
+        cause: _,
+      })
+  );

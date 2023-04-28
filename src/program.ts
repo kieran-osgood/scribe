@@ -1,7 +1,7 @@
 import { readConfigFlag, readFlags } from './reader/arguments.js';
 import * as Effect from '@effect/io/Effect';
 import { readConfig, readUserTemplateOptions } from './reader/config';
-import { readPrompt } from './reader/prompt';
+import { launchPromptInterface } from './reader/prompt';
 import { Exit, pipe } from './common/fp';
 
 const ExitStatus = {
@@ -59,7 +59,7 @@ const program = Effect.gen(function* ($) {
   const config = yield* $(readConfig(configPath));
   const templates = yield* $(readUserTemplateOptions(configPath));
   const flags = yield* $(readFlags(templates));
-  const input = yield* $(readPrompt({ templates, flags }));
+  const input = yield* $(launchPromptInterface({ templates, flags }));
 
   return {
     config,
