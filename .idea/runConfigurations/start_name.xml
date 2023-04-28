@@ -6,6 +6,7 @@
       <script value="start:dev:name" />
     </scripts>
     <node-interpreter value="project" />
+    <package-manager value="$USER_HOME$/Library/Caches/fnm_multishells/74825_1682720456180/bin/npm" />
     <envs />
     <method v="2" />
   </configuration>
