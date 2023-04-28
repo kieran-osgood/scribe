@@ -4,43 +4,49 @@ import { readConfig, readUserTemplateOptions } from './reader/config';
 import { launchPromptInterface } from './reader/prompt';
 import { Exit, pipe } from './common/fp';
 
-const ExitStatus = {
-  success: 0,
-  error: 2,
-} as const;
-
+/**
+ * 1. Check if git, if git, check history is clean (Allow dangerously prompt)
+ *    https://www.npmjs.com/package/simple-git
+ * 2. ✅Get program inputs (flags, config, file paths)
+ * 3.
+ *    3.1. Check input files exist (ejs template)
+ *    3.2. Check output path clear
+ * 4. Format ejs template with variables
+ * 5. Write file
+ */
 export async function run() {
   return Effect.runPromiseExit(
     pipe(
-      program,
+      generateProgramInputs,
+      // tap?
       Effect.map(_ => {
-        console.log('abc: ', _);
-        return _;
+        console.log('[Parsed Program]: ', _);
       }),
-      Effect.map(_ => {
-        _.config.templateOptions;
-        _.input.template;
-        const createFilePath = Effect.succeed('');
 
-        // pipe(
-        //   createFilePath, //
-        //
-        //   Effect.flatMap(_ => FS.fileExists(_)),
-        //   //
-        //   Effect.provideSomeLayer(FS.LiveFS)
-        // );
-
-        /**
-         * 1. create template file path
-         * 1. check the template file exists
-         * 1.1 if so, parse it for syntax
-         * 1.2 if not, die
-         * 2. create the filename
-         * 3. create the file
-         * 4. write the file
-         * 5. exit
-         */
-      }),
+      // Effect.map(_ => {
+      //   _.config.templateOptions;
+      //   _.input.template;
+      //   const createFilePath = Effect.succeed('');
+      //
+      //   // pipe(
+      //   //   createFilePath, //
+      //   //
+      //   //   Effect.flatMap(_ => FS.fileExists(_)),
+      //   //   //
+      //   //   Effect.provideSomeLayer(FS.LiveFS)
+      //   // );
+      //
+      //   /**
+      //    * 1. create template file path
+      //    * 1. check the template file exists
+      //    * 1.1 if so, parse it for syntax
+      //    * 1.2 if not, die
+      //    * 2. create the filename
+      //    * 3. create the file
+      //    * 4. write the file
+      //    * 5. exit
+      //    */
+      // }),
       Effect.map(_ => {
         return 'Complete!';
       })
@@ -54,7 +60,7 @@ export async function run() {
   // );
 }
 
-const program = Effect.gen(function* ($) {
+const generateProgramInputs = Effect.gen(function* ($) {
   const configPath = yield* $(readConfigFlag());
   const config = yield* $(readConfig(configPath));
   const templates = yield* $(readUserTemplateOptions(configPath));
@@ -67,6 +73,11 @@ const program = Effect.gen(function* ($) {
     // flags
   };
 });
+
+const ExitStatus = {
+  success: 0,
+  error: 2,
+} as const;
 
 const logAndExit = Exit.mapBoth(
   _ => {

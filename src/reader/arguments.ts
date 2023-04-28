@@ -53,7 +53,7 @@ async function parseConfig() {
 export function readConfigFlag() {
   return Effect.tryCatchPromise(
     parseConfig,
-    err => new YargError({ error: new Error(String(err)) })
+    _ => new YargError({ error: new Error(String(_)) })
   );
 }
 
