@@ -1,11 +1,22 @@
-// type FileNameFormatter = 'PascalCase' | 'camelCase' | 'lower-kebab-case' | 'Upper-Kebab-Case'
+// type FileNameFormatter =
+// | 'PascalCase'
+// | 'camelCase'
+// | 'lower-kebab-case'
+// | 'Upper-Kebab-Case';
 
-type Template = {
-  template: string;
-  output: {
-    directory?: string;
-    fileName: string;
+export type Config = {
+  // Global settings that apply to all template options
+  // Overridable within templateOptions
+  global: {
+    /**
+     * Sets the root for pathing on relative paths
+     */
+    rootOutDir: string;
+    templatesDirectories: string[];
+    // fileNameFormatter: FileNameFormatter
   };
+  // List of templates for the CLI to render
+  templateOptions: Record<string, TemplateSettings>;
 };
 
 type TemplateSettings = {
@@ -15,18 +26,11 @@ type TemplateSettings = {
   outputs: Template[];
 };
 
-export type Config = {
-  // Global settings that apply to all template options
-  // Overrideable within option settings
-  global: {
-    // fileNameFormatter: FileNameFormatter
-    /**
-     * Sets the root for pathing on relative paths
-     */
-    rootOutDir: string;
-
-    templatesDirectories: string[];
+type Template = {
+  template: string;
+  output: {
+    directory?: string;
+    fileName: string;
+    // case: FileNameFormatter;
   };
-  // List of templates for the CLI to render
-  templateOptions: Record<string, TemplateSettings>;
 };
