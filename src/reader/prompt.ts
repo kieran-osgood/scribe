@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { pipe, SStd } from '../common/fp';
 import { Flags } from './arguments.js';
-import { formatErrorMessage } from '../error';
+import { fmtError } from '../error';
 import inquirer, { QuestionCollection } from 'inquirer';
 import * as Effect from '@effect/io/Effect';
 import { TaggedClass } from '@effect/data/Data';
@@ -54,7 +54,7 @@ export function readPrompt(options: { templates: string[]; flags: Flags }) {
       () => inquirer.prompt(createQuestions(options)),
       error =>
         new PromptError({
-          error: `Prompt failed: ${formatErrorMessage(error)}`,
+          error: `Prompt failed: ${fmtError(error)}`,
           cause: error,
         })
     ),
@@ -68,7 +68,7 @@ function parsePrompt(response: unknown) {
     () => promptSchema.parse(response),
     error =>
       new PromptError({
-        error: `Parsing prompt failed: ${formatErrorMessage(error)}`,
+        error: `Parsing prompt failed: ${fmtError(error)}`,
         cause: error,
       })
   );

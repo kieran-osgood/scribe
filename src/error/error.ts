@@ -1,6 +1,6 @@
-import { ZodError } from "zod";
+import { ZodError } from 'zod';
 
-export function formatErrorMessage(error: unknown) {
+export function fmtError(error: unknown) {
   if (error instanceof ZodError) {
     return `${JSON.stringify(error.format())}`;
   } else if (error instanceof Error) {

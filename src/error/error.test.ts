@@ -1,4 +1,4 @@
-import { formatErrorMessage } from './error';
+import { fmtError } from './error';
 import { pipe } from '../common/fp';
 import { ZodError } from 'zod';
 import { describe } from 'vitest';
@@ -7,7 +7,7 @@ import * as S from 'fp-ts/lib/string';
 
 describe('formatErrorMessage', () => {
   it('should format the errors if it was a Error instance', () => {
-    pipe(new Error('An error instance!'), formatErrorMessage, e =>
+    pipe(new Error('An error instance!'), fmtError, e =>
       expect(e).toBe('An error instance!')
     );
   });
@@ -23,7 +23,7 @@ describe('formatErrorMessage', () => {
           message: 'Expected a string but you sent a number?',
         },
       ]),
-      formatErrorMessage,
+      fmtError,
       e =>
         expect(e).toMatchInlineSnapshot(
           '"{\\"_errors\\":[],\\"test\\":{\\"_errors\\":[\\"Expected a string but you sent a number?\\"]}}"'
@@ -34,7 +34,7 @@ describe('formatErrorMessage', () => {
   it('non Error values should stringify', () =>
     fc.assert(
       fc.property(fc.anything({ withObjectString: true }), _ =>
-        S.Eq.equals(formatErrorMessage(_), String(_))
+        S.Eq.equals(fmtError(_), String(_))
       )
     ));
 });
