@@ -13,8 +13,8 @@
     "type": "git",
     "url": "https://github.com/@kieran-osgood/scribe.git"
   },
-  "homepage": "https://github.com/mattpocock/zod-message-protocol#readme",
-  "bugs": "https://github.com/mattpocock/zod-message-protocol/issues",
+  "homepage": "https://github.com/kieran-osgood/scribe/#readme",
+  "bugs": "https://github.com/kieran-osgood/scribe/issues",
   "license": "MIT",
   "keywords": [
     "cli",
