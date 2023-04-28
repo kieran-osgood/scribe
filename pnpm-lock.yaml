@@ -1,6 +1,18 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  '@effect-ts/core':
+    specifier: ^0.60.5
+    version: 0.60.5
+  '@effect-ts/node':
+    specifier: ^0.39.0
+    version: 0.39.0(@effect-ts/core@0.60.5)
+  '@effect-ts/system':
+    specifier: ^0.57.5
+    version: 0.57.5
+  '@effect-ts/tracing-utils':
+    specifier: ^0.5.2
+    version: 0.5.2
   '@effect/data':
     specifier: ^0.11.5
     version: 0.11.5
@@ -339,17 +351,39 @@ packages:
     dev: true
 
   /@cspotcode/source-map-support@0.8.1:
-    resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
-    engines: {node: '>=12'}
+    resolution: { integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw== }
+    engines: { node: '>=12' }
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
+  /@effect-ts/core@0.60.5:
+    resolution: { integrity: sha512-qi1WrtJA90XLMnj2hnUszW9Sx4dXP03ZJtCc5DiUBIOhF4Vw7plfb65/bdBySPoC9s7zy995TdUX1XBSxUkl5w== }
+    dependencies:
+      '@effect-ts/system': 0.57.5
+    dev: false
+
+  /@effect-ts/node@0.39.0(@effect-ts/core@0.60.5):
+    resolution: { integrity: sha512-YYBfWMrx6KW0UQ1H+NKYP8LhvD8YcCS9Gpfyv0KR5p5N843bfcJkuKqw44fRrDy6/khY3G2T202x6ibL3uXRoA== }
+    peerDependencies:
+      '@effect-ts/core': ^0.60.0
+    dependencies:
+      '@effect-ts/core': 0.60.5
+    dev: false
+
+  /@effect-ts/system@0.57.5:
+    resolution: { integrity: sha512-/crHGujo0xnuHIYNc1VgP0HGJGFSoSqq88JFXe6FmFyXPpWt8Xu39LyLg7rchsxfXFeEdA9CrIZvLV5eswXV5g== }
+    dev: false
+
+  /@effect-ts/tracing-utils@0.5.2:
+    resolution: { integrity: sha512-sjIML3B9DdQ92STfZl8bsOuvTnprf6VoW9CYbILjt7wvdAp5kCSeP2bSMoTGXy2C83SLnGvhMdCI+dSiB8A42w== }
+    dev: false
+
   /@effect/data@0.11.5:
-    resolution: {integrity: sha512-IRnimtB3/Z3VC9iQUfu3xm9njHXozrTyhOY0nK+0K1XqF/ZcXvONEm4AQ48kjXZTSHFkrKqUn9XwwtmikLCPvA==}
+    resolution: { integrity: sha512-IRnimtB3/Z3VC9iQUfu3xm9njHXozrTyhOY0nK+0K1XqF/ZcXvONEm4AQ48kjXZTSHFkrKqUn9XwwtmikLCPvA== }
     dev: false
 
   /@effect/io@0.19.2:
-    resolution: {integrity: sha512-8h9rnVPf6afOO4a5NkgfOTdRMqgoyXYA9P1OKtj4IuFSstIf19TfBcJ2UYDGBAFMxWr36OjAOuz6gXZF87hzDQ==}
+    resolution: { integrity: sha512-8h9rnVPf6afOO4a5NkgfOTdRMqgoyXYA9P1OKtj4IuFSstIf19TfBcJ2UYDGBAFMxWr36OjAOuz6gXZF87hzDQ== }
     dependencies:
       '@effect/data': 0.11.5
     dev: false

@@ -3,12 +3,15 @@ export * as Boolean from '@effect/data/Boolean';
 export * as Either from '@effect/data/Either';
 export * from '@effect/data/Function';
 export * as Option from '@effect/data/Option';
-//
+// io
 export * as Effect from '@effect/io/Effect';
 export * as Runtime from '@effect/io/Runtime';
 export * as Exit from '@effect/io/Exit';
-//
+//schema
 export * as Schema from '@effect/schema/Schema';
+
+//
+export * as FS from '@effect-ts/node/FileSystem';
 
 // fp-ts
 export * as IO from 'fp-ts/lib/IO.js';
