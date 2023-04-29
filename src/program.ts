@@ -4,6 +4,7 @@ import { readConfig, readUserTemplateOptions } from './reader/config';
 import { launchPromptInterface } from './reader/prompt';
 import { Exit, pipe } from './common/fp';
 import { checkWorkingTreeClean } from './git';
+import { then } from '@effect-ts/system/Exit/_internal/cause';
 
 /**
  * 1. ✅Check if git, if git, check history is clean (Allow dangerously prompt)
@@ -24,26 +25,21 @@ export async function run() {
   return Effect.runPromiseExit(
     pipe(
       checkWorkingTreeClean(),
-      Effect.map(_ => {
+      // Effect.map(_ => {
+      //   // Kick off Effect prompt for continue dangerously
+      //   console.log('clean?', _);
+      //   return _;
+      // }),
+
+      // Effect.tap(Effect.log('')),
+
+      _ => _,
+
+      Effect.catchTag('GitStatusError', _ => {
+        // Can't determine if clean or not
         // Kick off Effect prompt for continue dangerously
-        console.log('clean?', _);
-        return _;
-      }),
-      Effect.catchTags({
-        GitError: _ => {
-          // Can't determine if clean or not
-          // Kick off Effect prompt for continue dangerously
-          console.log(_.message);
-          console.log('c', _.cause);
-          return Effect.succeed('');
-        },
-        GitStatusCleanError: _ => {
-          // clean false
-          // Kick off Effect prompt for continue dangerously
-          console.log(_.message);
-          console.log('c', _.cause);
-          return Effect.succeed('');
-        },
+        console.log(_.toString());
+        return Effect.succeed('');
       }),
 
       // generateProgramInputs,

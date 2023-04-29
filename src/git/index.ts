@@ -1,50 +1,40 @@
-import simpleGit, { TaskOptions } from 'simple-git';
+import simpleGit, { GitError, StatusResult, TaskOptions } from 'simple-git';
 import * as Effect from '@effect/io/Effect';
 import { TaggedClass } from '@effect/data/Data';
 
-class GitError extends TaggedClass('GitError')<{
-  readonly message: string;
+class GitStatusError extends TaggedClass('GitStatusError')<{
   readonly cause?: unknown;
-}> {}
-
-class GitStatusCleanError extends TaggedClass('GitStatusCleanError')<{
-  readonly message: string;
-  readonly cause?: unknown;
-}> {}
-
-export const checkWorkingTreeClean = (options?: TaskOptions) => {
-  return Effect.asyncInterrupt<never, GitError | GitStatusCleanError, boolean>(
-    resume => {
-      const controller = new AbortController();
-      const git = simpleGit({ abort: controller.signal });
-
-      git.status(options, (error, status) => {
-        if (error) {
-          resume(
-            Effect.fail(
-              new GitError({
-                message:
-                  '❗️Unable to check Git status, are you in a git repository?',
-                cause: error,
-              })
-            )
-          );
-        }
-
-        if (status.isClean()) {
-          resume(Effect.succeed(true));
-        } else {
-          resume(
-            Effect.fail(
-              new GitStatusCleanError({
-                message: '⚠️ Working directory not clean',
-              })
-            )
-          );
-        }
-      });
-
-      return Effect.succeed(() => controller.abort());
+  readonly status: StatusResult;
+}> {
+  toString = (): string => {
+    switch (true) {
+      case this.status.isClean():
+        return '⚠️ Working directory not clean';
+      case this.cause instanceof GitError:
+      //   specific message for GitError?
+      //   Is there a more specific error for status?
+      default:
+        return '❗️Unable to check Git status, are you in a git repository?';
     }
-  );
-};
+  };
+}
+
+export const checkWorkingTreeClean = (options?: TaskOptions) =>
+  Effect.asyncInterrupt<never, GitStatusError, StatusResult>(resume => {
+    const controller = new AbortController();
+    const git = simpleGit({ abort: controller.signal });
+
+    git.status(options, (cause, status) => {
+      if (cause) {
+        resume(Effect.fail(new GitStatusError({ status, cause })));
+      }
+
+      if (status.isClean()) {
+        resume(Effect.succeed(status));
+      } else {
+        resume(Effect.fail(new GitStatusError({ status })));
+      }
+    });
+
+    return Effect.succeed(() => controller.abort());
+  });
