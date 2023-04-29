@@ -6,20 +6,24 @@ import { Exit, pipe } from './common/fp';
 import { checkWorkingTreeClean } from './git';
 
 /**
- * 1. Check if git, if git, check history is clean (Allow dangerously prompt)
+ * 1. ✅Check if git, if git, check history is clean (Allow dangerously prompt)
  *    https://www.npmjs.com/package/simple-git
+ *
  * 2. ✅Get program inputs (flags, config, file paths)
+ *
  * 3.
  *    3.1. Check input files exist (ejs template)
+ *       3.1.1 parse it for syntax
  *    3.2. Check output path clear
+ *
  * 4. Format ejs template with variables
+ *
  * 5. Write file
  */
-
 export async function run() {
   return Effect.runPromiseExit(
     pipe(
-      checkWorkingTreeClean,
+      checkWorkingTreeClean(),
       Effect.map(_ => {
         // Kick off Effect prompt for continue dangerously
         console.log('clean?', _);
@@ -61,16 +65,6 @@ export async function run() {
       //   //   Effect.provideSomeLayer(FS.LiveFS)
       //   // );
       //
-      //   /**
-      //    * 1. create template file path
-      //    * 1. check the template file exists
-      //    * 1.1 if so, parse it for syntax
-      //    * 1.2 if not, die
-      //    * 2. create the filename
-      //    * 3. create the file
-      //    * 4. write the file
-      //    * 5. exit
-      //    */
       // }),
       Effect.map(_ => {
         return 'Complete!';
