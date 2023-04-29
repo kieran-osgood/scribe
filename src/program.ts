@@ -19,16 +19,16 @@ import { checkWorkingTreeClean } from './git';
 export async function run() {
   return Effect.runPromiseExit(
     pipe(
-      checkWorkingTreeClean(),
+      checkWorkingTreeClean,
       Effect.map(_ => {
         // Kick off Effect prompt for continue dangerously
         console.log('clean?', _);
         return _;
       }),
-      Effect.catchTag('GitError', () => {
+      Effect.catchTag('GitError', _ => {
         // Can't determine if clean or not
         // Kick off Effect prompt for continue dangerously
-        console.log('?');
+        console.log(_.message);
         return Effect.succeed('');
       }),
 

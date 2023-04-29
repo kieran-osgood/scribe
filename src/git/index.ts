@@ -6,20 +6,15 @@ import { pipe } from '../common/fp';
 export const git = simpleGit();
 
 class GitError extends TaggedClass('GitError')<{
-  readonly error: string;
+  readonly message: string;
   readonly cause?: unknown;
 }> {}
 
-export function checkWorkingTreeClean(): Effect.Effect<
-  never,
-  GitError,
-  boolean
-> {
-  return pipe(
+export const checkWorkingTreeClean: Effect.Effect<never, GitError, boolean> =
+  pipe(
     Effect.tryCatchPromise(
-      () => git.status(),
-      _ => new GitError({ error: 'Working directory not clean', cause: _ })
+      git.status,
+      _ => new GitError({ message: '⚠️ Working directory not clean', cause: _ })
     ),
     Effect.map(_ => _.isClean())
   );
-}
