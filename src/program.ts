@@ -25,11 +25,21 @@ export async function run() {
         console.log('clean?', _);
         return _;
       }),
-      Effect.catchTag('GitError', _ => {
-        // Can't determine if clean or not
-        // Kick off Effect prompt for continue dangerously
-        console.log(_.message);
-        return Effect.succeed('');
+      Effect.catchTags({
+        GitError: _ => {
+          // Can't determine if clean or not
+          // Kick off Effect prompt for continue dangerously
+          console.log(_.message);
+          console.log('c', _.cause);
+          return Effect.succeed('');
+        },
+        GitStatusCleanError: _ => {
+          // clean false
+          // Kick off Effect prompt for continue dangerously
+          console.log(_.message);
+          console.log('c', _.cause);
+          return Effect.succeed('');
+        },
       }),
 
       // generateProgramInputs,
