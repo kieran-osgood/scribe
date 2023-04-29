@@ -58,6 +58,7 @@
     "load-json-file": "^7.0.1",
     "postinstall-postinstall": "^2.1.0",
     "shelljs": "^0.8.5",
+    "simple-git": "^3.18.0",
     "vite-node": "^0.29.8",
     "yargs": "^17.7.1",
     "zod": "^3.20.6"

@@ -3,6 +3,7 @@ import * as Effect from '@effect/io/Effect';
 import { readConfig, readUserTemplateOptions } from './reader/config';
 import { launchPromptInterface } from './reader/prompt';
 import { Exit, pipe } from './common/fp';
+import { checkWorkingTreeClean } from './git';
 
 /**
  * 1. Check if git, if git, check history is clean (Allow dangerously prompt)
@@ -14,14 +15,28 @@ import { Exit, pipe } from './common/fp';
  * 4. Format ejs template with variables
  * 5. Write file
  */
+
 export async function run() {
   return Effect.runPromiseExit(
     pipe(
-      generateProgramInputs,
-      // tap?
+      checkWorkingTreeClean(),
       Effect.map(_ => {
-        console.log('[Parsed Program]: ', _);
+        // Kick off Effect prompt for continue dangerously
+        console.log('clean?', _);
+        return _;
       }),
+      Effect.catchTag('GitError', () => {
+        // Can't determine if clean or not
+        // Kick off Effect prompt for continue dangerously
+        console.log('?');
+        return Effect.succeed('');
+      }),
+
+      // generateProgramInputs,
+      // tap?
+      // Effect.map(_ => {
+      //   console.log('[Parsed Program]: ', _);
+      // }),
 
       // Effect.map(_ => {
       //   _.config.templateOptions;
@@ -52,12 +67,6 @@ export async function run() {
       })
     )
   ).then(logAndExit);
-
-  // // Write files based on selections.template option
-  // const fileName = fileNameFormatter(
-  //   selections.data.template,
-  //   selections.data.name
-  // );
 }
 
 const generateProgramInputs = Effect.gen(function* ($) {
