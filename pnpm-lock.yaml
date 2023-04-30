@@ -79,6 +79,9 @@ dependencies:
   vite-node:
     specifier: ^0.29.8
     version: 0.29.8(@types/node@18.15.3)
+  vscode-textmate:
+    specifier: ^9.0.0
+    version: 9.0.0
   yargs:
     specifier: ^17.7.1
     version: 17.7.1
@@ -3829,6 +3832,10 @@ packages:
       - supports-color
       - terser
     dev: true
+
+  /vscode-textmate@9.0.0:
+    resolution: {integrity: sha512-Cl65diFGxz7gpwbav10HqiY/eVYTO1sjQpmRmV991Bj7wAoOAjGQ97PpQcXorDE2Uc4hnGWLY17xme+5t6MlSg==}
+    dev: false
 
   /wcwidth@1.0.1:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}

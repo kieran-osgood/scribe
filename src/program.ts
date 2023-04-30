@@ -4,7 +4,6 @@ import { readConfig, readUserTemplateOptions } from './reader/config';
 import { launchPromptInterface } from './reader/prompt';
 import { Exit, pipe } from './common/fp';
 import { checkWorkingTreeClean } from './git';
-import { then } from '@effect-ts/system/Exit/_internal/cause';
 
 /**
  * 1. ✅Check if git, if git, check history is clean (Allow dangerously prompt)
@@ -21,28 +20,50 @@ import { then } from '@effect-ts/system/Exit/_internal/cause';
  *
  * 5. Write file
  */
+const snippet = `import * as React from 'react'
+import { render, fireEvent } from '@/utils/test-utils'
+
+describe('', () => {
+    it('$1', () => {
+        const props = createHydratedMock()
+        const t = render(<Component {...props} />)
+
+        const NODE = t.getByText(/node/i)
+        fireEvent(NODE, 'onPress')
+        expect(NODE)
+    })
+})
+`;
+
 export async function run() {
   return Effect.runPromiseExit(
     pipe(
+      Effect.succeed(snippet), //
+      
+    )
+  ).then(logAndExit);
+}
+
+export async function run1() {
+  return Effect.runPromiseExit(
+    pipe(
       checkWorkingTreeClean(),
-      // Effect.map(_ => {
-      //   // Kick off Effect prompt for continue dangerously
-      //   console.log('clean?', _);
-      //   return _;
+
+      // Effect.catchTag('GitStatusError', _ => {
+      //   if (_.status.isClean() === false) {
+      //     // Not clean - Kick off Effect prompt for continue dangerously
+      //     console.log(_.toString());
+      //   } else {
+      //     // Unknown error/not git - Kick off Effect prompt for continue dangerously
+      //     console.log(_.toString());
+      //   }
+      //   return Effect.succeed('');
       // }),
 
-      // Effect.tap(Effect.log('')),
+      Effect.flatMap(_ => generateProgramInputs),
 
       _ => _,
 
-      Effect.catchTag('GitStatusError', _ => {
-        // Can't determine if clean or not
-        // Kick off Effect prompt for continue dangerously
-        console.log(_.toString());
-        return Effect.succeed('');
-      }),
-
-      // generateProgramInputs,
       // tap?
       // Effect.map(_ => {
       //   console.log('[Parsed Program]: ', _);
@@ -60,8 +81,8 @@ export async function run() {
       //   //   //
       //   //   Effect.provideSomeLayer(FS.LiveFS)
       //   // );
-      //
       // }),
+
       Effect.map(_ => {
         return 'Complete!';
       })

@@ -6,17 +6,17 @@ class GitStatusError extends TaggedClass('GitStatusError')<{
   readonly cause?: unknown;
   readonly status: StatusResult;
 }> {
-  toString = (): string => {
+  toString(): string {
     switch (true) {
       case this.status.isClean():
         return '⚠️ Working directory not clean';
       case this.cause instanceof GitError:
-      //   specific message for GitError?
+      //   Specific message for GitError?
       //   Is there a more specific error for status?
       default:
         return '❗️Unable to check Git status, are you in a git repository?';
     }
-  };
+  }
 }
 
 export const checkWorkingTreeClean = (options?: TaskOptions) =>
@@ -25,6 +25,10 @@ export const checkWorkingTreeClean = (options?: TaskOptions) =>
     const git = simpleGit({ abort: controller.signal });
 
     git.status(options, (cause, status) => {
+      if (process.env.NODE_ENV === 'development') {
+        resume(Effect.succeed(status));
+      }
+
       if (cause) {
         resume(Effect.fail(new GitStatusError({ status, cause })));
       }
