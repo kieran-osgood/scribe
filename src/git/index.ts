@@ -25,6 +25,7 @@ export const checkWorkingTreeClean = (options?: TaskOptions) =>
     const git = simpleGit({ abort: controller.signal });
 
     git.status(options, (cause, status) => {
+      // TODO: remove development flags
       if (process.env.NODE_ENV === 'development') {
         resume(Effect.succeed(status));
       }
