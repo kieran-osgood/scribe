@@ -3,8 +3,7 @@ import { hideBin } from 'yargs/helpers';
 import { TaggedClass } from '@effect/data/Data';
 import * as Effect from '@effect/io/Effect';
 
-const processArgs = hideBin(process.argv);
-const yargInstance = yargs(processArgs);
+const yarg = () => yargs(hideBin(process.argv));
 
 const config: Options = {
   type: 'string',
@@ -15,8 +14,9 @@ const config: Options = {
 } as const;
 
 function parseYargs(choices: string[]) {
-  return yargInstance
+  return yarg()
     .options({
+      config,
       template: {
         type: 'string',
         choices,
@@ -26,15 +26,17 @@ function parseYargs(choices: string[]) {
       name: {
         type: 'string',
         alias: 'n',
-        description: 'String to replace $NAME$ in the file name.',
+        description: 'String to replace {{ Name }} in the file name.',
       },
-      config,
     })
     .parseSync();
 }
 
 export function readFlags(templates: string[]) {
-  return Effect.tryCatchPromise(async () => parseYargs(templates), identity);
+  return Effect.tryCatchPromise(
+    async () => parseYargs(templates),
+    _ => new YargError({ error: new Error(String(_)) })
+  );
 }
 
 class YargError extends TaggedClass('YargError')<{
@@ -42,17 +44,15 @@ class YargError extends TaggedClass('YargError')<{
 }> {}
 
 async function parseConfig() {
-  return yargInstance
+  return yarg()
     .options({ config })
     .parseAsync()
     .then(_ => _.config as string);
 }
 
-export function readConfigFlag() {
-  return Effect.tryCatchPromise(
-    parseConfig,
-    _ => new YargError({ error: new Error(String(_)) })
-  );
-}
+export const readConfigFlag = Effect.tryCatchPromise(
+  parseConfig,
+  _ => new YargError({ error: new Error(String(_)) })
+);
 
 export type Flags = Awaited<ReturnType<typeof parseYargs>>;

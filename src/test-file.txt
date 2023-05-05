@@ -1,0 +1,6 @@
+import * as React from 'react';
+
+type {{Name}}Props = {}
+function {{Name}}Screen() {
+
+}

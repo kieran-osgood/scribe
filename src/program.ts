@@ -21,107 +21,65 @@ import { LogFatalExit } from './program-exit';
  * 2. ✅Get program inputs (flags, config, file paths)
  *
  * 3.
- *    3.1. Check input files exist (ejs template)
- *       3.1.1 parse it for syntax
+ *    3.1. Check input files exist (textmate snippets)
+ *       3.1.1 readFile
+ *       3.1.2 split by '\n'
+ *       3.1.3 pass into textmate/oniguruma
  *    3.2. Check output path clear
  *
  * 4. Format ejs template with variables
  *
  * 5. Write file
  */
-const snippet = `import * as React from 'react'
-import { render, fireEvent } from '@/utils/test-utils'
-
-describe('', () => {
-    it('$1', () => {
-        const props = createHydratedMock()
-        const t = render(<Component {...props} />)
-
-        const NODE = t.getByText(/node/i)
-        fireEvent(NODE, 'onPress')
-        expect(NODE)
-    })
-})
-`;
 
 export async function run() {
   return Effect.runPromiseExit(
     pipe(
-      Effect.succeed(snippet), //
-      
-    )
-  ).then(logAndExit);
-}
-
-export async function run1() {
-  return Effect.runPromiseExit(
-    pipe(
       checkWorkingTreeClean(),
-
-      // Effect.catchTag('GitStatusError', _ => {
-      //   if (_.status.isClean() === false) {
-      //     // Not clean - Kick off Effect prompt for continue dangerously
-      //     console.log(_.toString());
-      //   } else {
-      //     // Unknown error/not git - Kick off Effect prompt for continue dangerously
-      //     console.log(_.toString());
-      //   }
-      //   return Effect.succeed('');
-      // }),
-
+      Effect.catchTag('GitStatusError', _ => {
+        if (_.status.isClean() === false) {
+          // Not clean - Kick off Effect prompt for continue dangerously
+          console.log(_.toString());
+        } else {
+          // Unknown error/not git - Kick off Effect prompt for continue dangerously
+          console.log(_.toString());
+        }
+        return Effect.succeed('');
+      }),
       Effect.flatMap(_ => generateProgramInputs),
 
-      _ => _,
+      Effect.flatMap(ctx =>
+        pipe(
+          Effect.tryCatchPromise(
+            () =>
+              renderFile(path.join(__dirname, 'test-file.txt'), {
+                Name: ctx.input.name,
+              }),
+            // TODO: new TemplateFileError()
+            () => null
+          ),
+          // TODO: ...ctx.variables
+          Effect.map(_ => ({ fileContents: _, ...ctx }))
+        )
+      ),
 
-      // tap?
-      // Effect.map(_ => {
-      //   console.log('[Parsed Program]: ', _);
-      // }),
-
-      // Effect.map(_ => {
-      //   _.config.templateOptions;
-      //   _.input.template;
-      //   const createFilePath = Effect.succeed('');
-      //
-      //   // pipe(
-      //   //   createFilePath, //
-      //   //
-      //   //   Effect.flatMap(_ => FS.fileExists(_)),
-      //   //   //
-      //   //   Effect.provideSomeLayer(FS.LiveFS)
-      //   // );
-      // }),
-
-      Effect.map(_ => {
-        return 'Complete!';
-      })
+      Effect.flatMap(_ =>
+        // TODO: setup node fs
+        Effect.tryCatch(
+          () => fs.writeFile('abc.ts', _.fileContents, () => {}),
+          () => null
+        )
+      )
     )
-  ).then(logAndExit);
+  ).then(LogFatalExit);
 }
 
 const generateProgramInputs = Effect.gen(function* ($) {
-  const configPath = yield* $(readConfigFlag());
+  const configPath = yield* $(readConfigFlag);
   const config = yield* $(readConfig(configPath));
   const templates = yield* $(readUserTemplateOptions(configPath));
   const flags = yield* $(readFlags(templates));
   const input = yield* $(launchPromptInterface({ templates, flags }));
 
-  return {
-    config,
-    input,
-    // flags
-  };
+  return { config, input };
 });
-
-const ExitStatus = {
-  success: 0,
-  error: 2,
-} as const;
-
-const logAndExit = Exit.mapBoth(
-  _ => {
-    console.log('Run error: ', _);
-    process.exit(ExitStatus.error);
-  },
-  _ => console.log('✅: ', _)
-);
