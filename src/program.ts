@@ -1,12 +1,11 @@
 import {
   launchPromptInterface,
-  readConfig,
   readConfigFlag,
   readFlags,
-  readUserTemplateOptions,
 } from '@scribe/reader';
 import { Effect, pipe } from '@scribe/core';
 import { checkWorkingTreeClean } from '@scribe/git';
+import { readConfig, readUserTemplateOptions } from '@scribe/config';
 
 import { renderFile } from 'template-file';
 import path from 'path';
@@ -18,7 +17,7 @@ import { LogFatalExit } from './program-exit';
  * 1. ✅Check if git, if git, check history is clean (Allow dangerously prompt)
  *    https://www.npmjs.com/package/simple-git
  *
- * 2. ✅Get program inputs (flags, config, file paths)
+ * 2. ✅Get program inputs (flags, config.ts, file paths)
  *
  * 3.
  *    3.1. Check input files exist (textmate snippets)
@@ -76,6 +75,7 @@ export async function run() {
 
 const generateProgramInputs = Effect.gen(function* ($) {
   const configPath = yield* $(readConfigFlag);
+  console.log('abc', configPath);
   const config = yield* $(readConfig(configPath));
   const templates = yield* $(readUserTemplateOptions(configPath));
   const flags = yield* $(readFlags(templates));

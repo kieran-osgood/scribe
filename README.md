@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```sh
-$ scribe --config ./scribe.config.js
+$ scribe --config.ts ./scribe.config.ts
 ```
 
 # Learning fp-ts

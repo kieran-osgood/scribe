@@ -10,11 +10,11 @@ const config: Options = {
   alias: 'c',
   default: 'scribe.config.ts',
   description:
-    "File path for your config file, relative to where you're running the command.",
+    "File path for your config.ts file, relative to where you're running the command.",
 } as const;
 
-function parseYargs(choices: string[]) {
-  return yarg()
+const parseFlags = (choices: string[]) =>
+  yarg()
     .options({
       config,
       template: {
@@ -30,29 +30,26 @@ function parseYargs(choices: string[]) {
       },
     })
     .parseSync();
-}
 
-export function readFlags(templates: string[]) {
-  return Effect.tryCatchPromise(
-    async () => parseYargs(templates),
+export const readFlags = (templates: string[]) =>
+  Effect.tryCatchPromise(
+    async () => parseFlags(templates),
     _ => new YargError({ error: new Error(String(_)) })
   );
-}
 
 class YargError extends TaggedClass('YargError')<{
   readonly error: Error;
 }> {}
 
-async function parseConfig() {
-  return yarg()
+const parseConfig = async () =>
+  yarg()
     .options({ config })
     .parseAsync()
     .then(_ => _.config as string);
-}
 
 export const readConfigFlag = Effect.tryCatchPromise(
   parseConfig,
   _ => new YargError({ error: new Error(String(_)) })
 );
 
-export type Flags = Awaited<ReturnType<typeof parseYargs>>;
+export type Flags = Awaited<ReturnType<typeof parseFlags>>;

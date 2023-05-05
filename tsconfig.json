@@ -8,8 +8,9 @@
     "outDir": "dist",
     "paths": {
       "@scribe/core": ["src/common/core/index.ts"],
+      "@scribe/config": ["src/config/index.ts"],
       "@scribe/reader": ["src/reader/index.ts"],
-      "@scribe/git": ["src/git/index.ts"]
+      "@scribe/git": ["src/git/index.ts"],
     },
     "lib": [
       "ESNext"

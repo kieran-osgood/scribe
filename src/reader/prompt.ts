@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { pipe, SStd } from '../common/core';
 import { Flags } from './arguments.js';
-import { fmtError } from '../error';
+import { fmtError } from '../common/error';
 import inquirer, { Answers, QuestionCollection } from 'inquirer';
 import * as Effect from '@effect/io/Effect';
 import { TaggedClass } from '@effect/data/Data';
