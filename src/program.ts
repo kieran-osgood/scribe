@@ -1,9 +1,18 @@
-import { readConfigFlag, readFlags } from './reader/arguments.js';
-import * as Effect from '@effect/io/Effect';
-import { readConfig, readUserTemplateOptions } from './reader/config';
-import { launchPromptInterface } from './reader/prompt';
-import { Exit, pipe } from './common/fp';
-import { checkWorkingTreeClean } from './git';
+import {
+  launchPromptInterface,
+  readConfig,
+  readConfigFlag,
+  readFlags,
+  readUserTemplateOptions,
+} from '@scribe/reader';
+import { Effect, pipe } from '@scribe/core';
+import { checkWorkingTreeClean } from '@scribe/git';
+
+import { renderFile } from 'template-file';
+import path from 'path';
+import * as fs from 'fs';
+
+import { LogFatalExit } from './program-exit';
 
 /**
  * 1. ✅Check if git, if git, check history is clean (Allow dangerously prompt)

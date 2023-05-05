@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { pipe, SStd } from '../common/fp';
+import { pipe, SStd } from '../common/core';
 import { Flags } from './arguments.js';
 import { fmtError } from '../error';
 import inquirer, { Answers, QuestionCollection } from 'inquirer';

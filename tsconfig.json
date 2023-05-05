@@ -6,6 +6,11 @@
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
     "outDir": "dist",
+    "paths": {
+      "@scribe/core": ["src/common/core/index.ts"],
+      "@scribe/reader": ["src/reader/index.ts"],
+      "@scribe/git": ["src/git/index.ts"]
+    },
     "lib": [
       "ESNext"
     ],

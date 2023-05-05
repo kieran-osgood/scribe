@@ -1,6 +1,6 @@
 import { cosmiconfig } from 'cosmiconfig';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
-import { flow, pipe } from '../common/fp';
+import { flow, pipe } from '../common/core';
 import * as Effect from '@effect/io/Effect';
 import { TaggedClass } from '@effect/data/Data';
 import { CosmiconfigResult } from 'cosmiconfig/dist/types';

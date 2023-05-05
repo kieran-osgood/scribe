@@ -1,5 +1,5 @@
 import { fmtError } from './error';
-import { pipe } from '../common/fp';
+import { pipe } from '../common/core';
 import { ZodError } from 'zod';
 import { describe } from 'vitest';
 import * as fc from 'fast-check';

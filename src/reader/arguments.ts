@@ -1,7 +1,5 @@
 import yargs, { Options } from 'yargs';
-import { identity } from '../common/fp';
 import { hideBin } from 'yargs/helpers';
-
 import { TaggedClass } from '@effect/data/Data';
 import * as Effect from '@effect/io/Effect';
 
