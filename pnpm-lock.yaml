@@ -1,18 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
-  '@effect-ts/core':
-    specifier: ^0.60.5
-    version: 0.60.5
   '@effect-ts/node':
     specifier: ^0.39.0
     version: 0.39.0(@effect-ts/core@0.60.5)
-  '@effect-ts/system':
-    specifier: ^0.57.5
-    version: 0.57.5
-  '@effect-ts/tracing-utils':
-    specifier: ^0.5.2
-    version: 0.5.2
   '@effect/data':
     specifier: ^0.11.5
     version: 0.11.5
@@ -25,6 +16,9 @@ dependencies:
   '@effect/schema':
     specifier: ^0.11.1
     version: 0.11.1
+  '@effect/stream':
+    specifier: ^0.21.1
+    version: 0.21.1
   case-anything:
     specifier: ^2.1.10
     version: 2.1.10
@@ -48,7 +42,7 @@ dependencies:
     version: 2.13.1
   fp-ts-std:
     specifier: ^0.15.1
-    version: 0.15.1(fp-ts@2.13.1)(monocle-ts@2.3.13)(newtype-ts@0.3.5)
+    version: 0.15.1(core-ts@2.13.1)(monocle-ts@2.3.13)(newtype-ts@0.3.5)
   fs-extra:
     specifier: ^11.1.0
     version: 11.1.0
@@ -382,18 +376,24 @@ packages:
     resolution: {integrity: sha512-/crHGujo0xnuHIYNc1VgP0HGJGFSoSqq88JFXe6FmFyXPpWt8Xu39LyLg7rchsxfXFeEdA9CrIZvLV5eswXV5g==}
     dev: false
 
-  /@effect-ts/tracing-utils@0.5.2:
-    resolution: {integrity: sha512-sjIML3B9DdQ92STfZl8bsOuvTnprf6VoW9CYbILjt7wvdAp5kCSeP2bSMoTGXy2C83SLnGvhMdCI+dSiB8A42w==}
-    dev: false
-
   /@effect/data@0.11.5:
     resolution: {integrity: sha512-IRnimtB3/Z3VC9iQUfu3xm9njHXozrTyhOY0nK+0K1XqF/ZcXvONEm4AQ48kjXZTSHFkrKqUn9XwwtmikLCPvA==}
+    dev: false
+
+  /@effect/data@0.12.2:
+    resolution: {integrity: sha512-bmWRTcsSRG1FlBswT+D8SxW6r3c4B3pKJrjYfitCD03tXHnup5gLHaWqbFgIjiyYITS+UsJRRjVrNxvyGG4ZNQ==}
     dev: false
 
   /@effect/io@0.19.2:
     resolution: {integrity: sha512-8h9rnVPf6afOO4a5NkgfOTdRMqgoyXYA9P1OKtj4IuFSstIf19TfBcJ2UYDGBAFMxWr36OjAOuz6gXZF87hzDQ==}
     dependencies:
       '@effect/data': 0.11.5
+    dev: false
+
+  /@effect/io@0.25.8:
+    resolution: {integrity: sha512-fFSf7CdKyqqRyRKIFKoWx63sO1tGDjDIs26Ce+UevD3V/HbT0sKmG2MBThWoO5D2/tWEqwmq8+a/og6gq8KX4w==}
+    dependencies:
+      '@effect/data': 0.12.2
     dev: false
 
   /@effect/match@0.12.1:
@@ -409,6 +409,13 @@ packages:
       '@effect/data': 0.11.5
       '@effect/io': 0.19.2
       fast-check: 3.8.0
+    dev: false
+
+  /@effect/stream@0.21.1:
+    resolution: {integrity: sha512-x227xIB+PC/xaz4R3RYkjg2Z0sw5Fgkt5hfxXeGHpKThhmqVEeIXjd0v04pcoz2lJtStcvWL5Wuh/Z8HP3Hw/Q==}
+    dependencies:
+      '@effect/data': 0.12.2
+      '@effect/io': 0.25.8
     dev: false
 
   /@esbuild/android-arm64@0.17.11:
@@ -1898,8 +1905,8 @@ packages:
       newtype-ts: ^0.3.0
     dependencies:
       fp-ts: 2.13.1
-      monocle-ts: 2.3.13(fp-ts@2.13.1)
-      newtype-ts: 0.3.5(fp-ts@2.13.1)(monocle-ts@2.3.13)
+      monocle-ts: 2.3.13(core-ts@2.13.1)
+      newtype-ts: 0.3.5(core-ts@2.13.1)(monocle-ts@2.3.13)
     dev: false
 
   /fp-ts@2.13.1:
@@ -2673,7 +2680,7 @@ packages:
       monocle-ts: ^2.0.0
     dependencies:
       fp-ts: 2.13.1
-      monocle-ts: 2.3.13(fp-ts@2.13.1)
+      monocle-ts: 2.3.13(core-ts@2.13.1)
     dev: false
 
   /nice-try@1.0.5:

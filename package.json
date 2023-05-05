@@ -24,9 +24,9 @@
     "test": "vitest run",
     "start": "npm run start:dev",
     "start:dev": "tsup main.ts --watch --format cjs,esm --dts --onSuccess=\"NODE_ENV=development node ./dist/main.js\"",
-    "start:dev:name": "tsup main.ts --watch --format cjs,esm --dts --onSuccess=\"NODE_ENV=development node ./dist/main.js --name LoginScreen\"",
+    "start:dev:name": "tsup main.ts --watch --format cjs,esm --dts --onSuccess=\"NODE_ENV=development node ./dist/main.js --name Login\"",
     "start:dev:template": "tsup main.ts --watch --format cjs,esm --dts --onSuccess=\"NODE_ENV=development node ./dist/main.js --template screen\"",
-    "start:dev:template:name": "tsup main.ts --watch --format cjs,esm --dts --onSuccess=\"NODE_ENV=development node ./dist/main.js --name LoginScreen --template screen\"",
+    "start:dev:template:name": "tsup main.ts --watch --format cjs,esm --dts --onSuccess=\"NODE_ENV=development node ./dist/main.js --name Login --template screen\"",
     "postinstall": "patch-package",
     "lint": "tsc",
     "build": "tsup main.ts --dts --format cjs,esm",
@@ -34,10 +34,7 @@
     "release": "pnpm run lint && pnpm run test && pnpm run build && changeset publish"
   },
   "dependencies": {
-    "@effect-ts/core": "^0.60.5",
     "@effect-ts/node": "^0.39.0",
-    "@effect-ts/system": "^0.57.5",
-    "@effect-ts/tracing-utils": "^0.5.2",
     "@effect/data": "^0.11.5",
     "@effect/io": "^0.19.2",
     "@effect/match": "^0.12.1",
