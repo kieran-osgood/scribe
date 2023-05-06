@@ -1,35 +1,13 @@
-import {
-  launchPromptInterface,
-  readConfigFlag,
-  readFlags,
-} from '@scribe/reader';
+import * as Reader from '@scribe/reader';
 import { Effect, pipe } from '@scribe/core';
 import { checkWorkingTreeClean } from '@scribe/git';
-import { readConfig, readUserTemplateOptions } from '@scribe/config';
+import * as Config from '@scribe/config';
 
 import { renderFile } from 'template-file';
 import path from 'path';
 import * as fs from 'fs';
 
 import { LogFatalExit } from './program-exit';
-
-/**
- * 1. ✅Check if git, if git, check history is clean (Allow dangerously prompt)
- *    https://www.npmjs.com/package/simple-git
- *
- * 2. ✅Get program inputs (flags, config.ts, file paths)
- *
- * 3.
- *    3.1. Check input files exist (textmate snippets)
- *       3.1.1 readFile
- *       3.1.2 split by '\n'
- *       3.1.3 pass into textmate/oniguruma
- *    3.2. Check output path clear
- *
- * 4. Format ejs template with variables
- *
- * 5. Write file
- */
 
 export async function run() {
   return Effect.runPromiseExit(
@@ -47,11 +25,13 @@ export async function run() {
       }),
       Effect.flatMap(_ => generateProgramInputs),
 
+      Effect.tap(v => Effect.logInfo(JSON.stringify(v))),
+
       Effect.flatMap(ctx =>
         pipe(
           Effect.tryCatchPromise(
             () =>
-              renderFile(path.join(__dirname, 'test-file.txt'), {
+              renderFile(getFilePath(ctx), {
                 Name: ctx.input.name,
               }),
             // TODO: new TemplateFileError()
@@ -74,12 +54,20 @@ export async function run() {
 }
 
 const generateProgramInputs = Effect.gen(function* ($) {
-  const configPath = yield* $(readConfigFlag);
-  console.log('abc', configPath);
-  const config = yield* $(readConfig(configPath));
-  const templates = yield* $(readUserTemplateOptions(configPath));
-  const flags = yield* $(readFlags(templates));
-  const input = yield* $(launchPromptInterface({ templates, flags }));
+  const configPath = yield* $(Reader.parseConfigFlag());
+  //
+  const config = yield* $(Config.readConfig(configPath));
+  const templates = yield* $(Config.readUserTemplateOptions(configPath));
+  const flags = yield* $(Reader.parseFlags(templates));
+  //
+  const input = yield* $(Reader.launchPromptInterface({ templates, flags }));
 
   return { config, input };
 });
+
+type Ctx = Effect.Effect.Success<typeof generateProgramInputs>;
+function getFilePath(ctx: Ctx) {
+  const p = path.join(__dirname, `${ctx.input.name}.scribe`);
+  console.log(p);
+  return p;
+}
