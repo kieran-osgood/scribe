@@ -78,19 +78,19 @@ const tryInquirerPrompt = (
 ) =>
   Effect.tryCatchPromise(
     () => inquirer.prompt(questions, initialAnswers),
-    error =>
+    cause =>
       new PromptError({
-        error: `Prompt failed: ${fmtError(error)}`,
-        cause: error,
+        error: `Prompt failed: ${fmtError(cause)}`,
+        cause,
       })
   );
 
 const tryParsePrompt = (response: unknown) =>
   Effect.tryCatch(
     () => prompt.parse(response),
-    _ =>
+    cause =>
       new PromptError({
-        error: `Parsing prompt failed: ${fmtError(_)}`,
-        cause: _,
+        error: `Parsing prompt failed: ${fmtError(cause)}`,
+        cause,
       })
   );
