@@ -22,3 +22,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm run ci
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            .github/tests/*.xml
