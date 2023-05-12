@@ -130,3 +130,5 @@ yarn-error.log
 .yarn/install-state.gz
 .pnp.*
 .idea/sonarlint/
+examples/src/screens/*
+!examples/src/screens/login.ts

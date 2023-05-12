@@ -1,10 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="start" type="js.build_tools.npm" nameIsGenerated="true">
+  <configuration default="false" name="start -- --config examples/scribe.config.ts" type="js.build_tools.npm" nameIsGenerated="true">
     <package-json value="$PROJECT_DIR$/package.json" />
     <command value="run" />
     <scripts>
       <script value="start" />
     </scripts>
+    <arguments value="-- --config examples/scribe.config.ts" />
     <node-interpreter value="$USER_HOME$/Library/Caches/fnm_multishells/74825_1682720456180/bin/node" />
     <package-manager value="$USER_HOME$/Library/Caches/fnm_multishells/74825_1682720456180/bin/npm" />
     <envs>

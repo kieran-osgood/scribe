@@ -1,4 +1,4 @@
-import type { Config } from './src/config';
+import type { Config } from '@scribe/config';
 
 const config: Config = {
   global: {
@@ -11,7 +11,7 @@ const config: Config = {
         {
           templateFileKey: 'screen',
           output: {
-            directory: 'example/src/screens',
+            directory: 'examples/src/screens',
             fileName: '{{Name}}.ts',
           },
         },
