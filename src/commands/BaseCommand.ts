@@ -20,7 +20,7 @@ export abstract class BaseCommand extends Command {
       this.executeSafe(),
       Effect.runPromise,
       // LogFatalExit,
-      _ => _.then(() => console.log('then')).catch(() => console.log('catch'))
+      _ => _.then(() => console.log('✅ ')).catch(() => console.log('x'))
 
       // core.runMain({
       //   tracingServiceName: 'contentlayer-cli',
