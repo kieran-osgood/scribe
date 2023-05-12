@@ -3,10 +3,9 @@ import * as t from 'typanion';
 import { Effect, pipe } from '@scribe/core';
 
 export abstract class BaseCommand extends Command {
-  configPath = Option.String('-c,--config', {
+  configPath = Option.String('-c,--config', 'scribe.config.ts', {
     description: 'Path to the config (default: scribe.config.ts/js)',
     validator: t.isString(),
-    required: false,
   });
 
   verbose = Option.Boolean('--verbose', false, {
@@ -19,7 +18,10 @@ export abstract class BaseCommand extends Command {
   execute = (): Promise<void> =>
     pipe(
       this.executeSafe(),
-      Effect.runPromise
+      Effect.runPromise,
+      // LogFatalExit,
+      _ => _.then(() => console.log('then')).catch(() => console.log('catch'))
+
       // core.runMain({
       //   tracingServiceName: 'contentlayer-cli',
       //   verbose: this.verbose || process.env.CL_DEBUG !== undefined,

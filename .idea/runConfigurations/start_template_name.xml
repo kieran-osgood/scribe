@@ -7,7 +7,6 @@
     </scripts>
     <arguments value="-- --name=Login --template=screen" />
     <node-interpreter value="$USER_HOME$/Library/Caches/fnm_multishells/74825_1682720456180/bin/node" />
-    <node-options value="--name Login --template screen" />
     <package-manager value="$USER_HOME$/Library/Caches/fnm_multishells/74825_1682720456180/bin/npm" />
     <envs />
     <method v="2" />

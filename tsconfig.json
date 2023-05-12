@@ -7,6 +7,7 @@
     "noUncheckedIndexedAccess": true,
     "outDir": "dist",
     "noImplicitOverride": true,
+    "resolveJsonModule": true,
     "paths": {
       "@scribe/core": [
         "src/common/core/index"
@@ -22,6 +23,9 @@
       ],
       "@scribe/commands": [
         "src/commands/index"
+      ],
+      "@scribe/fs": [
+        "src/common/fs/index"
       ]
     },
     "lib": [

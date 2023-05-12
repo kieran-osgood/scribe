@@ -1,49 +1,18 @@
-import { Effect, pipe } from '@scribe/core';
+import { Effect } from '@scribe/core';
 import * as NFS from 'fs';
 import { ErrnoError } from './error';
 
-export const read = (
-  fd: number,
-  buf: Uint8Array,
-  offset: number,
-  length: number,
-  position: NFS.ReadPosition | null
+export const writeFile = (
+  path: NFS.PathOrFileDescriptor,
+  data: string | NodeJS.ArrayBufferView,
+  options: NFS.WriteFileOptions
 ) =>
-  Effect.async<never, ErrnoError, number>(resume => {
-    NFS.read(fd, buf, offset, length, position, (err, bytesRead) => {
+  Effect.async<never, ErrnoError, boolean>(resume => {
+    NFS.writeFile(path, data, options, err => {
       if (err) {
         resume(Effect.fail(new ErrnoError(err)));
       } else {
-        resume(Effect.succeed(bytesRead));
+        resume(Effect.succeed(true));
       }
     });
   });
-
-export const write = (fd: number, data: Uint8Array, offset?: number) =>
-  Effect.async<never, ErrnoError, number>(resume => {
-    NFS.write(fd, data, offset, (err, written) => {
-      if (err) {
-        resume(Effect.fail(new ErrnoError(err)));
-      } else {
-        resume(Effect.succeed(written));
-      }
-    });
-  });
-
-export const writeAll = (
-  fd: number,
-  data: Uint8Array,
-  offset = 0
-): Effect.Effect<never, ErrnoError, void> =>
-  pipe(
-    write(fd, data, offset),
-    Effect.flatMap(bytesWritten => {
-      const newOffset = offset + bytesWritten;
-
-      if (newOffset >= data.byteLength) {
-        return Effect.unit();
-      }
-
-      return writeAll(fd, data, newOffset);
-    })
-  );

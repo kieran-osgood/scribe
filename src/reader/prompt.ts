@@ -7,6 +7,8 @@ import * as Effect from '@effect/io/Effect';
 import { TaggedClass } from '@effect/data/Data';
 
 type LaunchPromptInterface = {
+  template: string | undefined;
+  name: string | undefined;
   templates: string[];
   flags: Flags;
 };
@@ -37,6 +39,8 @@ type Prompt = z.infer<typeof prompt>;
 type MakeQuestionsOptions = {
   templates: string[];
   flags: Flags;
+  name: string | undefined;
+  template: string | undefined;
 };
 
 function makeQuestionCollection(
@@ -50,13 +54,16 @@ function makeQuestionCollection(
       type: 'list',
       message: 'Pick your template',
       choices: templates,
-      when: () => Boolean(flags.template) === false,
+      when: () =>
+        Boolean(flags.template) === false ||
+        typeof options.template !== 'string',
     },
     {
       name: 'name',
       type: 'input',
       message: 'File name:',
-      when: () => Boolean(flags.name) === false,
+      when: () =>
+        Boolean(flags.name) === false || typeof options.name !== 'string',
       validate: (s: string) => {
         if (/^([A-Za-z\-_\d])+$/.test(s)) return true;
         return 'File name may only include letters, numbers & underscores.';

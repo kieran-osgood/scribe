@@ -6,7 +6,7 @@ class GitStatusError extends TaggedClass('GitStatusError')<{
   readonly cause?: unknown;
   readonly status: StatusResult;
 }> {
-  toString(): string {
+  override toString(): string {
     switch (true) {
       case this.status.isClean():
         return '⚠️ Working directory not clean';
