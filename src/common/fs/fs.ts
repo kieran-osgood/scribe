@@ -1,14 +1,14 @@
 import { Effect } from '@scribe/core';
-import * as NFS from 'fs';
+import * as FSE from 'fs-extra';
 import { ErrnoError } from './error';
 
 export const writeFile = (
-  path: NFS.PathOrFileDescriptor,
+  path: string,
   data: string | NodeJS.ArrayBufferView,
-  options: NFS.WriteFileOptions
+  options: FSE.WriteFileOptions
 ) =>
   Effect.async<never, ErrnoError, boolean>(resume => {
-    NFS.writeFile(path, data, options, err => {
+    FSE.outputFile(path, data, options, err => {
       if (err) {
         resume(Effect.fail(new ErrnoError(err)));
       } else {
