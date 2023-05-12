@@ -4,8 +4,8 @@ import path from 'path';
 export default defineConfig({
   test: {
     globals: true,
-    outputFile: '.github/tests/run.xml',
-    reporters: 'junit',
+    outputFile: process.env.CI ? '.github/tests/run.xml' : undefined,
+    reporters: process.env.CI ? 'junit' : undefined,
   },
   resolve: {
     alias: {

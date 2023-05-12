@@ -132,4 +132,4 @@ yarn-error.log
 .idea/sonarlint/
 examples/src/screens/*
 !examples/src/screens/login.ts
-.github/test-run.xml
+.github/tests/*.xml
