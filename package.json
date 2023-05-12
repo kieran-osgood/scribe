@@ -24,9 +24,11 @@
     "start": "ts-node main.ts",
     "start:name": "ts-node main.ts --name=Login",
     "test": "vitest run",
-    "lint": "tsc",
+    "lint": "eslint src --fix --ext .js,.ts,.tsx",
+    "typecheck": "tsc",
     "build": "tsup main.ts",
     "ci": "run-p ci:*",
+    "ci:typecheck": "pnpm run typecheck",
     "ci:lint": "pnpm run lint",
     "ci:test": "pnpm run test",
     "ci:build": "pnpm run build",
@@ -76,8 +78,10 @@
     "@types/node": "^18.14.0",
     "@types/shelljs": "^0.8.11",
     "@types/yargs": "^17.0.22",
+    "@typescript-eslint/eslint-plugin": "^5.59.5",
     "changeset": "^0.2.6",
     "eslint": "^8.34.0",
+    "eslint-plugin-communist-spelling": "^1.0.0",
     "patch-package": "^6.5.1",
     "prettier": "^2.8.4",
     "regenerator-runtime": "^0.13.11",
@@ -86,6 +90,7 @@
     "tsconfig-paths": "^4.2.0",
     "tsup": "^6.6.3",
     "typescript": "^4.9.5",
+    "vite-tsconfig-paths": "^4.2.0",
     "vitest": "0.25.0"
   }
 }
