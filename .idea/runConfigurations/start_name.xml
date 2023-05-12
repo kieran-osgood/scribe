@@ -3,8 +3,9 @@
     <package-json value="$PROJECT_DIR$/package.json" />
     <command value="run" />
     <scripts>
-      <script value="start:dev:name" />
+      <script value="start" />
     </scripts>
+    <arguments value="-- --name=Login" />
     <node-interpreter value="$USER_HOME$/Library/Caches/fnm_multishells/74825_1682720456180/bin/node" />
     <package-manager value="$USER_HOME$/Library/Caches/fnm_multishells/74825_1682720456180/bin/npm" />
     <envs />

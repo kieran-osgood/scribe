@@ -1,11 +1,13 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="start:name:template" type="js.build_tools.npm">
+  <configuration default="false" name="start:template:name" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/package.json" />
     <command value="run" />
     <scripts>
-      <script value="start:dev:template:name" />
+      <script value="start" />
     </scripts>
+    <arguments value="-- --name=Login --template=screen" />
     <node-interpreter value="$USER_HOME$/Library/Caches/fnm_multishells/74825_1682720456180/bin/node" />
+    <node-options value="--name Login --template screen" />
     <package-manager value="$USER_HOME$/Library/Caches/fnm_multishells/74825_1682720456180/bin/npm" />
     <envs />
     <method v="2" />
