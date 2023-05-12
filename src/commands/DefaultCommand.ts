@@ -2,13 +2,14 @@ import { Data, Effect, pipe } from '@scribe/core';
 import { writeFile } from '@scribe/fs';
 import { checkWorkingTreeClean } from '@scribe/git';
 
-import { renderFile } from 'template-file';
+import { render, renderFile } from 'template-file';
 import path from 'path';
 import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 
 import { BaseCommand } from './BaseCommand';
 import { generateProgramInputs } from '../context';
+import { Template } from '@scribe/config';
 
 export class DefaultCommand extends BaseCommand {
   static override paths = [Command.Default];
@@ -33,45 +34,33 @@ export class DefaultCommand extends BaseCommand {
     required: false,
   });
 
-  executeSafe = () => {
-    return pipe(
+  executeSafe = () =>
+    pipe(
       checkWorkingTreeClean(),
 
-      Effect.catchTag('GitStatusError', _ => {
-        if (_.status.isClean() === false) {
-          // Not clean - Kick off Effect prompt for continue dangerously
-          console.log(_.toString());
-        } else {
-          // Unknown error/not git - Kick off Effect prompt for continue dangerously
-          console.log(_.toString());
-        }
-        return Effect.succeed('');
-      }),
-
       Effect.flatMap(_ =>
-        generateProgramInputs({
-          name: this.name,
-          template: this.template,
-          configPath: this.configPath,
-        })
+        pipe(
+          generateProgramInputs({
+            name: this.name,
+            template: this.template,
+            configPath: this.configPath,
+          }),
+          Effect.map(_ => {
+            this.name = _.input.name;
+            this.template = _.input.template;
+            return _;
+          })
+        )
       ),
-      // validate _.input.templateKeys.includes(this.template)
-      // Effect.tap(v => Effect.logInfo(JSON.stringify(v))),
 
       Effect.flatMap(constructTemplate),
 
       Effect.flatMap(writeTemplate),
 
-      // Effect.map(_ => {
-      //   this.name = _.input.name;
-      //   this.template = _.input.template;
-      // }),
-      Effect.tap(_ => Effect.log('TAP ' + JSON.stringify(_)))
+      Effect.tap(_ => Effect.log(JSON.stringify(_))),
+      Effect.tapError(_ => Effect.log(JSON.stringify(_)))
     );
-  };
 }
-
-type Ctx = Effect.Effect.Success<ReturnType<typeof generateProgramInputs>>;
 
 class TemplateFileError extends Data.TaggedClass('TemplateFileError')<{
   readonly cause?: unknown;
@@ -80,6 +69,8 @@ class TemplateFileError extends Data.TaggedClass('TemplateFileError')<{
     return 'Writing to file failed, please report this.';
   }
 }
+
+type Ctx = Effect.Effect.Success<ReturnType<typeof generateProgramInputs>>;
 
 function constructTemplate(ctx: Ctx) {
   return pipe(
@@ -96,11 +87,13 @@ function constructTemplate(ctx: Ctx) {
   );
 }
 
-const writeTemplate = (_: Ctx & { fileContents: string }) =>
-  pipe(
-    writeFile(
-      path.join(process.cwd(), `${_.input.template}`),
-      _.fileContents,
-      null
-    ) //
-  );
+// TODO: handle list of outputs
+const writeTemplate = (_: Ctx & { fileContents: string }) => {
+  const output = _.config.templateOptions[_.input.template]?.outputs[0]
+    ?.output as Template['output'];
+
+  const fileName = render(output.fileName, { Name: _.input.name });
+  const filePath = path.join(process.cwd(), output.directory, fileName);
+
+  return writeFile(filePath, _.fileContents, null);
+};

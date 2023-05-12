@@ -27,5 +27,5 @@ export const generateProgramInputs = ({
       })
     );
 
-    return { config, input };
+    return { config, input, templateKeys };
   });

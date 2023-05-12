@@ -19,17 +19,17 @@ export type Config = {
   templateOptions: Record<string, TemplateSettings>;
 };
 
-type TemplateSettings = {
+export type TemplateSettings = {
   output?: {
     directory?: string;
   };
   outputs: Template[];
 };
 
-type Template = {
-  template: string;
+export type Template = {
+  templateFileKey: string;
   output: {
-    directory?: string;
+    directory: string;
     fileName: string;
     // case: FileNameFormatter;
   };
