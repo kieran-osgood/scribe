@@ -44,6 +44,9 @@
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true
   },
+  "exclude": [
+    "examples/"
+  ],
   "ts-node": {
     "swc": true,
     "require": [
