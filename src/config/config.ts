@@ -4,6 +4,7 @@ import { flow, pipe } from '../common/core';
 import * as Effect from '@effect/io/Effect';
 import { TaggedClass } from '@effect/data/Data';
 import { CosmiconfigResult } from 'cosmiconfig/dist/types';
+import { Config } from './types';
 
 class CosmicConfigError extends TaggedClass('CosmicConfigError')<{
   readonly error:
@@ -26,7 +27,7 @@ const extractConfig = (_: CosmiconfigResult) =>
   );
 
 type ReadUserConfigValue = {
-  templateOptions: Record<string, unknown>;
+  templateOptions: Config['templateOptions'];
 };
 export const readConfig = (
   path: string
