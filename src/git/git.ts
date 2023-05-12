@@ -12,8 +12,12 @@ class GitStatusError extends TaggedClass('GitStatusError')<{
       case this.status.isClean():
         return '⚠️ Working directory not clean';
       case this.cause instanceof GitError:
-      //   Specific message for GitError?
-      //   Is there a more specific error for status?
+        /**
+         * TODO:
+         *  Specific message for GitError?
+         *  Is there a more specific error for status?
+         */
+        return 'unknown cause';
       default:
         return '❗️Unable to check Git status, are you in a git repository?';
     }

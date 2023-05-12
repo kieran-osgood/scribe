@@ -38,7 +38,7 @@ export class DefaultCommand extends BaseCommand {
     pipe(
       checkWorkingTreeClean(),
 
-      Effect.flatMap(_ =>
+      Effect.flatMap(() =>
         pipe(
           generateProgramInputs({
             name: this.name,
