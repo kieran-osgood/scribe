@@ -1,18 +1,18 @@
-import type { Config } from "./src/config";
+import type { Config } from './src/config';
 
 const config: Config = {
   global: {
-    rootOutDir: ".",
-    templatesDirectories: ["."],
+    rootOutDir: '.',
+    templatesDirectories: ['.'],
   },
   templateOptions: {
     screen: {
       outputs: [
         {
-          template: "screen",
+          templateFileKey: 'screen',
           output: {
-            directory: "src/screens",
-            fileName: "PascalCase",
+            directory: 'example/src/screens',
+            fileName: '{{Name}}.ts',
           },
         },
       ],
