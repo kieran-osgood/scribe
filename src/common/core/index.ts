@@ -9,8 +9,8 @@ export * as Runtime from '@effect/io/Runtime';
 export * as Exit from '@effect/io/Exit';
 //schema
 export * as Schema from '@effect/schema/Schema';
-export * as Sink from '@effect/stream/Sink';
-export * as Stream from '@effect/stream/Stream';
+// export * as Sink from '@effect/stream/Sink';
+// export * as Stream from '@effect/stream/Stream';
 
 //
 export * as FS from '@effect-ts/node/FileSystem';

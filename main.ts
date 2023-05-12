@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { run } from './src/program.js';
+import { run } from './src/program';
 
 (async () => {
   await run();

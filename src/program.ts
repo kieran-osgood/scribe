@@ -1,5 +1,5 @@
-import * as Reader from '@scribe/reader';
 import { Effect, pipe } from '@scribe/core';
+import * as Reader from '@scribe/reader';
 import { checkWorkingTreeClean } from '@scribe/git';
 import * as Config from '@scribe/config';
 
@@ -8,8 +8,33 @@ import path from 'path';
 import * as fs from 'fs';
 
 import { LogFatalExit } from './program-exit';
+import { DefaultCommand } from './commands/DefaultCommand';
+import { Cli } from 'clipanion';
 
 export async function run() {
+  const [
+    node, //
+    app,
+    ...args
+  ] = process.argv;
+  console.log({ args });
+  // const res = await pipe(generateProgramInputs, Effect.runPromiseEither);
+  // console.log({ res });
+
+  const cli = new Cli({
+    binaryLabel: `Scribe`,
+    binaryName: process.env['CL_DEBUG'] ? `${node} ${app}` : 'Scribe',
+    binaryVersion: '',
+  });
+
+  cli.register(DefaultCommand);
+  // cli.register(Builtins.HelpCommand);
+  // cli.register(Builtins.VersionCommand);
+
+  await cli.runExit(args, Cli.defaultContext);
+}
+
+export async function run1() {
   return Effect.runPromiseExit(
     pipe(
       checkWorkingTreeClean(),
@@ -35,7 +60,7 @@ export async function run() {
                 Name: ctx.input.name,
               }),
             // TODO: new TemplateFileError()
-            () => null
+            () => 'template file error'
           ),
           // TODO: ...ctx.variables
           Effect.map(_ => ({ fileContents: _, ...ctx }))
@@ -46,14 +71,14 @@ export async function run() {
         // TODO: setup node fs
         Effect.tryCatch(
           () => fs.writeFile('abc.ts', _.fileContents, () => {}),
-          () => null
+          () => 'write file error'
         )
       )
     )
   ).then(LogFatalExit);
 }
 
-const generateProgramInputs = Effect.gen(function* ($) {
+export const generateProgramInputs = Effect.gen(function* ($) {
   const configPath = yield* $(Reader.parseConfigFlag());
   //
   const config = yield* $(Config.readConfig(configPath));
@@ -66,6 +91,7 @@ const generateProgramInputs = Effect.gen(function* ($) {
 });
 
 type Ctx = Effect.Effect.Success<typeof generateProgramInputs>;
+
 function getFilePath(ctx: Ctx) {
   const p = path.join(__dirname, `${ctx.input.name}.scribe`);
   console.log(p);
