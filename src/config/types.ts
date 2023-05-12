@@ -5,18 +5,21 @@
 // | 'Upper-Kebab-Case';
 
 export type Config = {
-  // Global settings that apply to all template options
-  // Overridable within templateOptions
-  global: {
+  /**
+   * Global settings that apply to all template options
+   * Overridable within templates
+   */
+  options?: {
     /**
      * Sets the root for pathing on relative paths
      */
     rootOutDir: string;
     templatesDirectories: string[];
-    // fileNameFormatter: FileNameFormatter
   };
-  // List of templates for the CLI to render
-  templateOptions: Record<string, TemplateSettings>;
+  /**
+   * List of templates for the CLI to render
+   */
+  templates: Record<string, TemplateSettings>;
 };
 
 export type TemplateSettings = {
@@ -31,6 +34,5 @@ export type Template = {
   output: {
     directory: string;
     fileName: string;
-    // case: FileNameFormatter;
   };
 };

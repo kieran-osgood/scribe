@@ -27,7 +27,7 @@ const extractConfig = (_: CosmiconfigResult) =>
   );
 
 type ReadUserConfigValue = {
-  templateOptions: Config['templateOptions'];
+  templates: Config['templates'];
 };
 export const readConfig = (
   path: string
@@ -49,7 +49,7 @@ export const readConfig = (
  */
 export const readUserTemplateOptions = flow(
   readConfig,
-  Effect.map(_ => Object.keys(_.templateOptions)),
+  Effect.map(_ => Object.keys(_.templates)),
   Effect.flatMap(_ =>
     Effect.cond(
       () => _.length > 0,

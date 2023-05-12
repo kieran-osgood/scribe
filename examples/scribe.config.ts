@@ -1,11 +1,11 @@
 import type { Config } from '@scribe/config';
 
 const config: Config = {
-  global: {
-    rootOutDir: '.',
-    templatesDirectories: ['.'],
-  },
-  templateOptions: {
+  // global: {
+  //   rootOutDir: '.',
+  //   templatesDirectories: ['.'],
+  // },
+  templates: {
     screen: {
       outputs: [
         {

@@ -1,11 +1,11 @@
 import { Config } from './index.js';
 
 const baseConfig: Config = {
-  global: {
+  options: {
     rootOutDir: '.',
     templatesDirectories: ['.'],
   },
-  templateOptions: {
+  templates: {
     screen: {
       output: {
         directory: '',

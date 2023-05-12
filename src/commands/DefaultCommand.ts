@@ -23,7 +23,7 @@ export class DefaultCommand extends BaseCommand {
   });
 
   name = Option.String('-n,--name', {
-    description: 'The key of templateOptions to generate.',
+    description: 'The key of templates to generate.',
     validator: t.isString(),
     required: false,
   });
@@ -89,7 +89,7 @@ function constructTemplate(ctx: Ctx) {
 
 // TODO: handle list of outputs
 const writeTemplate = (_: Ctx & { fileContents: string }) => {
-  const output = _.config.templateOptions[_.input.template]?.outputs[0]
+  const output = _.config.templates[_.input.template]?.outputs[0]
     ?.output as Template['output'];
 
   const fileName = render(output.fileName, { Name: _.input.name });
