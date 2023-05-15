@@ -18,7 +18,9 @@ describe('fs', () => {
         Effect.gen(function* ($) {
           // arrange
           const filePath = path.join(process.cwd(), './template.ts');
-          vol.writeFile(filePath, fileContents, () => {});
+          vol.writeFile(filePath, fileContents, err => {
+            if (err) throw err;
+          });
 
           // act
           const result = yield* $(FS.readFile(filePath, null));
