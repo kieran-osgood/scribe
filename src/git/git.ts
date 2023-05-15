@@ -58,6 +58,6 @@ export const checkWorkingTreeClean = (options?: TaskOptions) =>
         // Unknown error/not git - Kick off Effect prompt for continue dangerously
         console.log(_.toString());
       }
-      return Effect.succeed('');
+      return Effect.succeed(_.status);
     })
   );
