@@ -1,11 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="start:template" type="js.build_tools.npm">
+  <configuration default="false" name="start:template:name" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/package.json" />
     <command value="run" />
     <scripts>
       <script value="start" />
     </scripts>
-    <arguments value="-- --template=screen --config examples/scribe.config.ts" />
+    <arguments value="-- --name=Login --template=screen --config examples/scribe.config.ts" />
     <node-interpreter value="$USER_HOME$/Library/Caches/fnm_multishells/74825_1682720456180/bin/node" />
     <package-manager value="$USER_HOME$/Library/Caches/fnm_multishells/74825_1682720456180/bin/npm" />
     <envs>

@@ -1,0 +1,26 @@
+// Vitest Snapshot v1
+
+exports[`fs > mkdir > creates recursively  1`] = `
+{
+  "some/nested/pathway": null,
+}
+`;
+
+exports[`fs > mkdir > creates recursively  2`] = `
+{
+  "some/nested/pathway": null,
+  "tmpl/a/b": null,
+}
+`;
+
+exports[`fs > mkdir > returns undefined if dir already exists 1`] = `
+{
+  "some/path": null,
+}
+`;
+
+exports[`fs > mkdir > returns undefined if dir already exists 2`] = `
+{
+  "some/path": null,
+}
+`;

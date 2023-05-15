@@ -1,54 +1,51 @@
-import yargs, { Options } from "yargs";
-import { hideBin } from "yargs/helpers";
-import * as TE from "fp-ts/lib/TaskEither.js";
-import { pipe } from "fp-ts/lib/function.js";
+import yargs, { Options } from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import { TaggedClass } from '@effect/data/Data';
+import * as Effect from '@effect/io/Effect';
 
-const processArgs = hideBin(process.argv);
-const yargInstance = yargs(processArgs);
+class YargError extends TaggedClass('YargError')<{
+  readonly error: Error;
+}> {}
+
+const yarg = () => yargs(hideBin(process.argv));
 
 const config: Options = {
-  type: "string",
-  alias: "c",
-  default: "scribe.config.ts",
+  type: 'string',
+  alias: 'c',
+  default: 'scribe.config.ts',
   description:
-    "File path for your config file, relative to where you're running the command.",
-} as const;
+    "File path for your config.ts file, relative to where you're running the command.",
+};
 
-function parseYargs(choices: string[]) {
-  return yargInstance
-    .options({
-      template: {
-        type: "string",
-        choices,
-        alias: "t",
-        description: "Name of the template key to generate.",
-      },
-      name: {
-        type: "string",
-        alias: "n",
-        description: "String to replace $NAME$ in the file name.",
-      },
-      config,
-    })
-    .parseSync();
-}
-
-export function readFlags({ templates }: { templates: string[] }) {
-  return TE.tryCatch(
-    async () => parseYargs(templates),
-    (e) => e
+export const parseFlags = (templates: string[]) =>
+  Effect.tryCatchPromise(
+    () =>
+      yarg()
+        .options({
+          config,
+          template: {
+            type: 'string',
+            choices: templates,
+            alias: 't',
+            description: 'Name of the template key to generate.',
+          },
+          name: {
+            type: 'string',
+            alias: 'n',
+            description: 'String to replace {{ Name }} in the file name.',
+          },
+        })
+        .parseAsync(),
+    _ => new YargError({ error: new Error(String(_)) })
   );
-}
+export type Flags = Effect.Effect.Success<ReturnType<typeof parseFlags>>;
 
-function parseConfig() {
-  return yargInstance.options({ config }).parseSync().config;
-}
-
-export function readConfigFlag() {
-  return TE.tryCatch(
-    async () => pipe(parseConfig(), (s) => s as string),
-    (e) => e
+export const parseConfigFlag = () =>
+  Effect.tryCatchPromise(
+    () =>
+      yarg()
+        .options({ config })
+        .parseAsync()
+        .then(_ => _.config as string),
+    _ => new YargError({ error: new Error(String(_)) })
   );
-}
-
-export type Flags = Awaited<ReturnType<typeof parseYargs>>;

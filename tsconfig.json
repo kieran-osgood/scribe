@@ -1,29 +1,56 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@tsconfig/node18/tsconfig.json",
-  "ts-node": {
-    "transpileOnly": true,
-    "moduleTypes": {
-      // Globs are also supported with the same behavior as tsconfig "include"
-      "fp-ts/**/*": "cjs"
-    }
-  },
   "compilerOptions": {
     "strict": true,
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
     "outDir": "dist",
-    "lib": ["ESNext"],
+    "noImplicitOverride": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@scribe/core": [
+        "src/common/core/index"
+      ],
+      "@scribe/config": [
+        "src/config/index"
+      ],
+      "@scribe/reader": [
+        "src/reader/index"
+      ],
+      "@scribe/git": [
+        "src/git/index"
+      ],
+      "@scribe/commands": [
+        "src/commands/index"
+      ],
+      "@scribe/fs": [
+        "src/common/fs/index"
+      ]
+    },
+    "lib": [
+      "ESNext"
+    ],
+    "baseUrl": ".",
     "target": "ES2022",
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "esModuleInterop": true, // Eases ESM support
-    "types": ["node"],
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    // Eases ESM support
+    "types": [
+      "node",
+      "vitest/globals"
+    ],
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": [
-    "./src/**/*",
-    "./index.ts"
-  ]
+  "exclude": [
+    "examples/"
+  ],
+  "ts-node": {
+    "swc": true,
+    "require": [
+      "tsconfig-paths/register"
+    ]
+  }
 }
