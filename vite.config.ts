@@ -6,7 +6,7 @@ export default defineConfig({
     globals: true,
     outputFile: process.env.CI ? '.github/tests/run.xml' : undefined,
     reporters: process.env.CI ? 'junit' : undefined,
-    setupFiles: ['./setup-fs'],
+    setupFiles: ['./configs/vite/setup-fs'],
   },
   resolve: {
     alias: {

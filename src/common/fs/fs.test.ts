@@ -1,6 +1,6 @@
 import { Effect, pipe } from '@scribe/core';
 import { fs, vol } from 'memfs';
-import { cwdAsJson } from '../../../setup-fs';
+import { cwdAsJson } from '../../../configs/vite/setup-fs';
 import * as FS from './node-fs';
 import path from 'path';
 import { ErrnoError } from './error';
@@ -16,16 +16,13 @@ describe('fs', () => {
     it('should read file to path', () =>
       pipe(
         Effect.gen(function* ($) {
-          // arrange
           const filePath = path.join(process.cwd(), './template.ts');
           vol.writeFile(filePath, fileContents, err => {
             if (err) throw err;
           });
 
-          // act
           const result = yield* $(FS.readFile(filePath, null));
 
-          // assert
           expect(String(result)).toBe(fileContents);
         }),
         Effect.runPromise
@@ -60,7 +57,22 @@ describe('fs', () => {
         Effect.runPromise
       ));
 
+    // NOT IMPLEMENTED
     it.todo('throw error if file is not writable');
+    // it.skip('throw error if file is not writable', () =>
+    //   pipe(
+    //     Effect.gen(function* ($) {
+    //       const filePath = path.join(process.cwd(), './template.ts');
+    //
+    //       expect(
+    //         yield* $(FS.writeFile(filePath, fileContents, null)) //
+    //       ).toBe(true);
+    //       expect(
+    //         yield* $(FS.readFile(filePath, { encoding: 'utf8' })) //
+    //       ).toEqual(fileContents);
+    //     }),
+    //     Effect.runPromise
+    //   ));
   });
 
   describe('mkdir', () => {
@@ -79,7 +91,19 @@ describe('fs', () => {
         Effect.runPromise
       ));
 
-    it.todo('doesnt throw if dir already exists');
+    it('returns undefined if dir already exists', () =>
+      pipe(
+        Effect.gen(function* ($) {
+          const filePath = './some/path';
+          vol.mkdirSync(filePath, { recursive: true });
+          expect(cwdAsJson()).toMatchSnapshot();
+
+          const result = yield* $(FS.mkdir(filePath, { recursive: true }));
+          expect(result).toBe(undefined);
+          expect(cwdAsJson()).toMatchSnapshot();
+        }),
+        Effect.runPromise
+      ));
   });
 
   describe('writeFileWithDir', () => {
@@ -87,6 +111,7 @@ describe('fs', () => {
       pipe(
         Effect.gen(function* ($) {
           const filePath = '/path/to/template.ts';
+
           const result = yield $(
             FS.writeFileWithDir(filePath, fileContents, null)
           );
