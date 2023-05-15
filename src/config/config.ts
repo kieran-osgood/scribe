@@ -23,7 +23,7 @@ const extractConfig = (_: CosmiconfigResult) =>
   Effect.cond(
     () => !!_?.isEmpty !== true,
     () => _?.config as ReadUserConfigValue,
-    () => new CosmicConfigError({ error: 'Empty Config' as const })
+    () => new CosmicConfigError({ error: 'Empty Config' })
   );
 
 type ReadUserConfigValue = {
