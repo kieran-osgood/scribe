@@ -23,7 +23,7 @@
   "scripts": {
     "start": "ts-node main.ts",
     "start:name": "ts-node main.ts --name=Login",
-    "test": "vitest run",
+    "test": "vitest",
     "lint": "eslint src --fix --ext .js,.ts,.tsx",
     "typecheck": "tsc",
     "build": "tsup main.ts",
@@ -38,7 +38,6 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@commander-js/extra-typings": "^10.0.3",
     "@effect-ts/node": "^0.39.0",
     "@effect/data": "^0.11.5",
     "@effect/io": "^0.19.2",
@@ -53,7 +52,6 @@
     "fast-check": "^3.8.0",
     "fp-ts": "^2.13.1",
     "fp-ts-std": "^0.15.1",
-    "fs-extra": "^11.1.0",
     "inquirer": "8.0.0",
     "load-json-file": "^7.0.1",
     "npm-run-all": "^4.1.5",
@@ -82,6 +80,7 @@
     "changeset": "^0.2.6",
     "eslint": "^8.34.0",
     "eslint-plugin-communist-spelling": "^1.0.0",
+    "memfs": "^3.5.1",
     "patch-package": "^6.5.1",
     "prettier": "^2.8.4",
     "regenerator-runtime": "^0.13.11",
@@ -90,7 +89,7 @@
     "tsconfig-paths": "^4.2.0",
     "tsup": "^6.6.3",
     "typescript": "^4.9.5",
-    "vite-tsconfig-paths": "^4.2.0",
+    "unionfs": "^4.4.0",
     "vitest": "0.25.0"
   }
 }

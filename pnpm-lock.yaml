@@ -1,9 +1,6 @@
 lockfileVersion: '6.0'
 
 dependencies:
-  '@commander-js/extra-typings':
-    specifier: ^10.0.3
-    version: 10.0.3(commander@10.0.0)
   '@effect-ts/node':
     specifier: ^0.39.0
     version: 0.39.0(@effect-ts/core@0.60.5)
@@ -46,9 +43,6 @@ dependencies:
   fp-ts-std:
     specifier: ^0.15.1
     version: 0.15.1(fp-ts@2.13.1)(monocle-ts@2.3.13)(newtype-ts@0.3.5)
-  fs-extra:
-    specifier: ^11.1.0
-    version: 11.1.0
   inquirer:
     specifier: 8.0.0
     version: 8.0.0
@@ -129,6 +123,9 @@ devDependencies:
   eslint-plugin-communist-spelling:
     specifier: ^1.0.0
     version: 1.0.0(eslint@8.36.0)
+  memfs:
+    specifier: ^3.5.1
+    version: 3.5.1
   patch-package:
     specifier: ^6.5.1
     version: 6.5.1
@@ -153,9 +150,9 @@ devDependencies:
   typescript:
     specifier: ^4.9.5
     version: 4.9.5
-  vite-tsconfig-paths:
-    specifier: ^4.2.0
-    version: 4.2.0(typescript@4.9.5)
+  unionfs:
+    specifier: ^4.4.0
+    version: 4.4.0
   vitest:
     specifier: 0.25.0
     version: 0.25.0
@@ -381,14 +378,6 @@ packages:
       human-id: 1.0.2
       prettier: 2.8.4
     dev: true
-
-  /@commander-js/extra-typings@10.0.3(commander@10.0.0):
-    resolution: {integrity: sha512-OIw28QV/GlP8k0B5CJTRsl8IyNvd0R8C8rfo54Yz9P388vCNDgdNrFlKxZTGqps+5j6lSw3Ss9JTQwcur1w1oA==}
-    peerDependencies:
-      commander: 10.0.x
-    dependencies:
-      commander: 10.0.0
-    dev: false
 
   /@cspotcode/source-map-support@0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -2202,15 +2191,6 @@ packages:
     resolution: {integrity: sha512-0eu5ULPS2c/jsa1lGFneEFFEdTbembJv8e4QKXeVJ3lm/5hyve06dlKZrpxmMwJt6rYen7sxmHHK2CLaXvWuWQ==}
     dev: false
 
-  /fs-extra@11.1.0:
-    resolution: {integrity: sha512-0rcTq621PD5jM/e0a3EJoGC/1TC5ZBCERW82LQuwfGnCa1V8w7dpYH1yNu+SLb6E5dkeCBzKEyLGlFrnr+dUyw==}
-    engines: {node: '>=14.14'}
-    dependencies:
-      graceful-fs: 4.2.10
-      jsonfile: 6.1.0
-      universalify: 2.0.0
-    dev: false
-
   /fs-extra@7.0.1:
     resolution: {integrity: sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==}
     engines: {node: '>=6 <7 || >=8'}
@@ -2237,6 +2217,10 @@ packages:
       graceful-fs: 4.2.10
       jsonfile: 6.1.0
       universalify: 2.0.0
+    dev: true
+
+  /fs-monkey@1.0.3:
+    resolution: {integrity: sha512-cybjIfiiE+pTWicSCLFHSrXZ6EilF30oh91FDP9S2B051prEa7QWfrVTQm10/dDpswBDXZugPa1Ogu8Yh+HV0Q==}
     dev: true
 
   /fs.realpath@1.0.0:
@@ -2349,10 +2333,6 @@ packages:
       ignore: 5.2.4
       merge2: 1.4.1
       slash: 3.0.0
-    dev: true
-
-  /globrex@0.1.2:
-    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
     dev: true
 
   /gopd@1.0.1:
@@ -2722,6 +2702,7 @@ packages:
       universalify: 2.0.0
     optionalDependencies:
       graceful-fs: 4.2.10
+    dev: true
 
   /kind-of@6.0.3:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
@@ -2851,6 +2832,13 @@ packages:
   /map-obj@4.3.0:
     resolution: {integrity: sha512-hdN1wVrZbb29eBGiGjJbeP8JbKjq1urkHJ/LIP/NY48MZ1QVXUsQBV1G1zvYFHn1XE06cwjBsOI2K3Ulnj1YXQ==}
     engines: {node: '>=8'}
+    dev: true
+
+  /memfs@3.5.1:
+    resolution: {integrity: sha512-UWbFJKvj5k+nETdteFndTpYxdeTMox/ULeqX5k/dpaQJCCFmj5EeKv3dBcyO2xmkRAx2vppRu5dVG7SOtsGOzA==}
+    engines: {node: '>= 4.0.0'}
+    dependencies:
+      fs-monkey: 1.0.3
     dev: true
 
   /memorystream@0.3.1:
@@ -3888,19 +3876,6 @@ packages:
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
-  /tsconfck@2.1.1(typescript@4.9.5):
-    resolution: {integrity: sha512-ZPCkJBKASZBmBUNqGHmRhdhM8pJYDdOXp4nRgj/O0JwUwsMq50lCDRQP/M5GBNAA0elPrq4gAeu4dkaVCuKWww==}
-    engines: {node: ^14.13.1 || ^16 || >=18}
-    hasBin: true
-    peerDependencies:
-      typescript: ^4.3.5 || ^5.0.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      typescript: 4.9.5
-    dev: true
-
   /tsconfig-paths@4.2.0:
     resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
     engines: {node: '>=6'}
@@ -4050,6 +4025,12 @@ packages:
     resolution: {integrity: sha512-+A5Sja4HP1M08MaXya7p5LvjuM7K6q/2EaC0+iovj/wOcMsTzMvDFbasi/oSapiwOlt252IqsKqPjCl7huKS0A==}
     dev: true
 
+  /unionfs@4.4.0:
+    resolution: {integrity: sha512-N+TuJHJ3PjmzIRCE1d2N3VN4qg/P78eh/nxzwHnzpg3W2Mvf8Wvi7J1mvv6eNkb8neUeSdFSQsKna0eXVyF4+w==}
+    dependencies:
+      fs-monkey: 1.0.3
+    dev: true
+
   /universalify@0.1.2:
     resolution: {integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==}
     engines: {node: '>= 4.0.0'}
@@ -4058,6 +4039,7 @@ packages:
   /universalify@2.0.0:
     resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==}
     engines: {node: '>= 10.0.0'}
+    dev: true
 
   /uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
@@ -4094,22 +4076,6 @@ packages:
       - supports-color
       - terser
     dev: false
-
-  /vite-tsconfig-paths@4.2.0(typescript@4.9.5):
-    resolution: {integrity: sha512-jGpus0eUy5qbbMVGiTxCL1iB9ZGN6Bd37VGLJU39kTDD6ZfULTTb1bcc5IeTWqWJKiWV5YihCaibeASPiGi8kw==}
-    peerDependencies:
-      vite: '*'
-    peerDependenciesMeta:
-      vite:
-        optional: true
-    dependencies:
-      debug: 4.3.4
-      globrex: 0.1.2
-      tsconfck: 2.1.1(typescript@4.9.5)
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
-    dev: true
 
   /vite@3.2.5(@types/node@18.15.3):
     resolution: {integrity: sha512-4mVEpXpSOgrssFZAOmGIr85wPHKvaDAcXqxVxVRZhljkJOMZi1ibLibzjLHzJvcok8BMguLc7g1W6W/GqZbLdQ==}
