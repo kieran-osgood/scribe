@@ -35,6 +35,7 @@
     "release": "run-s release:*",
     "release:ci": "pnpm run ci",
     "release:publish": "changeset publish",
+    "changeset": "changeset",
     "postinstall": "patch-package"
   },
   "dependencies": {
