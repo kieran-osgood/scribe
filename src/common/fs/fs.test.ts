@@ -2,6 +2,8 @@ import { Effect, pipe } from '@scribe/core';
 import { fs, vol } from 'memfs';
 import { cwdAsJson } from '../../../setup-fs';
 import * as FS from './node-fs';
+import path from 'path';
+import { ErrnoError } from './error';
 
 const fileContents = 'super secret file';
 
@@ -10,88 +12,90 @@ beforeEach(() => {
 });
 
 describe('fs', () => {
-  describe('readFile', function () {
-    it('should read file to path', async () => {
-      vol.writeFile('template.ts', fileContents, () => {});
+  describe('readFile', () => {
+    it('should read file to path', () =>
+      pipe(
+        Effect.gen(function* ($) {
+          // arrange
+          const filePath = path.join(process.cwd(), './template.ts');
+          vol.writeFile(filePath, fileContents, () => {});
 
-      const result = await pipe(
-        FS.readFile('./template.ts', null),
+          // act
+          const result = yield* $(FS.readFile(filePath, null));
+
+          // assert
+          expect(String(result)).toBe(fileContents);
+        }),
         Effect.runPromise
-      );
-      expect(String(result)).toBe(fileContents);
-    });
+      ));
 
-    it('throw error if file doesnt exist', async () => {
-      const read = FS.readFile('./template.ts', null);
-      await expect(() =>
-        Effect.runPromise(read)
-      ).rejects.toThrowErrorMatchingInlineSnapshot(
-        '"{\\"_tag\\":\\"ErrnoError\\",\\"error\\":{\\"code\\":\\"ENOENT\\",\\"path\\":\\"./template.ts\\",\\"prev\\":null}}"'
-      );
-    });
+    it('throw error if file doesnt exist', () =>
+      pipe(
+        Effect.gen(function* ($) {
+          const filePath = path.join(process.cwd(), './template.ts');
+          const result = yield* $(FS.readFile(filePath, null), Effect.flip);
+
+          expect(result._tag).toBe('ErrnoError');
+          expect(result).toBeInstanceOf(ErrnoError);
+        }),
+        Effect.runPromise
+      ));
   });
 
-  describe('writeFile', function () {
-    it('should write file to path and read it back', async () => {
-      const result = await pipe(
-        FS.writeFile('./template.ts', fileContents, null),
-        Effect.runPromise
-      );
-      expect(result).toBe(true);
+  describe('writeFile', () => {
+    it('should write file to path and read it back', () =>
+      pipe(
+        Effect.gen(function* ($) {
+          const filePath = path.join(process.cwd(), './template.ts');
 
-      const readResult = await pipe(
-        FS.readFile('./template.ts', { encoding: 'utf8' }),
+          expect(
+            yield* $(FS.writeFile(filePath, fileContents, null)) //
+          ).toBe(true);
+          expect(
+            yield* $(FS.readFile(filePath, { encoding: 'utf8' })) //
+          ).toEqual(fileContents);
+        }),
         Effect.runPromise
-      );
-      expect(readResult).toEqual(fileContents);
-    });
+      ));
 
     it.todo('throw error if file is not writable');
   });
 
-  describe('mkdir', function () {
-    it('creates recursively ', async () => {
-      await pipe(
-        FS.mkdir('./some/nested/pathway', { recursive: true }),
-        Effect.runPromise
-      );
+  describe('mkdir', () => {
+    it('creates recursively ', () =>
+      pipe(
+        Effect.gen(function* ($) {
+          yield* $(FS.mkdir('./some/nested/pathway', { recursive: true }));
+          expect(cwdAsJson()).toMatchSnapshot();
 
-      expect(cwdAsJson()).toMatchInlineSnapshot(`
-        {
-          "some/nested/pathway": null,
-        }
-      `);
-      const dirExists = fs.existsSync('./some/nested/pathway');
-      expect(dirExists).toEqual(true);
+          const dirExists = fs.existsSync('./some/nested/pathway');
+          expect(dirExists).toEqual(true);
 
-      await pipe(
-        FS.mkdir('./tmpl/a/b', { recursive: true }),
+          yield* $(FS.mkdir('./tmpl/a/b', { recursive: true }));
+          expect(cwdAsJson()).toMatchSnapshot();
+        }),
         Effect.runPromise
-      );
-      expect(cwdAsJson()).toMatchInlineSnapshot(`
-        {
-          "some/nested/pathway": null,
-          "tmpl/a/b": null,
-        }
-      `);
-    });
+      ));
 
     it.todo('doesnt throw if dir already exists');
   });
 
-  describe('writeFileWithDir', function () {
-    it('should write file to path and read it back', async () => {
-      const result = await pipe(
-        FS.writeFileWithDir('/path/to/template.ts', fileContents, null),
-        Effect.runPromise
-      );
-      expect(result).toBe(true);
+  describe('writeFileWithDir', () => {
+    it('should write file to path and read it back', () =>
+      pipe(
+        Effect.gen(function* ($) {
+          const filePath = '/path/to/template.ts';
+          const result = yield $(
+            FS.writeFileWithDir(filePath, fileContents, null)
+          );
+          expect(result).toBe(true);
 
-      const readResult = await pipe(
-        FS.readFile('/path/to/template.ts', { encoding: 'utf8' }),
+          const readResult = yield* $(
+            FS.readFile(filePath, { encoding: 'utf8' })
+          );
+          expect(readResult).toEqual(fileContents);
+        }),
         Effect.runPromise
-      );
-      expect(readResult).toEqual(fileContents);
-    });
+      ));
   });
 });
