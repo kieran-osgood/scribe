@@ -2,10 +2,12 @@
 
 A CLI to bootstrap files with [Mustache](https://github.com/mustache/mustache.github.com) templates.
 
----
+<div align='center'>
+  <img src="docs/usage.png" alt="scribe usage example" style='margin-bottom: 25px; margin-top: 20px; height: 450px;'>
+</div>
 
 <p align="center">
-  <img src="docs/usage.png" alt="scribe usage example" style='margin-bottom: 25px; margin-top: 20px;'>
+
 
 [//]: # (URL for usage example above)
 [//]: # (https://ray.so/#code=JCBzY3JpYmUgLS10ZW1wbGF0ZT1zY3JlZW4gLS1uYW1lPUxvZ2luCgrinIUgU3VjY2Vzc2Z1bCBHZW5lcmF0aW9uCgpPdXRwdXQgZmlsZXM6IAotICJzcmMvc2NyZWVucy9sb2dpbi50cyIKLSAic3JjL3NjcmVlbnMvbG9naW4udGVzdC50cyIK&language=shell)
@@ -32,16 +34,12 @@ A CLI to bootstrap files with [Mustache](https://github.com/mustache/mustache.gi
 
 ## Installation
 
----
-
 ```shell
 npm i -D scribe
 pnpm i -D scribe
 yarn add -D scribe
 ```
 ## Usage
-
----
 
 A simple use-case is a single file to output, but you can bootstrap multiple files, e.g. test files, related components,
 etc.
@@ -82,15 +80,9 @@ function LoginScreen() {
 
 ## Arguments
 
----
-
 ## Syntax
 
----
-
 ## Roadmap
-
----
 
 ### Features
 
