@@ -1,33 +1,14 @@
-import simpleGit, { GitError, StatusResult, TaskOptions } from 'simple-git';
+import simpleGit, { StatusResult, TaskOptions } from 'simple-git';
 import * as Effect from '@effect/io/Effect';
-import { TaggedClass } from '@effect/data/Data';
 import { pipe } from '@scribe/core';
+import GitStatusError from './error';
 
-class GitStatusError extends TaggedClass('GitStatusError')<{
-  readonly cause?: unknown;
-  readonly status: StatusResult;
-}> {
-  override toString(): string {
-    switch (true) {
-      case this.status.isClean():
-        return '⚠️ Working directory not clean';
-      case this.cause instanceof GitError:
-        /**
-         * TODO:
-         *  Specific message for GitError?
-         *  Is there a more specific error for status?
-         */
-        return 'unknown cause';
-      default:
-        return '❗️Unable to check Git status, are you in a git repository?';
-    }
-  }
-}
-
-export const checkWorkingTreeClean = (options?: TaskOptions) =>
+export const checkWorkingTreeClean = (
+  options?: TaskOptions,
+  controller = new AbortController()
+) =>
   pipe(
     Effect.asyncInterrupt<never, GitStatusError, StatusResult>(resume => {
-      const controller = new AbortController();
       const git = simpleGit({ abort: controller.signal });
 
       git.status(options, (cause, status) => {
@@ -57,6 +38,10 @@ export const checkWorkingTreeClean = (options?: TaskOptions) =>
       } else {
         // Unknown error/not git - Kick off Effect prompt for continue dangerously
         console.log(_.toString());
+      }
+
+      if (true) {
+        return Effect.fail(_.status);
       }
       return Effect.succeed(_.status);
     })
