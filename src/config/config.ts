@@ -1,20 +1,13 @@
 import { cosmiconfig } from 'cosmiconfig';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
-import { flow, pipe } from '../common/core';
-import * as Effect from '@effect/io/Effect';
-import { TaggedClass } from '@effect/data/Data';
+
 import { CosmiconfigResult } from 'cosmiconfig/dist/types';
-import { Config } from './types';
 
-class CosmicConfigError extends TaggedClass('CosmicConfigError')<{
-  readonly error:
-    | `[read config failed] ${string}`
-    | 'invalid config'
-    | 'Empty Config'
-    | 'No template options found';
-}> {}
+import { Effect, flow, pipe, S, TF } from '@scribe/core';
+import { CosmicConfigError } from './error';
+import { ScribeConfig } from './schema';
 
-const cosmicExplorer = () =>
+const getCosmicExplorer = () =>
   cosmiconfig('test', {
     loaders: { '.ts': TypeScriptLoader() },
   });
@@ -22,25 +15,34 @@ const cosmicExplorer = () =>
 const extractConfig = (_: CosmiconfigResult) =>
   Effect.cond(
     () => !!_?.isEmpty !== true,
-    () => _?.config as ReadUserConfigValue,
+    () => _?.config as unknown,
     () => new CosmicConfigError({ error: 'Empty Config' })
   );
-
-type ReadUserConfigValue = {
-  templates: Config['templates'];
-};
-export const readConfig = (
-  path: string
-): Effect.Effect<never, CosmicConfigError, ReadUserConfigValue> =>
+const parse = (conf: unknown) =>
+  Effect.mapError(S.parseEffect(ScribeConfig)(conf), e =>
+    TF.formatErrors(e.errors)
+  );
+export const readConfig = (path: string) =>
   pipe(
     Effect.tryCatchPromise(
-      () => cosmicExplorer().load(path),
+      () => getCosmicExplorer().load(path),
       _ =>
         new CosmicConfigError({
           error: `[read config failed] ${_}` as const,
         })
     ),
-    Effect.flatMap(extractConfig)
+    Effect.flatMap(extractConfig),
+
+    // Effect.tap(_ => Effect.log('Lets parse?')),
+    Effect.flatMap(S.parseEffect(ScribeConfig)),
+    Effect.catchTag('ParseError', _ => {
+      console.log(`⚠️ Failed to read config: ${path}
+${TF.formatErrors(_.errors)}
+`);
+      console.log();
+      return Effect.fail(_);
+    }),
+    i => i
   );
 
 /**

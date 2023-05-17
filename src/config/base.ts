@@ -1,18 +1,11 @@
-import { Config } from './index.js';
+import { ScribeConfig } from './index.js';
 
-const baseConfig: Config = {
+const BaseConfig = {
   options: {
     rootOutDir: '.',
     templatesDirectories: ['.'],
   },
-  templates: {
-    screen: {
-      output: {
-        directory: '',
-      },
-      outputs: [],
-    },
-  },
-};
+  templates: {},
+} satisfies ScribeConfig;
 
-export default baseConfig;
+export default BaseConfig;

@@ -10,7 +10,9 @@ export * as Runtime from '@effect/io/Runtime';
 export * as Exit from '@effect/io/Exit';
 
 //schema
-export * as Schema from '@effect/schema/Schema';
+export * as S from '@effect/schema/Schema';
+export * as TF from '@effect/schema/TreeFormatter';
+
 // export * as Sink from '@effect/stream/Sink';
 // export * as Stream from '@effect/stream/Stream';
 
