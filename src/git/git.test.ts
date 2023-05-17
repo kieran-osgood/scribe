@@ -3,6 +3,10 @@ import { checkWorkingTreeClean } from './git';
 import { beforeEach } from 'vitest';
 
 const mockStatusImplementation = vi.fn();
+const mockConsoleLog = vi.fn();
+vi.stubGlobal('console', {
+  log: mockConsoleLog,
+});
 
 type SimpleGitModule = typeof import('simple-git');
 vi.mock('simple-git', async () => ({
@@ -18,6 +22,10 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllEnvs();
+});
+
+afterAll(() => {
+  vi.unstubAllGlobals();
 });
 
 describe('Git', async () => {
@@ -41,16 +49,17 @@ describe('Git', async () => {
     it('The callback has an error', () =>
       pipe(
         Effect.gen(function* ($) {
-          const logSpy = vi.spyOn(global.console, 'log');
           mockStatusImplementation.mockImplementation((_options, cb) => {
             return cb(new GitError(), { isClean: () => true });
           });
           const result = yield* $(checkWorkingTreeClean(), Effect.flip);
-          expect(logSpy).toBeCalledTimes(1);
-          expect(logSpy).toBeCalledWith('⚠️ Working directory not clean');
+          expect(mockConsoleLog).toBeCalledTimes(1);
+          expect(mockConsoleLog).toBeCalledWith(
+            '⚠️ Working directory not clean'
+          );
 
           expect(result.isClean()).toBe(true);
-          logSpy.mockRestore();
+          mockConsoleLog.mockRestore();
         }),
         Effect.runPromise
       ));
@@ -71,19 +80,17 @@ describe('Git', async () => {
       it('The status.isClean is false', () =>
         pipe(
           Effect.gen(function* ($) {
-            const logSpy = vi.spyOn(global.console, 'log');
-
             mockStatusImplementation.mockImplementation((_, cb) => {
               cb(null, { isClean: () => false });
             });
             const result = yield* $(checkWorkingTreeClean(), Effect.flip);
-            expect(logSpy).toBeCalledTimes(1);
-            expect(logSpy).toBeCalledWith(
+            expect(mockConsoleLog).toBeCalledTimes(1);
+            expect(mockConsoleLog).toBeCalledWith(
               '❗️Unable to check Git status, are you in a git repository?'
             );
 
             expect(result.isClean()).toBe(false);
-            logSpy.mockRestore();
+            mockConsoleLog.mockRestore();
           }),
           Effect.runPromise
         ));
