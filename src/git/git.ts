@@ -34,15 +34,21 @@ export const checkWorkingTreeClean = (
     Effect.catchTag('GitStatusError', _ => {
       if (_.status.isClean() === false) {
         // Not clean - Kick off Effect prompt for continue dangerously
-        console.log(_.toString());
+        // console.log(_.toString());
       } else {
         // Unknown error/not git - Kick off Effect prompt for continue dangerously
-        console.log(_.toString());
+        // console.log(_.toString());
       }
 
-      if (true) {
+      /**
+       * Temporary as this is the expected behaviour of the tests
+       * But we need to handle the confirmation behaviour above
+       */
+      const debug = true;
+      if (debug) {
         return Effect.fail(_.status);
       }
+
       return Effect.succeed(_.status);
     })
   );
