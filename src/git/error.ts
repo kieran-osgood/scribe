@@ -1,7 +1,7 @@
-import { TaggedClass } from '@effect/data/Data';
+import { Data } from '@scribe/core';
 import { GitError, StatusResult } from 'simple-git';
 
-export default class GitStatusError extends TaggedClass('GitStatusError')<{
+export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
   readonly status: StatusResult;
   readonly cause?: unknown;
 }> {

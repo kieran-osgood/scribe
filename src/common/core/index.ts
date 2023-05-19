@@ -1,9 +1,13 @@
 // effect
 export * as Boolean from '@effect/data/Boolean';
 export * as Either from '@effect/data/Either';
+export * as RA from '@effect/data/ReadonlyArray';
 export * from '@effect/data/Function';
 export * as Option from '@effect/data/Option';
 export * as Data from '@effect/data/Data';
+export * as Chunk from '@effect/data/Chunk';
+export { TaggedClass } from '@effect/data/Data';
+
 // io
 export * as Effect from '@effect/io/Effect';
 export * as Runtime from '@effect/io/Runtime';
