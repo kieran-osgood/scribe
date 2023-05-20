@@ -40,7 +40,6 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@effect-ts/node": "^0.39.0",
     "@effect/data": "^0.11.5",
     "@effect/io": "^0.19.2",
     "@effect/match": "^0.12.1",
@@ -48,21 +47,14 @@
     "case-anything": "^2.1.10",
     "clipanion": "^3.2.0",
     "colorette": "^2.0.20",
-    "commander": "^10.0.0",
     "cosmiconfig": "^8.1.0",
     "cosmiconfig-typescript-loader": "^4.3.0",
-    "fast-check": "^3.8.0",
     "fp-ts": "^2.13.1",
     "fp-ts-std": "^0.15.1",
     "inquirer": "8.0.0",
-    "load-json-file": "^7.0.1",
-    "npm-run-all": "^4.1.5",
-    "postinstall-postinstall": "^2.1.0",
-    "shelljs": "^0.8.5",
     "simple-git": "^3.18.0",
     "template-file": "^6.0.1",
     "typanion": "^3.12.1",
-    "vite-node": "^0.29.8",
     "yargs": "^17.7.1",
     "zod": "^3.20.6"
   },
@@ -82,8 +74,11 @@
     "changeset": "^0.2.6",
     "eslint": "^8.34.0",
     "eslint-plugin-communist-spelling": "^1.0.0",
+    "fast-check": "^3.8.0",
     "memfs": "^3.5.1",
+    "npm-run-all": "^4.1.5",
     "patch-package": "^6.5.1",
+    "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.8.4",
     "regenerator-runtime": "^0.13.11",
     "shx": "^0.3.4",
@@ -92,6 +87,7 @@
     "tsup": "^6.6.3",
     "typescript": "^4.9.5",
     "unionfs": "^4.4.0",
+    "vite-node": "^0.29.8",
     "vitest": "0.31.1"
   }
 }

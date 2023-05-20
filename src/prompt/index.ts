@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { pipe, SStd } from '../common/core';
+import { pipe } from '../common/core';
 import { fmtError } from '../common/error';
 import inquirer, { Answers, QuestionCollection } from 'inquirer';
 import * as Effect from '@effect/io/Effect';
@@ -19,9 +19,11 @@ export function launchPromptInterface(
     options,
     makeQuestionCollection,
     tryInquirerPrompt,
-    Effect.map(
-      SStd.merge({ name: options.flags.name, template: options.flags.template })
-    ),
+    Effect.map(_ => ({
+      ..._,
+      name: options.flags.name,
+      template: options.flags.template,
+    })),
     Effect.flatMap(tryParsePrompt)
   );
 }
