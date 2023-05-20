@@ -33,7 +33,8 @@ export abstract class BaseCommand extends Command {
       this.executeSafe(), //
       Effect.runPromise,
       _ =>
-        _.catch(_ => {
+        // empty then to stop node exit code coercion?
+        _.then(() => {}).catch(_ => {
           console.warn(_.toString());
           // process.exit(1);
         })

@@ -8,6 +8,7 @@ import { promptUserForMissingArgs } from '../context';
 import { BaseCommand } from './BaseCommand';
 import { constructTemplate, Ctx, writeTemplate } from '../templates';
 import { Template } from '@scribe/config';
+import { green } from 'colorette';
 
 export class DefaultCommand extends BaseCommand {
   static override paths = [Command.Default];
@@ -65,7 +66,7 @@ export class DefaultCommand extends BaseCommand {
           Chunk.map(s => `- ${s}`),
           Chunk.join('\n')
         );
-        console.log(`✅ Generation Successful!\n\nOutput files:\n${results}\n`);
+        console.log(green(`✅  Success!\n\nOutput files:\n${results}\n`));
         return _;
       })
     );

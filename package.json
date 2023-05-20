@@ -22,7 +22,6 @@
   ],
   "scripts": {
     "start": "ts-node main.ts",
-    "start:name": "ts-node main.ts --name=Login",
     "test": "run-p test:*",
     "test:unit": "vitest",
     "test:types": "vitest typecheck",
@@ -47,8 +46,8 @@
     "@effect/match": "^0.12.1",
     "@effect/schema": "^0.11.1",
     "case-anything": "^2.1.10",
-    "chalk": "^5.2.0",
     "clipanion": "^3.2.0",
+    "colorette": "^2.0.20",
     "commander": "^10.0.0",
     "cosmiconfig": "^8.1.0",
     "cosmiconfig-typescript-loader": "^4.3.0",
