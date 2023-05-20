@@ -7,7 +7,7 @@ export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
 }> {
   override toString(): string {
     switch (true) {
-      case this.status.isClean():
+      case this.status.isClean() === false:
         return '⚠️ Working directory not clean';
       case this.cause instanceof GitError:
         /**

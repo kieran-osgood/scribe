@@ -54,9 +54,7 @@ describe('Git', async () => {
           });
           const result = yield* $(checkWorkingTreeClean(), Effect.flip);
           expect(mockConsoleLog).toBeCalledTimes(1);
-          expect(mockConsoleLog).toBeCalledWith(
-            '⚠️ Working directory not clean'
-          );
+          expect(mockConsoleLog).toBeCalledWith('unknown cause');
 
           expect(result.isClean()).toBe(true);
           mockConsoleLog.mockRestore();
@@ -86,7 +84,7 @@ describe('Git', async () => {
             const result = yield* $(checkWorkingTreeClean(), Effect.flip);
             expect(mockConsoleLog).toBeCalledTimes(1);
             expect(mockConsoleLog).toBeCalledWith(
-              '❗️Unable to check Git status, are you in a git repository?'
+              '⚠️ Working directory not clean'
             );
 
             expect(result.isClean()).toBe(false);

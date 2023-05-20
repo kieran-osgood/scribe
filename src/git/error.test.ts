@@ -5,22 +5,20 @@ describe('GitStatusError', () => {
   describe('toString', () => {
     it('Warns if directory is not clean', () => {
       const error = new GitStatusError({
-        status: { isClean: () => true } as StatusResult,
+        status: { isClean: () => false } as StatusResult,
       });
-      expect(error.toString()).toMatchInlineSnapshot(
-        '"⚠️ Working directory not clean"'
-      );
+      expect(error.toString()).toBe('⚠️ Working directory not clean');
     });
     it('Warns if GitError is thrown', () => {
       const error = new GitStatusError({
-        status: { isClean: () => false } as StatusResult,
+        status: { isClean: () => true } as StatusResult,
         cause: new GitError(),
       });
       expect(error.toString()).toBe('unknown cause');
     });
     it('Warns if running in non-git directory', () => {
       const error = new GitStatusError({
-        status: { isClean: () => false } as StatusResult,
+        status: { isClean: () => true } as StatusResult,
       });
       expect(error.toString()).toBe(
         '❗️Unable to check Git status, are you in a git repository?'
