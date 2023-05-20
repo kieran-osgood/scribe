@@ -34,10 +34,10 @@ export const checkWorkingTreeClean = (
     Effect.catchTag('GitStatusError', _ => {
       if (_.status.isClean() === false) {
         // Not clean - Kick off Effect prompt for continue dangerously
-        // console.log(_.toString());
+        console.log(_.toString());
       } else {
         // Unknown error/not git - Kick off Effect prompt for continue dangerously
-        // console.log(_.toString());
+        console.log(_.toString());
       }
 
       /**

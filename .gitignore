@@ -133,3 +133,5 @@ yarn-error.log
 examples/src/screens/*
 !examples/src/screens/login.ts
 .github/tests/*.xml
+
+tsconfig.vitest-temp.json
