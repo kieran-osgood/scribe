@@ -8,7 +8,7 @@ import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 
 import { BaseCommand } from './BaseCommand';
-import { generateProgramInputs } from '../context';
+import { promptUserForMissingArgs } from '../context';
 import { Template } from '@scribe/config';
 
 export class DefaultCommand extends BaseCommand {
@@ -41,7 +41,7 @@ export class DefaultCommand extends BaseCommand {
 
       Effect.flatMap(() =>
         pipe(
-          generateProgramInputs({
+          promptUserForMissingArgs({
             name: this.name,
             template: this.template,
             configPath: this.configPath,
@@ -66,7 +66,7 @@ class TemplateFileError extends Data.TaggedClass('TemplateFileError')<{
   }
 }
 
-type Ctx = Effect.Effect.Success<ReturnType<typeof generateProgramInputs>>;
+type Ctx = Effect.Effect.Success<ReturnType<typeof promptUserForMissingArgs>>;
 
 function constructTemplate(ctx: Ctx) {
   /**
