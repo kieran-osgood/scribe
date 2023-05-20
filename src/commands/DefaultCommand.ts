@@ -1,14 +1,12 @@
-import { Data, Effect, pipe } from '@scribe/core';
-import { writeFile } from '@scribe/fs';
-import { checkWorkingTreeClean } from '@scribe/git';
-
-import { render, renderFile } from 'template-file';
-import path from 'path';
 import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 
+import { Chunk, Effect, pipe, RA } from '@scribe/core';
+import { checkWorkingTreeClean } from '@scribe/git';
+
+import { promptUserForMissingArgs } from '../context';
 import { BaseCommand } from './BaseCommand';
-import { generateProgramInputs } from '../context';
+import { constructTemplate, Ctx, writeTemplate } from '../templates';
 import { Template } from '@scribe/config';
 
 export class DefaultCommand extends BaseCommand {
@@ -29,7 +27,8 @@ export class DefaultCommand extends BaseCommand {
   });
 
   template = Option.String('-t,--template', {
-    description: '',
+    description:
+      'Specify the name of the template to generate. Must be a key under templates in config.',
     validator: t.isString(),
     required: false,
   });
@@ -37,10 +36,9 @@ export class DefaultCommand extends BaseCommand {
   executeSafe = () =>
     pipe(
       checkWorkingTreeClean(),
-
       Effect.flatMap(() =>
         pipe(
-          generateProgramInputs({
+          promptUserForMissingArgs({
             name: this.name,
             template: this.template,
             configPath: this.configPath,
@@ -52,48 +50,40 @@ export class DefaultCommand extends BaseCommand {
           })
         )
       ),
-
-      Effect.flatMap(constructTemplate),
-
-      Effect.flatMap(writeTemplate),
-
-      Effect.tap(_ => Effect.log(JSON.stringify(_))),
-      Effect.tapError(_ => Effect.log(JSON.stringify(_)))
+      Effect.map(_ =>
+        pipe(
+          _.config.templates[_.input.template]?.outputs ?? [],
+          RA.map(templateOutput => createTemplate({ templateOutput, ..._ }))
+        )
+      ),
+      Effect.flatMap(Effect.collectAll),
+      Effect.map(Chunk.flatten),
+      Effect.flatMap(Effect.forEach(s => s)),
+      Effect.map(_ => {
+        const results = pipe(
+          _,
+          Chunk.map(s => `- ${s}`),
+          Chunk.join('\n')
+        );
+        console.log(`✅ Generation Successful!\n\nOutput files:\n${results}\n`);
+        return _;
+      })
     );
 }
 
-class TemplateFileError extends Data.TaggedClass('TemplateFileError')<{
-  readonly cause?: unknown;
-}> {
-  override toString(): string {
-    return 'Writing to file failed, please report this.';
-  }
-}
-
-type Ctx = Effect.Effect.Success<ReturnType<typeof generateProgramInputs>>;
-
-function constructTemplate(ctx: Ctx) {
+/**
+ * Wrap writeTemplate with Effect.gen
+ * to keep track of the filePaths without process.cwd()
+ * or return array of full paths and string.replace process.cwd()
+ */
+const createTemplate = (ctx: Ctx & { templateOutput: Template }) => {
   return pipe(
-    Effect.tryCatchPromise(
-      () =>
-        renderFile(path.join(process.cwd(), `${ctx.input.template}.scribe`), {
-          Name: ctx.input.name,
-          //   ...ctx.input.variables
-        }),
-      cause => new TemplateFileError({ cause })
-    ),
-    // TODO: ...ctx.variables
-    Effect.map(_ => ({ fileContents: _, ...ctx }))
+    Effect.gen(function* ($) {
+      const templates = yield* $(
+        pipe(constructTemplate(ctx), Effect.collectAll)
+      );
+
+      return pipe(templates, Chunk.map(writeTemplate));
+    })
   );
-}
-
-// TODO: handle list of outputs
-const writeTemplate = (_: Ctx & { fileContents: string }) => {
-  const output = _.config.templates[_.input.template]?.outputs[0]
-    ?.output as Template['output'];
-
-  const fileName = render(output.fileName, { Name: _.input.name });
-  const filePath = path.join(process.cwd(), output.directory, fileName);
-
-  return writeFile(filePath, _.fileContents, null);
 };

@@ -1,20 +1,13 @@
 import { cosmiconfig } from 'cosmiconfig';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
-import { flow, pipe } from '../common/core';
-import * as Effect from '@effect/io/Effect';
-import { TaggedClass } from '@effect/data/Data';
 import { CosmiconfigResult } from 'cosmiconfig/dist/types';
-import { Config } from './types';
 
-class CosmicConfigError extends TaggedClass('CosmicConfigError')<{
-  readonly error:
-    | `[read config failed] ${string}`
-    | 'invalid config'
-    | 'Empty Config'
-    | 'No template options found';
-}> {}
+import { Effect, flow, pipe, RA, S } from '@scribe/core';
 
-const cosmicExplorer = () =>
+import { ConfigParseError, CosmicConfigError } from './error';
+import { ScribeConfig } from './schema';
+
+const getCosmicExplorer = () =>
   cosmiconfig('test', {
     loaders: { '.ts': TypeScriptLoader() },
   });
@@ -22,42 +15,46 @@ const cosmicExplorer = () =>
 const extractConfig = (_: CosmiconfigResult) =>
   Effect.cond(
     () => !!_?.isEmpty !== true,
-    () => _?.config as ReadUserConfigValue,
+    () => _?.config as unknown,
     () => new CosmicConfigError({ error: 'Empty Config' })
   );
 
-type ReadUserConfigValue = {
-  templates: Config['templates'];
-};
-export const readConfig = (
-  path: string
-): Effect.Effect<never, CosmicConfigError, ReadUserConfigValue> =>
+export const readConfig = (path: string) =>
   pipe(
     Effect.tryCatchPromise(
-      () => cosmicExplorer().load(path),
+      () => getCosmicExplorer().load(path),
       _ =>
         new CosmicConfigError({
-          error: `[read config failed] ${_}` as const,
+          error: `[read config failed] ${_}`,
         })
     ),
-    Effect.flatMap(extractConfig)
+    Effect.flatMap(extractConfig),
+    Effect.flatMap(S.parseEffect(ScribeConfig)),
+    Effect.catchTag('ParseError', _ =>
+      Effect.fail(new ConfigParseError({ errors: _.errors, path }))
+    )
   );
 
+const checkForTemplates = (_: string[]) =>
+  Effect.cond(
+    () => _.length > 0,
+    () => _,
+    () =>
+      new CosmicConfigError({
+        error: 'No template options found',
+      })
+  );
 /**
  * reads the config from readUserConfig and picks out the values
  * which are valid options
  */
 export const readUserTemplateOptions = flow(
   readConfig,
-  Effect.map(_ => Object.keys(_.templates)),
-  Effect.flatMap(_ =>
-    Effect.cond(
-      () => _.length > 0,
-      () => _,
-      () =>
-        new CosmicConfigError({
-          error: 'No template options found' as const,
-        })
+  Effect.flatMap(config =>
+    pipe(
+      RA.fromRecord(config.templates),
+      RA.map(_ => _[0]),
+      checkForTemplates
     )
   )
 );

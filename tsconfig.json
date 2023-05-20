@@ -45,7 +45,7 @@
     "allowSyntheticDefaultImports": true
   },
   "exclude": [
-    "examples/"
+    "examples/**/*.*"
   ],
   "ts-node": {
     "swc": true,

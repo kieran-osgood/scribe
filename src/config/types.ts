@@ -1,25 +1,24 @@
-// type FileNameFormatter =
-// | 'PascalCase'
-// | 'camelCase'
-// | 'lower-kebab-case'
-// | 'Upper-Kebab-Case';
-
-export type Config = {
+export type ScribeConfig = {
   /**
    * Global settings that apply to all template options
    * Overridable within templates
    */
-  options?: {
-    /**
-     * Sets the root for pathing on relative paths
-     */
-    rootOutDir: string;
-    templatesDirectories: string[];
-  };
+  options?: GlobalOptions;
   /**
    * List of templates for the CLI to render
    */
   templates: Record<string, TemplateSettings>;
+};
+
+export type GlobalOptions = {
+  /**
+   * Sets the root for pathing on relative paths
+   */
+  rootOutDir: string;
+  /**
+   * Directories to discover `*.scribe` files
+   */
+  templatesDirectories: string[];
 };
 
 export type TemplateSettings = {

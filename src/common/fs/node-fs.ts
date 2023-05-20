@@ -1,5 +1,5 @@
 import { Effect, pipe } from '@scribe/core';
-import * as FS from 'fs';
+import * as NFS from 'fs';
 import { ErrnoError } from './error';
 import { Abortable } from 'node:events';
 import path from 'path';
@@ -7,14 +7,14 @@ import path from 'path';
 export const writeFile = (
   pathName: string,
   data: string | NodeJS.ArrayBufferView,
-  options: FS.WriteFileOptions
+  options: NFS.WriteFileOptions
 ) =>
-  Effect.async<never, ErrnoError, boolean>(resume => {
-    FS.writeFile(pathName, data, options, err => {
-      if (err) {
-        resume(Effect.fail(new ErrnoError(err)));
+  Effect.async<never, ErrnoError, string>(resume => {
+    NFS.writeFile(pathName, data, options, error => {
+      if (error) {
+        resume(Effect.fail(new ErrnoError({ error })));
       } else {
-        resume(Effect.succeed(true));
+        resume(Effect.succeed(pathName));
       }
     });
   });
@@ -22,7 +22,7 @@ export const writeFile = (
 export const writeFileWithDir = (
   pathName: string,
   data: string | NodeJS.ArrayBufferView,
-  options: FS.WriteFileOptions
+  options: NFS.WriteFileOptions
 ) =>
   pipe(
     mkdir(path.dirname(pathName), { recursive: true }),
@@ -30,7 +30,7 @@ export const writeFileWithDir = (
   );
 
 export const readFile = (
-  path: FS.PathOrFileDescriptor,
+  path: NFS.PathOrFileDescriptor,
   options:
     | ({
         encoding?: BufferEncoding;
@@ -40,9 +40,9 @@ export const readFile = (
     | null
 ) =>
   Effect.async<never, ErrnoError, string | Buffer>(resume => {
-    FS.readFile(path, options, (err, data) => {
-      if (err) {
-        resume(Effect.fail(new ErrnoError(err)));
+    NFS.readFile(path, options, (error, data) => {
+      if (error) {
+        resume(Effect.fail(new ErrnoError({ error })));
       } else {
         resume(Effect.succeed(data));
       }
@@ -50,17 +50,38 @@ export const readFile = (
   });
 
 export const mkdir = (
-  path: FS.PathLike,
-  options: FS.MakeDirectoryOptions & {
+  path: NFS.PathLike,
+  options: NFS.MakeDirectoryOptions & {
     recursive: true;
   }
 ) =>
   Effect.async<never, ErrnoError, string | undefined>(resume => {
-    FS.mkdir(path, options, (err, data) => {
-      if (err) {
-        resume(Effect.fail(new ErrnoError(err)));
+    NFS.mkdir(path, options, (error, data) => {
+      if (error) {
+        resume(Effect.fail(new ErrnoError({ error })));
       } else {
         resume(Effect.succeed(data));
       }
     });
   });
+
+export const stat = (
+  filePath: string
+): Effect.Effect<never, ErrnoError, NFS.Stats> =>
+  Effect.async(resume =>
+    NFS.stat(filePath, (error, stats) => {
+      if (error) {
+        resume(Effect.fail(new ErrnoError({ error })));
+      } else {
+        resume(Effect.succeed(stats));
+      }
+    })
+  );
+
+export const fileOrDirExists = (
+  pathLike: string
+): Effect.Effect<never, ErrnoError, boolean> =>
+  pipe(
+    stat(pathLike),
+    Effect.map(_ => _.isFile() || _.isDirectory())
+  );

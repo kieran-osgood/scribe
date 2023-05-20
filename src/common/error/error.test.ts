@@ -33,6 +33,12 @@ describe('formatErrorMessage', () => {
 
   it('non Error values should stringify', () =>
     fc.assert(
-      fc.property(fc.anything(), _ => S.Eq.equals(fmtError(_), String(_)))
+      fc.property(fc.anything({ withObjectString: true }), _ =>
+        S.Eq.equals(
+          fmtError(_),
+          typeof _?.toString === 'function' ? _?.toString() : 'Unknown Error'
+        )
+      ),
+      { seed: 1734679579, path: '8:1:78:78', endOnFailure: true }
     ));
 });

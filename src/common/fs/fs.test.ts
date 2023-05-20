@@ -6,7 +6,6 @@ import path from 'path';
 import { ErrnoError } from './error';
 
 const fileContents = 'super secret file';
-
 beforeEach(() => {
   vi.restoreAllMocks();
 });
@@ -16,7 +15,7 @@ describe('fs', () => {
     it('should read file to path', () =>
       pipe(
         Effect.gen(function* ($) {
-          const filePath = path.join(process.cwd(), './template.ts');
+          const filePath = './template1.ts';
           vol.writeFile(filePath, fileContents, err => {
             if (err) throw err;
           });
@@ -31,7 +30,7 @@ describe('fs', () => {
     it('throw error if file doesnt exist', () =>
       pipe(
         Effect.gen(function* ($) {
-          const filePath = path.join(process.cwd(), './template.ts');
+          const filePath = path.join(process.cwd(), './template2.ts');
           const result = yield* $(FS.readFile(filePath, null), Effect.flip);
 
           expect(result._tag).toBe('ErrnoError');
@@ -45,11 +44,11 @@ describe('fs', () => {
     it('should write file to path and read it back', () =>
       pipe(
         Effect.gen(function* ($) {
-          const filePath = path.join(process.cwd(), './template.ts');
+          const filePath = './template3.ts';
 
           expect(
             yield* $(FS.writeFile(filePath, fileContents, null)) //
-          ).toBe(true);
+          ).toBe('./template3.ts');
           expect(
             yield* $(FS.readFile(filePath, { encoding: 'utf8' })) //
           ).toEqual(fileContents);
@@ -57,22 +56,18 @@ describe('fs', () => {
         Effect.runPromise
       ));
 
-    // NOT IMPLEMENTED
-    it.todo('throw error if file is not writable');
-    // it.skip('throw error if file is not writable', () =>
-    //   pipe(
-    //     Effect.gen(function* ($) {
-    //       const filePath = path.join(process.cwd(), './template.ts');
-    //
-    //       expect(
-    //         yield* $(FS.writeFile(filePath, fileContents, null)) //
-    //       ).toBe(true);
-    //       expect(
-    //         yield* $(FS.readFile(filePath, { encoding: 'utf8' })) //
-    //       ).toEqual(fileContents);
-    //     }),
-    //     Effect.runPromise
-    //   ));
+    it('should write file to path and read it back', () =>
+      pipe(
+        Effect.gen(function* ($) {
+          const filePath = '/some/nonexistent/path/template4.ts';
+
+          const result = yield* $(
+            pipe(FS.writeFile(filePath, fileContents, null), Effect.flip)
+          );
+          expect(result).toBeInstanceOf(ErrnoError);
+        }),
+        Effect.runPromise
+      ));
   });
 
   describe('mkdir', () => {
@@ -110,12 +105,12 @@ describe('fs', () => {
     it('should write file to path and read it back', () =>
       pipe(
         Effect.gen(function* ($) {
-          const filePath = '/path/to/template.ts';
+          const filePath = '/path/to/template5.ts';
 
           const result = yield $(
             FS.writeFileWithDir(filePath, fileContents, null)
           );
-          expect(result).toBe(true);
+          expect(result).toBe(filePath);
 
           const readResult = yield* $(
             FS.readFile(filePath, { encoding: 'utf8' })

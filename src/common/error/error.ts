@@ -9,5 +9,7 @@ export function fmtError(error: unknown) {
     return error.message;
   }
 
-  return String(error);
+  return typeof error?.toString === 'function'
+    ? error?.toString()
+    : 'Unknown Error';
 }

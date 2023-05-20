@@ -1,10 +1,10 @@
-import type { Config } from '@scribe/config';
+import type { ScribeConfig } from '@scribe/config';
 
-const config: Config = {
-  // global: {
-  //   rootOutDir: '.',
-  //   templatesDirectories: ['.'],
-  // },
+const config = {
+  options: {
+    rootOutDir: '.',
+    templatesDirectories: ['./examples'],
+  },
   templates: {
     screen: {
       outputs: [
@@ -15,9 +15,16 @@ const config: Config = {
             fileName: '{{Name}}.ts',
           },
         },
+        {
+          templateFileKey: 'screen.test',
+          output: {
+            directory: 'examples/src/screens',
+            fileName: '{{Name}}.test.ts',
+          },
+        },
       ],
     },
   },
-};
+} satisfies ScribeConfig;
 
 export default config;
