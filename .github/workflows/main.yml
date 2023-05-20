@@ -21,7 +21,19 @@ jobs:
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run ci
+
+      - name: Lint
+        run: pnpm run ci:lint
+
+      - name: Typecheck
+        run: pnpm run ci:typecheck
+
+      - name: test
+        run: pnpm run ci:test
+
+      - name: Build
+        run: pnpm run ci:build
+
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()

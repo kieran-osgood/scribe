@@ -33,10 +33,13 @@ export abstract class BaseCommand extends Command {
       this.executeSafe(), //
       Effect.runPromise,
       _ =>
-        // empty then to stop node exit code coercion?
-        _.then(() => {}).catch(_ => {
-          console.warn(_.toString());
-          // process.exit(1);
-        })
+        _
+          // empty then to stop node exit code coercion?
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
+          .then(() => {})
+          .catch(_ => {
+            console.warn(_.toString());
+            // process.exit(1);
+          })
     );
 }
