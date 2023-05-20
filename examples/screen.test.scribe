@@ -1,7 +1,5 @@
-// @ts-ignore
-import * as React from 'react';
+describe('{{NAME}}', function() {
+  it('should ', function() {
 
-type {{Name}}Props = {}
-function {{Name}}Screen() {
-
-}
+  });
+});
