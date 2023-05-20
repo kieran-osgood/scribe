@@ -1,5 +1,16 @@
 # @kieran-osgood/scribe
 
+## 0.1.0
+
+### Minor Changes
+
+- 6749a02: Scribe can now accept multiple output files per run.
+  If writing to any file fails, cleans up after itself.
+
+### Patch Changes
+
+- 6749a02: Initial working prototype
+
 ## 0.0.4
 
 ### Patch Changes
