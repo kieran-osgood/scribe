@@ -64,5 +64,5 @@ export const writeTemplate = (
     );
     const absoluteFilePath = path.join(process.cwd(), relativeFilePaths);
 
-    return writeFile(absoluteFilePath, _.fileContents, null);
+    return yield* $(writeFile(absoluteFilePath, _.fileContents, null));
   });

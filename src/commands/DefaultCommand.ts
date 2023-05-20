@@ -83,11 +83,7 @@ const createTemplate = (ctx: Ctx & { templateOutput: Template }) => {
         pipe(constructTemplate(ctx), Effect.collectAll)
       );
 
-      return pipe(
-        templates,
-        Chunk.map(writeTemplate),
-        Chunk.map(Effect.flatten)
-      );
+      return pipe(templates, Chunk.map(writeTemplate));
     })
   );
 };
