@@ -87,10 +87,23 @@ function LoginScreen() {
 ### Features
 
 - Migrate from zod to schema
+  - Investigate issue with error messaging when can't locate the files from prompt
+```shell
+./main.js
+? Pick your template screen
+? File name: Login
+Error: {"error":"Parsing prompt failed: {\"_errors\":[],\"template\":{\"_errors\":[\"Required\"]},\"name\":{\"_errors\":[\"Required\"]}}","cause":{"issues":[{"code":"invalid_type","expected":"string","received":"undefined","path":["template"],"message":"Required"},{"code":"invalid_type","expected":"string","received":"undefined","path":["name"],"message":"Required"}],"name":"ZodError"},"_tag":"PromptError"}
+```
+  
 - Unify clipanion with yargs
 - Add option to continue despite dirty git
 - Barrel exports for TS
     - https://github.com/bencoveney/barrelsby
+- make sure stat doesn't fail 
+```shell
+./main.js --template screen --name login
+Error: {"error":{"errno":-2,"code":"ENOENT","syscall":"open","path":"/Users/kieranosgood/WebstormProjects/scribe/dist/examples/src/screens/login.ts"},"_tag":"ErrnoError"}
+```
 
 ### DX tasks
 
