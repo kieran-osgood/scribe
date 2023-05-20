@@ -1,4 +1,6 @@
-import { DefaultCommand } from 'src/commands/DefaultCommand';
+#!/usr/bin/env node
+
+import { DefaultCommand } from './src/commands/DefaultCommand';
 import { Builtins, Cli } from 'clipanion';
 
 (async () => {
