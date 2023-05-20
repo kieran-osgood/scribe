@@ -28,15 +28,21 @@ export const readConfig = (path: string) =>
           error: `[read config failed] ${_}`,
         })
     ),
-    Effect.flatMap(
-      flow(
-        extractConfig, //
-        S.parseEffect(ScribeConfig),
-        Effect.catchTag('ParseError', _ =>
-          Effect.fail(new ConfigParseError({ errors: _.errors, path }))
-        )
-      )
+    Effect.flatMap(extractConfig),
+    Effect.flatMap(S.parseEffect(ScribeConfig)),
+    Effect.catchTag('ParseError', _ =>
+      Effect.fail(new ConfigParseError({ errors: _.errors, path }))
     )
+  );
+
+const checkForTemplates = (_: string[]) =>
+  Effect.cond(
+    () => _.length > 0,
+    () => _,
+    () =>
+      new CosmicConfigError({
+        error: 'No template options found',
+      })
   );
 /**
  * reads the config from readUserConfig and picks out the values
@@ -48,15 +54,7 @@ export const readUserTemplateOptions = flow(
     pipe(
       RA.fromRecord(config.templates),
       RA.map(_ => _[0]),
-      _ =>
-        Effect.cond(
-          () => _.length > 0,
-          () => _,
-          () =>
-            new CosmicConfigError({
-              error: 'No template options found',
-            })
-        )
+      checkForTemplates
     )
   )
 );
