@@ -9,12 +9,12 @@ export const writeFile = (
   data: string | NodeJS.ArrayBufferView,
   options: NFS.WriteFileOptions
 ) =>
-  Effect.async<never, ErrnoError, boolean>(resume => {
+  Effect.async<never, ErrnoError, string>(resume => {
     NFS.writeFile(pathName, data, options, error => {
       if (error) {
         resume(Effect.fail(new ErrnoError({ error })));
       } else {
-        resume(Effect.succeed(true));
+        resume(Effect.succeed(pathName));
       }
     });
   });

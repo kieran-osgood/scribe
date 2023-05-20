@@ -33,10 +33,9 @@ export abstract class BaseCommand extends Command {
       this.executeSafe(), //
       Effect.runPromise,
       _ =>
-        _.then(() => console.log('✅ ')) //
-          .catch(_ => {
-            console.warn(_.toString());
-            process.exit(1);
-          })
+        _.catch(_ => {
+          console.warn(_.toString());
+          // process.exit(1);
+        })
     );
 }

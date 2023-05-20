@@ -15,6 +15,13 @@ const config = {
             fileName: '{{Name}}.ts',
           },
         },
+        {
+          templateFileKey: 'screen.test',
+          output: {
+            directory: 'examples/src/screens',
+            fileName: '{{Name}}.test.ts',
+          },
+        },
       ],
     },
   },

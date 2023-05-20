@@ -1,15 +1,12 @@
-import { Data, Effect, pipe } from '@scribe/core';
-import { fileOrDirExists, writeFile } from '@scribe/fs';
-import { checkWorkingTreeClean } from '@scribe/git';
-
-import { render, renderFile } from 'template-file';
-import path from 'path';
 import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 
-import { BaseCommand } from './BaseCommand';
+import { Effect, pipe } from '@scribe/core';
+import { checkWorkingTreeClean } from '@scribe/git';
+
 import { promptUserForMissingArgs } from '../context';
-import { Template } from '@scribe/config';
+import { BaseCommand } from './BaseCommand';
+import { constructTemplate, writeTemplate } from '../templates';
 
 export class DefaultCommand extends BaseCommand {
   static override paths = [Command.Default];
@@ -38,7 +35,6 @@ export class DefaultCommand extends BaseCommand {
   executeSafe = () =>
     pipe(
       checkWorkingTreeClean(),
-
       Effect.flatMap(() =>
         pipe(
           promptUserForMissingArgs({
@@ -53,80 +49,22 @@ export class DefaultCommand extends BaseCommand {
           })
         )
       ),
+
+      id => id,
+
       Effect.flatMap(constructTemplate),
-      Effect.flatMap(writeTemplate)
+      /**
+       * Wrap writeTemplate with Effect.gen
+       * to keep track of the filePaths without process.cwd()
+       * or return array of full paths and string.replace process.cwd()
+       */
+      Effect.flatMap(writeTemplate),
+
+      Effect.map(_ => {
+        console.log(`✅ Generation Successful!
+Output files:
+- ${_}`);
+        return _;
+      })
     );
 }
-
-class TemplateFileError extends Data.TaggedClass('TemplateFileError')<{
-  readonly cause?: unknown;
-}> {
-  override toString(): string {
-    return 'Writing to file failed, please report this.';
-  }
-}
-
-type Ctx = Effect.Effect.Success<ReturnType<typeof promptUserForMissingArgs>>;
-
-function constructTemplate(ctx: Ctx) {
-  /**
-   * need to check fileExists for each of templateDirectories
-   */
-  // TODO: remove as assertion
-  const templatesDirectories = ctx.config.options
-    ?.templatesDirectories as string[];
-  // const foundDefaultFiles = Effect.gen(function* ($) {
-  //   const prog = pipe(
-  //     Chunk.unsafeFromArray(templatesDirectories),
-  //     Chunk.map(_ =>
-  //       path.join(process.cwd(), _, `${ctx.input.template}.scribe`)
-  //     )
-  //     // Chunk.forEach(_ => FS.fileOrDirExists(_, null))
-  //   );
-  //
-  //   return yield* $(prog);
-  // });
-  // console.log(foundDefaultFiles);
-
-  // TODO: remove as assertion
-  const dir = templatesDirectories[0] as string;
-  const filePath = path.join(
-    process.cwd(),
-    dir,
-    `${ctx.input.template}.scribe`
-  );
-
-  // const a = RA.fromIterable(templatesDirectories);
-
-  return pipe(
-    fileOrDirExists(filePath),
-    Effect.map(_ => {
-      // console.log('-', _);
-      return _;
-    }),
-    Effect.flatMap(() =>
-      Effect.tryCatchPromise(
-        () =>
-          renderFile(filePath, {
-            Name: ctx.input.name,
-            //   ...ctx.input.variables
-          }),
-        cause => new TemplateFileError({ cause })
-      )
-    ),
-    // TODO: ...ctx.variables
-    Effect.map(_ => ({ fileContents: _, ...ctx }))
-  );
-}
-
-// TODO: handle list of outputs
-const writeTemplate = (_: Ctx & { fileContents: string }) => {
-  // TODO: ensure we have safe access
-  const output = _.config.templates[_.input.template]?.outputs[0]
-    ?.output as Template['output'];
-
-  const fileName = render(output.fileName, { Name: _.input.name });
-  const filePath = path.join(process.cwd(), output.directory, fileName);
-
-  return writeFile(filePath, _.fileContents, null);
-};
