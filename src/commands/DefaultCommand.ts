@@ -1,5 +1,5 @@
 import { Data, Effect, pipe } from '@scribe/core';
-import { writeFile } from '@scribe/fs';
+import { fileOrDirExists, writeFile } from '@scribe/fs';
 import { checkWorkingTreeClean } from '@scribe/git';
 
 import { render, renderFile } from 'template-file';
@@ -29,7 +29,8 @@ export class DefaultCommand extends BaseCommand {
   });
 
   template = Option.String('-t,--template', {
-    description: '',
+    description:
+      'Specify the name of the template to generate. Must be a key under templates in config.',
     validator: t.isString(),
     required: false,
   });
@@ -52,13 +53,8 @@ export class DefaultCommand extends BaseCommand {
           })
         )
       ),
-
       Effect.flatMap(constructTemplate),
-
-      Effect.flatMap(writeTemplate),
-
-      Effect.tap(_ => Effect.log(JSON.stringify(_))),
-      Effect.tapError(_ => Effect.log(JSON.stringify(_)))
+      Effect.flatMap(writeTemplate)
     );
 }
 
@@ -73,14 +69,50 @@ class TemplateFileError extends Data.TaggedClass('TemplateFileError')<{
 type Ctx = Effect.Effect.Success<ReturnType<typeof generateProgramInputs>>;
 
 function constructTemplate(ctx: Ctx) {
+  /**
+   * need to check fileExists for each of templateDirectories
+   */
+  // TODO: remove as assertion
+  const templatesDirectories = ctx.config.options
+    ?.templatesDirectories as string[];
+  // const foundDefaultFiles = Effect.gen(function* ($) {
+  //   const prog = pipe(
+  //     Chunk.unsafeFromArray(templatesDirectories),
+  //     Chunk.map(_ =>
+  //       path.join(process.cwd(), _, `${ctx.input.template}.scribe`)
+  //     )
+  //     // Chunk.forEach(_ => FS.fileOrDirExists(_, null))
+  //   );
+  //
+  //   return yield* $(prog);
+  // });
+  // console.log(foundDefaultFiles);
+
+  // TODO: remove as assertion
+  const dir = templatesDirectories[0] as string;
+  const filePath = path.join(
+    process.cwd(),
+    dir,
+    `${ctx.input.template}.scribe`
+  );
+
+  // const a = RA.fromIterable(templatesDirectories);
+
   return pipe(
-    Effect.tryCatchPromise(
-      () =>
-        renderFile(path.join(process.cwd(), `${ctx.input.template}.scribe`), {
-          Name: ctx.input.name,
-          //   ...ctx.input.variables
-        }),
-      cause => new TemplateFileError({ cause })
+    fileOrDirExists(filePath),
+    Effect.map(_ => {
+      // console.log('-', _);
+      return _;
+    }),
+    Effect.flatMap(() =>
+      Effect.tryCatchPromise(
+        () =>
+          renderFile(filePath, {
+            Name: ctx.input.name,
+            //   ...ctx.input.variables
+          }),
+        cause => new TemplateFileError({ cause })
+      )
     ),
     // TODO: ...ctx.variables
     Effect.map(_ => ({ fileContents: _, ...ctx }))
@@ -89,6 +121,7 @@ function constructTemplate(ctx: Ctx) {
 
 // TODO: handle list of outputs
 const writeTemplate = (_: Ctx & { fileContents: string }) => {
+  // TODO: ensure we have safe access
   const output = _.config.templates[_.input.template]?.outputs[0]
     ?.output as Template['output'];
 
