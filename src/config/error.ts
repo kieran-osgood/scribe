@@ -9,7 +9,11 @@ export class CosmicConfigError extends Data.TaggedClass('CosmicConfigError')<{
     | 'invalid config'
     | 'Empty Config'
     | 'No template options found';
-}> {}
+}> {
+  override toString() {
+    return `Config Read Error: ${this.error}`;
+  }
+}
 
 export class ConfigParseError extends TaggedClass('ParseError')<{
   readonly errors: NonEmptyReadonlyArray<ParseErrors>;
