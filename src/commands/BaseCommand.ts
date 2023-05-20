@@ -30,19 +30,13 @@ export abstract class BaseCommand extends Command {
 
   execute = (): Promise<void> =>
     pipe(
-      this.executeSafe(),
+      this.executeSafe(), //
       Effect.runPromise,
-      // LogFatalExit,
       _ =>
         _.then(() => console.log('✅ ')) //
           .catch(_ => {
             console.warn(_.toString());
             process.exit(1);
           })
-
-      // core.runMain({
-      //   tracingServiceName: 'contentlayer-cli',
-      //   verbose: this.verbose || process.env.CL_DEBUG !== undefined,
-      // })
     );
 }
