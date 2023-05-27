@@ -34,6 +34,13 @@ jobs:
       - name: Build
         run: pnpm run ci:build
 
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v3
+        if: always() # always run even if the previous step fails
+        with:
+          name: junit-test-results
+          path: '.github/tests/*.xml'
+          retention-days: 1
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
