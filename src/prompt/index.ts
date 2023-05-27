@@ -20,9 +20,10 @@ export function launchPromptInterface(
     makeQuestionCollection,
     tryInquirerPrompt,
     Effect.map(_ => ({
-      ..._,
+      // TODO: need to validate this in test
       name: options.flags.name,
       template: options.flags.template,
+      ..._,
     })),
     Effect.flatMap(tryParsePrompt)
   );
