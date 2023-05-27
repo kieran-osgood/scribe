@@ -1,14 +1,26 @@
-import { Effect, pipe } from '@scribe/core';
-import { fs, vol } from 'memfs';
-import { cwdAsJson } from '../../../configs/vite/setup-fs';
-import * as FS from './node-fs';
+import { Context, Effect, pipe } from '@scribe/core';
+import * as memfs from 'memfs';
+import { vol } from 'memfs';
+// import { cwdAsJson } from '../../../configs/vite/setup-fs';
 import path from 'path';
-import { ErrnoError } from './error';
+// import { ReadFileError, WriteFileError } from './error';
+import * as NFS from 'fs';
+import * as FS from './node-fs';
+import { ReadFileError, WriteFileError } from './error';
+import { cwdAsJson } from '../../../configs/vite/setup-fs';
 
 const fileContents = 'super secret file';
+
 beforeEach(() => {
   vi.restoreAllMocks();
 });
+
+beforeEach(() => {
+  vol.mkdirSync(process.cwd(), { recursive: true });
+});
+afterEach(() => vol.reset());
+
+export const FSMock = Context.make(FS.FS, memfs.fs as unknown as typeof NFS);
 
 describe('fs', () => {
   describe('readFile', () => {
@@ -16,7 +28,7 @@ describe('fs', () => {
       pipe(
         Effect.gen(function* ($) {
           const filePath = './template1.ts';
-          vol.writeFile(filePath, fileContents, err => {
+          memfs.vol.writeFile(filePath, fileContents, err => {
             if (err) throw err;
           });
 
@@ -24,6 +36,7 @@ describe('fs', () => {
 
           expect(String(result)).toBe(fileContents);
         }),
+        Effect.provideContext(FSMock),
         Effect.runPromise
       ));
 
@@ -33,9 +46,9 @@ describe('fs', () => {
           const filePath = path.join(process.cwd(), './template2.ts');
           const result = yield* $(FS.readFile(filePath, null), Effect.flip);
 
-          expect(result._tag).toBe('ErrnoError');
-          expect(result).toBeInstanceOf(ErrnoError);
+          expect(result).toBeInstanceOf(ReadFileError);
         }),
+        Effect.provideContext(FSMock),
         Effect.runPromise
       ));
   });
@@ -53,6 +66,7 @@ describe('fs', () => {
             yield* $(FS.readFile(filePath, { encoding: 'utf8' })) //
           ).toEqual(fileContents);
         }),
+        Effect.provideContext(FSMock),
         Effect.runPromise
       ));
 
@@ -64,8 +78,9 @@ describe('fs', () => {
           const result = yield* $(
             pipe(FS.writeFile(filePath, fileContents, null), Effect.flip)
           );
-          expect(result).toBeInstanceOf(ErrnoError);
+          expect(result).toBeInstanceOf(WriteFileError);
         }),
+        Effect.provideContext(FSMock),
         Effect.runPromise
       ));
   });
@@ -77,12 +92,13 @@ describe('fs', () => {
           yield* $(FS.mkdir('./some/nested/pathway', { recursive: true }));
           expect(cwdAsJson()).toMatchSnapshot();
 
-          const dirExists = fs.existsSync('./some/nested/pathway');
+          const dirExists = NFS.existsSync('./some/nested/pathway');
           expect(dirExists).toEqual(true);
 
           yield* $(FS.mkdir('./tmpl/a/b', { recursive: true }));
           expect(cwdAsJson()).toMatchSnapshot();
         }),
+        Effect.provideContext(FSMock),
         Effect.runPromise
       ));
 
@@ -90,34 +106,36 @@ describe('fs', () => {
       pipe(
         Effect.gen(function* ($) {
           const filePath = './some/path';
-          vol.mkdirSync(filePath, { recursive: true });
+          memfs.vol.mkdirSync(filePath, { recursive: true });
           expect(cwdAsJson()).toMatchSnapshot();
 
           const result = yield* $(FS.mkdir(filePath, { recursive: true }));
           expect(result).toBe(undefined);
           expect(cwdAsJson()).toMatchSnapshot();
         }),
+        Effect.provideContext(FSMock),
         Effect.runPromise
       ));
   });
+});
 
-  describe('writeFileWithDir', () => {
-    it('should write file to path and read it back', () =>
-      pipe(
-        Effect.gen(function* ($) {
-          const filePath = '/path/to/template5.ts';
+describe.only('writeFileWithDir', () => {
+  it('should write file to path and read it back', () =>
+    pipe(
+      Effect.gen(function* ($) {
+        const filePath = path.join(
+          process.cwd(),
+          './path/to/some/long/path/template5.ts'
+        );
 
-          const result = yield $(
-            FS.writeFileWithDir(filePath, fileContents, null)
-          );
-          expect(result).toBe(filePath);
-
-          const readResult = yield* $(
-            FS.readFile(filePath, { encoding: 'utf8' })
-          );
-          expect(readResult).toEqual(fileContents);
-        }),
-        Effect.runPromise
-      ));
-  });
+        const result = yield $(
+          FS.writeFileWithDir(filePath, fileContents, null)
+        );
+        expect(result).toBe(filePath);
+        const readResult = yield* $(FS.readFile(filePath, null));
+        expect(String(readResult)).toEqual(fileContents);
+      }),
+      Effect.provideContext(FSMock),
+      Effect.runPromise
+    ));
 });

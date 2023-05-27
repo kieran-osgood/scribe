@@ -1,23 +1,39 @@
-import { Effect, pipe } from '@scribe/core';
 import * as NFS from 'fs';
-import { ErrnoError } from './error';
-import { Abortable } from 'node:events';
 import path from 'path';
+import { MkDirError, ReadFileError, StatError, WriteFileError } from './error';
+import { Abortable } from 'node:events';
+import { Context, Effect, pipe } from '@scribe/core';
 
+export interface FS {
+  writeFile: typeof NFS.writeFile;
+  readFile: typeof NFS.readFile;
+  mkdir: typeof NFS.mkdir;
+  stat: typeof NFS.stat;
+}
+
+export const FS = Context.Tag<FS>();
+export const FSLive = Context.make(FS, NFS);
 export const writeFile = (
-  pathName: string,
+  file: NFS.PathOrFileDescriptor,
   data: string | NodeJS.ArrayBufferView,
   options: NFS.WriteFileOptions
 ) =>
-  Effect.async<never, ErrnoError, string>(resume => {
-    NFS.writeFile(pathName, data, options, error => {
-      if (error) {
-        resume(Effect.fail(new ErrnoError({ error })));
-      } else {
-        resume(Effect.succeed(pathName));
-      }
-    });
-  });
+  pipe(
+    FS,
+    Effect.flatMap(fs =>
+      Effect.async<FS, WriteFileError, NFS.PathOrFileDescriptor>(resume => {
+        fs.writeFile(file, data, options, error => {
+          if (error) {
+            resume(
+              Effect.fail(new WriteFileError({ file, data, options, error }))
+            );
+          } else {
+            resume(Effect.succeed(file));
+          }
+        });
+      })
+    )
+  );
 
 export const writeFileWithDir = (
   pathName: string,
@@ -39,10 +55,10 @@ export const readFile = (
     | undefined
     | null
 ) =>
-  Effect.async<never, ErrnoError, string | Buffer>(resume => {
+  Effect.async<FS, ReadFileError, string | Buffer>(resume => {
     NFS.readFile(path, options, (error, data) => {
       if (error) {
-        resume(Effect.fail(new ErrnoError({ error })));
+        resume(Effect.fail(new ReadFileError({ path, options, error })));
       } else {
         resume(Effect.succeed(data));
       }
@@ -50,37 +66,45 @@ export const readFile = (
   });
 
 export const mkdir = (
-  path: NFS.PathLike,
+  file: NFS.PathLike,
   options: NFS.MakeDirectoryOptions & {
     recursive: true;
   }
 ) =>
-  Effect.async<never, ErrnoError, string | undefined>(resume => {
-    NFS.mkdir(path, options, (error, data) => {
-      if (error) {
-        resume(Effect.fail(new ErrnoError({ error })));
-      } else {
-        resume(Effect.succeed(data));
-      }
-    });
-  });
+  pipe(
+    FS,
+    Effect.flatMap(fs =>
+      Effect.async<FS, MkDirError, string | undefined>(resume => {
+        fs.mkdir(file, options, (error, data) => {
+          if (error) {
+            resume(Effect.fail(new MkDirError({ file, options, error })));
+          } else {
+            resume(Effect.succeed(data));
+          }
+        });
+      })
+    )
+  );
 
-export const stat = (
-  filePath: string
-): Effect.Effect<never, ErrnoError, NFS.Stats> =>
-  Effect.async(resume =>
-    NFS.stat(filePath, (error, stats) => {
-      if (error) {
-        resume(Effect.fail(new ErrnoError({ error })));
-      } else {
-        resume(Effect.succeed(stats));
-      }
-    })
+export const stat = (path: string) =>
+  pipe(
+    FS,
+    Effect.flatMap(fs =>
+      Effect.async<FS, StatError, NFS.Stats>(resume =>
+        fs.stat(path, (error, stats) => {
+          if (error) {
+            resume(Effect.fail(new StatError({ path, error })));
+          } else {
+            resume(Effect.succeed(stats));
+          }
+        })
+      )
+    )
   );
 
 export const fileOrDirExists = (
   pathLike: string
-): Effect.Effect<never, ErrnoError, boolean> =>
+): Effect.Effect<unknown, StatError, boolean> =>
   pipe(
     stat(pathLike),
     Effect.map(_ => _.isFile() || _.isDirectory())

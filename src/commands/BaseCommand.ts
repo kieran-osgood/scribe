@@ -2,6 +2,7 @@ import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 import { Effect, pipe } from '@scribe/core';
 import { runtimeDebug } from '@effect/data/Debug';
+import { FS, FSLive } from '@scribe/fs';
 
 export abstract class BaseCommand extends Command {
   configPath = Option.String('-c,--config', 'scribe.config.ts', {
@@ -26,11 +27,12 @@ export abstract class BaseCommand extends Command {
     }
   }
 
-  abstract executeSafe: () => Effect.Effect<never, unknown, void>;
+  abstract executeSafe: () => Effect.Effect<FS, unknown, void>;
 
   execute = (): Promise<void> =>
     pipe(
       this.executeSafe(), //
+      Effect.provideContext(FSLive),
       Effect.runPromise,
       _ =>
         _
