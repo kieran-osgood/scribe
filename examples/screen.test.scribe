@@ -1,4 +1,4 @@
-describe('{{NAME}}', function() {
+describe('{{Name}}', function() {
   it('should ', function() {
 
   });
