@@ -40,6 +40,13 @@ jobs:
         with:
           report_paths: '.github/tests/*.xml'
 
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: |
+            .github/tests/*.xml
+        if: always()
+
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
