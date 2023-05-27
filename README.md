@@ -86,6 +86,7 @@ function LoginScreen() {
 
 ### Features
 
+- init command to create a shell Config
 - Migrate from zod to schema
   - Investigate issue with error messaging when can't locate the files from prompt
 ```shell
