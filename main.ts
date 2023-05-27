@@ -10,8 +10,9 @@ import { Builtins, Cli } from 'clipanion';
   });
 
   cli.register(DefaultCommand);
+  // cli.register(InitCommand);
   cli.register(Builtins.HelpCommand);
   cli.register(Builtins.VersionCommand);
 
-  return await cli.runExit(process.argv.slice(2), Cli.defaultContext);
+  return cli.runExit(process.argv.slice(2), Cli.defaultContext);
 })();

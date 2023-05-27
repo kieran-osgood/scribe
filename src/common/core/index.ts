@@ -8,6 +8,8 @@ export * as Option from '@effect/data/Option';
 export * as Data from '@effect/data/Data';
 export * as Chunk from '@effect/data/Chunk';
 export { TaggedClass } from '@effect/data/Data';
+export * as Context from '@effect/data/Context';
+export * as Layer from '@effect/io/Layer';
 
 // io
 export * as Effect from '@effect/io/Effect';
