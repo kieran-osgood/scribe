@@ -1,0 +1,43 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`config > readConfig > should return valid config 1`] = `
+{
+  "options": {
+    "rootOutDir": ".",
+    "templatesDirectories": [
+      "./examples",
+    ],
+  },
+  "templates": {
+    "component": {
+      "outputs": [
+        {
+          "output": {
+            "directory": "examples/src/components",
+            "fileName": "{{Name}}.ts",
+          },
+          "templateFileKey": "component",
+        },
+      ],
+    },
+    "screen": {
+      "outputs": [
+        {
+          "output": {
+            "directory": "examples/src/screens",
+            "fileName": "{{Name}}.ts",
+          },
+          "templateFileKey": "screen",
+        },
+        {
+          "output": {
+            "directory": "examples/src/screens",
+            "fileName": "{{Name}}.test.ts",
+          },
+          "templateFileKey": "screen.test",
+        },
+      ],
+    },
+  },
+}
+`;
