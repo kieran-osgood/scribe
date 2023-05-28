@@ -1,9 +1,6 @@
-import { z } from 'zod';
-import { pipe } from '../common/core';
+import { Effect, flow, pipe, S, TaggedClass, TF } from '@scribe/core';
 import { fmtError } from '../common/error';
 import inquirer, { Answers, QuestionCollection } from 'inquirer';
-import * as Effect from '@effect/io/Effect';
-import { TaggedClass } from '@effect/data/Data';
 
 type Flags = { template: string | undefined; name: string | undefined };
 
@@ -12,9 +9,7 @@ type LaunchPromptInterface = {
   flags: Flags;
 };
 
-export function launchPromptInterface(
-  options: LaunchPromptInterface
-): Effect.Effect<never, PromptError, Prompt> {
+export function launchPromptInterface(options: LaunchPromptInterface) {
   return pipe(
     options,
     makeQuestionCollection,
@@ -25,19 +20,31 @@ export function launchPromptInterface(
       template: options.flags.template,
       ..._,
     })),
-    Effect.flatMap(tryParsePrompt)
+    Effect.flatMap(
+      flow(
+        S.parseEffect(Prompt),
+        Effect.catchTag('ParseError', error =>
+          Effect.fail(
+            new PromptError({ message: TF.formatErrors(error.errors) })
+          )
+        )
+      )
+    )
   );
 }
 
 class PromptError extends TaggedClass('PromptError')<{
-  readonly error: string;
+  readonly message: string;
   readonly cause?: unknown;
-}> {}
+}> {
+  override toString = () => this.message;
+}
 
-const prompt = z
-  .object({ template: z.string(), name: z.string() })
-  .brand<'Prompt'>();
-type Prompt = z.infer<typeof prompt>;
+const Prompt = S.struct({
+  template: S.string,
+  name: S.string,
+});
+export type Prompt = S.To<typeof Prompt>;
 
 // We should just be passing the full context?
 type MakeQuestionsOptions = {
@@ -82,17 +89,7 @@ const tryInquirerPrompt = (
     () => inquirer.prompt(questions, initialAnswers),
     cause =>
       new PromptError({
-        error: `Prompt failed: ${fmtError(cause)}`,
-        cause,
-      })
-  );
-
-const tryParsePrompt = (response: unknown) =>
-  Effect.tryCatch(
-    () => prompt.parse(response),
-    cause =>
-      new PromptError({
-        error: `Parsing prompt failed: ${fmtError(cause)}`,
+        message: `Prompt failed: ${fmtError(cause)}`,
         cause,
       })
   );
