@@ -29,7 +29,7 @@ jobs:
         run: pnpm run ci:typecheck
 
       - name: Test
-        run: pnpm run test:unit
+        run: pnpm run test
 
       - name: Build
         run: pnpm run ci:build
