@@ -30,6 +30,7 @@ export function constructTemplate(ctx: Ctx & { templateOutput: Template }) {
         Effect.flatMap(() =>
           Effect.tryCatchPromise(
             () =>
+              // extract renderFile to effectify
               renderFile(filePath, {
                 Name: ctx.input.name,
                 //   ...ctx.input.variables

@@ -48,18 +48,18 @@ export class DefaultCommand extends BaseCommand {
             this.name = _.input.name;
             this.template = _.input.template;
             return _;
-          })
-        )
-      ),
-      Effect.map(_ =>
-        pipe(
-          _.config.templates[_.input.template]?.outputs ?? [],
-          RA.map(templateOutput => createTemplate({ templateOutput, ..._ }))
+          }),
+          Effect.map(_ =>
+            pipe(
+              _.config.templates[_.input.template]?.outputs ?? [],
+              RA.map(templateOutput => createTemplate({ templateOutput, ..._ }))
+            )
+          )
         )
       ),
       Effect.flatMap(Effect.collectAll),
       Effect.map(Chunk.flatten),
-      Effect.flatMap(Effect.forEach(s => s)),
+      Effect.flatMap(Effect.forEachPar(s => s)),
       Effect.map(_ => {
         const results = pipe(
           _,
@@ -67,7 +67,6 @@ export class DefaultCommand extends BaseCommand {
           Chunk.join('\n')
         );
         console.log(green(`✅  Success!\n\nOutput files:\n${results}\n`));
-        return _;
       })
     );
 }

@@ -1,8 +1,8 @@
 import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
-import { Effect, pipe } from '@scribe/core';
+import { Effect, flow, pipe } from '@scribe/core';
 import { runtimeDebug } from '@effect/data/Debug';
-import { FS, FSLive } from '@scribe/fs';
+import * as FS from '@scribe/fs';
 
 export abstract class BaseCommand extends Command {
   configPath = Option.String('-c,--config', 'scribe.config.ts', {
@@ -27,21 +27,26 @@ export abstract class BaseCommand extends Command {
     }
   }
 
-  abstract executeSafe: () => Effect.Effect<FS, unknown, void>;
+  abstract executeSafe: () => Effect.Effect<FS.FS, unknown, void>;
 
   execute = (): Promise<void> =>
     pipe(
       this.executeSafe(), //
-      Effect.provideContext(FSLive),
-      Effect.runPromise,
-      _ =>
-        _
-          // empty then to stop node exit code coercion?
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
-          .then(() => {})
-          .catch(_ => {
-            console.warn(_.toString());
-            // process.exit(1);
-          })
+      runExecute
     );
 }
+
+const runExecute = flow(
+  Effect.provideContext(FS.FSLive), //
+  Effect.runPromise, //
+  _ =>
+    _
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      .then(() => {
+        // empty then to stop node exit code coercion?
+      })
+      .catch(_ => {
+        console.warn(_.toString());
+        // process.exit(1);
+      })
+);

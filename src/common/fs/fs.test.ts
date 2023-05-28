@@ -27,7 +27,7 @@ describe('fs', () => {
     it('should read file to path', () =>
       pipe(
         Effect.gen(function* ($) {
-          const filePath = './template1.ts';
+          const filePath = './template1.txt';
           memfs.vol.writeFile(filePath, fileContents, err => {
             if (err) throw err;
           });
@@ -43,7 +43,7 @@ describe('fs', () => {
     it('throw error if file doesnt exist', () =>
       pipe(
         Effect.gen(function* ($) {
-          const filePath = path.join(process.cwd(), './template2.ts');
+          const filePath = path.join(process.cwd(), './template2.txt');
           const result = yield* $(FS.readFile(filePath, null), Effect.flip);
 
           expect(result).toBeInstanceOf(ReadFileError);
@@ -57,11 +57,11 @@ describe('fs', () => {
     it('should write file to path and read it back', () =>
       pipe(
         Effect.gen(function* ($) {
-          const filePath = './template3.ts';
+          const filePath = './template3.txt';
 
           expect(
             yield* $(FS.writeFile(filePath, fileContents, null)) //
-          ).toBe('./template3.ts');
+          ).toBe('./template3.txt');
           expect(
             yield* $(FS.readFile(filePath, { encoding: 'utf8' })) //
           ).toEqual(fileContents);
@@ -73,7 +73,7 @@ describe('fs', () => {
     it('should write file to path and read it back', () =>
       pipe(
         Effect.gen(function* ($) {
-          const filePath = '/some/nonexistent/path/template4.ts';
+          const filePath = '/some/nonexistent/path/template4.txt';
 
           const result = yield* $(
             pipe(FS.writeFile(filePath, fileContents, null), Effect.flip)
@@ -123,17 +123,13 @@ describe.only('writeFileWithDir', () => {
   it('should write file to path and read it back', () =>
     pipe(
       Effect.gen(function* ($) {
-        const filePath = path.join(
-          process.cwd(),
-          './path/to/some/long/path/template5.ts'
-        );
+        const filePath = path.join('./path/to/some/long/path/template5.txt');
 
         const result = yield $(
           FS.writeFileWithDir(filePath, fileContents, null)
         );
         expect(result).toBe(filePath);
-        const readResult = yield* $(FS.readFile(filePath, null));
-        expect(String(readResult)).toEqual(fileContents);
+        expect(cwdAsJson()).toMatchSnapshot();
       }),
       Effect.provideContext(FSMock),
       Effect.runPromise

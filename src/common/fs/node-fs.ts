@@ -104,7 +104,7 @@ export const stat = (path: string) =>
 
 export const fileOrDirExists = (
   pathLike: string
-): Effect.Effect<unknown, StatError, boolean> =>
+): Effect.Effect<FS, StatError, boolean> =>
   pipe(
     stat(pathLike),
     Effect.map(_ => _.isFile() || _.isDirectory())
