@@ -22,9 +22,7 @@
   ],
   "scripts": {
     "start": "ts-node main.ts",
-    "test": "run-p test:*",
-    "test:unit": "vitest",
-    "test:types": "vitest typecheck",
+    "test": "vitest",
     "lint": "eslint src --fix --ext .js,.ts,.tsx",
     "typecheck": "tsc",
     "build": "tsup main.ts",
