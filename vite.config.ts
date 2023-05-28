@@ -8,10 +8,12 @@ export default defineConfig({
     reporters: process.env.CI ? 'junit' : undefined,
     setupFiles: ['./configs/vite/setup-fs'],
     watch: false,
+    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache', 'examples'],
     coverage: {
       provider: 'istanbul',
       all: true,
       include: ['main.ts', 'src'],
+      exclude: ['examples/*'],
     },
   },
   resolve: {

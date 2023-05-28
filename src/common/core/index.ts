@@ -2,6 +2,7 @@
 export * as Boolean from '@effect/data/Boolean';
 export * as Either from '@effect/data/Either';
 export * as RA from '@effect/data/ReadonlyArray';
+export * as T from '@effect/data/Tuple';
 export * as R from '@effect/data/ReadonlyRecord';
 export * from '@effect/data/Function';
 export * as Option from '@effect/data/Option';
