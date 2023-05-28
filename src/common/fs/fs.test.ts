@@ -1,12 +1,10 @@
 import { Context, Effect, pipe } from '@scribe/core';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
-// import { cwdAsJson } from '../../../configs/vite/setup-fs';
 import path from 'path';
-// import { ReadFileError, WriteFileError } from './error';
 import * as NFS from 'fs';
-import * as FS from './node-fs';
-import { ReadFileError, WriteFileError } from './error';
+import * as FS from './fs';
+import { ReadFileError, StatError, WriteFileError } from './error';
 import { cwdAsJson } from '../../../configs/vite/setup-fs';
 
 const fileContents = 'super secret file';
@@ -27,10 +25,8 @@ describe('fs', () => {
     it('should read file to path', () =>
       pipe(
         Effect.gen(function* ($) {
-          const filePath = './template1.txt';
-          memfs.vol.writeFile(filePath, fileContents, err => {
-            if (err) throw err;
-          });
+          const filePath = 'template1.txt';
+          memfs.vol.writeFileSync(filePath, fileContents);
 
           const result = yield* $(FS.readFile(filePath, null));
 
@@ -89,14 +85,14 @@ describe('fs', () => {
     it('creates recursively ', () =>
       pipe(
         Effect.gen(function* ($) {
-          yield* $(FS.mkdir('./some/nested/pathway', { recursive: true }));
-          expect(cwdAsJson()).toMatchSnapshot();
+          const filePath = './mkdir/nested/path';
+          const statError = yield* $(FS.fileOrDirExists(filePath), Effect.flip);
+          expect(statError).toBeInstanceOf(StatError);
 
-          const dirExists = NFS.existsSync('./some/nested/pathway');
-          expect(dirExists).toEqual(true);
+          yield* $(FS.mkdir(filePath, { recursive: true }));
 
-          yield* $(FS.mkdir('./tmpl/a/b', { recursive: true }));
-          expect(cwdAsJson()).toMatchSnapshot();
+          const exists = yield* $(FS.fileOrDirExists(filePath));
+          expect(exists).toBe(true);
         }),
         Effect.provideContext(FSMock),
         Effect.runPromise
@@ -107,11 +103,11 @@ describe('fs', () => {
         Effect.gen(function* ($) {
           const filePath = './some/path';
           memfs.vol.mkdirSync(filePath, { recursive: true });
-          expect(cwdAsJson()).toMatchSnapshot();
+          const previousDirStructure = cwdAsJson();
 
           const result = yield* $(FS.mkdir(filePath, { recursive: true }));
           expect(result).toBe(undefined);
-          expect(cwdAsJson()).toMatchSnapshot();
+          expect(cwdAsJson()).toEqual(previousDirStructure);
         }),
         Effect.provideContext(FSMock),
         Effect.runPromise
@@ -119,17 +115,21 @@ describe('fs', () => {
   });
 });
 
-describe.only('writeFileWithDir', () => {
+describe('writeFileWithDir', () => {
   it('should write file to path and read it back', () =>
     pipe(
       Effect.gen(function* ($) {
-        const filePath = path.join('./path/to/some/long/path/template5.txt');
+        const filePath = './path/to/some/long/path/template5.txt';
 
         const result = yield $(
           FS.writeFileWithDir(filePath, fileContents, null)
         );
         expect(result).toBe(filePath);
-        expect(cwdAsJson()).toMatchSnapshot();
+
+        const readResult = yield* $(
+          FS.readFile(path.join('path/to/some/long/path/template5.txt'), null)
+        );
+        expect(String(readResult)).toEqual(fileContents);
       }),
       Effect.provideContext(FSMock),
       Effect.runPromise

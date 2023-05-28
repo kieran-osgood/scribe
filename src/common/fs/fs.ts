@@ -55,15 +55,20 @@ export const readFile = (
     | undefined
     | null
 ) =>
-  Effect.async<FS, ReadFileError, string | Buffer>(resume => {
-    NFS.readFile(path, options, (error, data) => {
-      if (error) {
-        resume(Effect.fail(new ReadFileError({ path, options, error })));
-      } else {
-        resume(Effect.succeed(data));
-      }
-    });
-  });
+  pipe(
+    FS,
+    Effect.flatMap(fs =>
+      Effect.async<FS, ReadFileError, string | Buffer>(resume => {
+        fs.readFile(path, options, (error, data) => {
+          if (error) {
+            resume(Effect.fail(new ReadFileError({ path, options, error })));
+          } else {
+            resume(Effect.succeed(data));
+          }
+        });
+      })
+    )
+  );
 
 export const mkdir = (
   file: NFS.PathLike,

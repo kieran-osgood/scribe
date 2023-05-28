@@ -1,7 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`writeFileWithDir > should write file to path and read it back 1`] = `
-{
-  "path/to/some/long/path/template5.txt": "super secret file",
-}
-`;
