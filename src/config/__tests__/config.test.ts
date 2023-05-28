@@ -3,9 +3,9 @@ import {
   extractConfig,
   readConfig,
   readUserTemplateOptions,
-} from './config';
+} from '../config';
 import { Effect, pipe } from '@scribe/core';
-import { ConfigParseError, CosmicConfigError } from './error';
+import { ConfigParseError, CosmicConfigError } from '../error';
 
 describe('config', function () {
   // describe('getCosmicExplorer', () => {

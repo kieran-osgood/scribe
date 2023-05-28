@@ -1,6 +1,6 @@
 import { S } from '@scribe/core';
-import BaseConfig from './base';
-import { ScribeConfig } from './schema';
+import BaseConfig from '../base';
+import { ScribeConfig } from '../schema';
 
 describe('Config', () => {
   describe('BaseConfig', () => {
