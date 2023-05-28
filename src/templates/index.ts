@@ -48,7 +48,6 @@ export function constructTemplate(ctx: Ctx & { templateOutput: Template }) {
   );
 }
 
-// TODO: handle list of outputs
 export const writeTemplate = (
   _: Ctx & { fileContents: string; templateOutput: Template }
 ) =>
