@@ -42,7 +42,20 @@
       "vitest/globals"
     ],
     "forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "plugins": [
+      {
+        "name": "@unsplash/ts-namespace-import-plugin",
+        "namespaces": {
+          "Effect": {
+            "importPath": "@effect/io/Effect"
+          },
+          "RA": {
+            "importPath": "@scribe/core"
+          }
+        }
+      },
+    ]
   },
   "exclude": [
     "examples/**/*.*"
@@ -52,5 +65,5 @@
     "require": [
       "tsconfig-paths/register"
     ]
-  }
+  },
 }

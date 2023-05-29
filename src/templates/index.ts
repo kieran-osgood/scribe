@@ -2,7 +2,7 @@ import { render, renderFile } from 'template-file';
 import path from 'path';
 
 import { Effect, pipe, RA } from '@scribe/core';
-import { fileOrDirExists, writeFile } from '@scribe/fs';
+import * as FS from '@scribe/fs';
 import { Template } from '@scribe/config';
 
 import { promptUserForMissingArgs } from '../context';
@@ -12,7 +12,11 @@ export type Ctx = Effect.Effect.Success<
   ReturnType<typeof promptUserForMissingArgs>
 >;
 
-export function constructTemplate(ctx: Ctx & { templateOutput: Template }) {
+export type ConstructTemplateCtx = Ctx & { templateOutput: Template };
+
+export function constructTemplate(
+  ctx: ConstructTemplateCtx
+): Effect.Effect<FS.FS, FS.StatError | TemplateFileError, WriteTemplateCtx>[] {
   const templateDirs = ctx.config.options?.templatesDirectories ?? [];
   /**
    * need to check fileExists for each of templateDirectories
@@ -23,10 +27,10 @@ export function constructTemplate(ctx: Ctx & { templateOutput: Template }) {
   );
 
   return pipe(
-    filePaths,
+    RA.fromIterable(filePaths),
     RA.map(filePath =>
       pipe(
-        fileOrDirExists(filePath),
+        FS.fileOrDirExists(filePath),
         Effect.flatMap(() =>
           Effect.tryCatchPromise(
             () =>
@@ -41,16 +45,18 @@ export function constructTemplate(ctx: Ctx & { templateOutput: Template }) {
         // TODO: ...ctx.variables
         Effect.map(_ => {
           // console.log('fileContents', _);
-          return { fileContents: _, ...ctx };
+          return { fileContents: _, ...ctx } satisfies WriteTemplateCtx;
         })
       )
     )
   );
 }
 
-export const writeTemplate = (
-  _: Ctx & { fileContents: string; templateOutput: Template }
-) =>
+export type WriteTemplateCtx = Ctx & {
+  fileContents: string;
+  templateOutput: Template;
+};
+export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
     // TODO: ensure we have safe access
 
@@ -62,7 +68,10 @@ export const writeTemplate = (
       _.templateOutput.output.directory,
       fileName
     );
+
     const absoluteFilePath = path.join(process.cwd(), relativeFilePaths);
 
-    return yield* $(writeFile(absoluteFilePath, _.fileContents, null));
+    return yield* $(
+      FS.writeFileWithDir(absoluteFilePath, _.fileContents, null)
+    );
   });

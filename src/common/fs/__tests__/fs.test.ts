@@ -3,9 +3,9 @@ import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import path from 'path';
 import * as NFS from 'fs';
-import * as FS from './fs';
-import { ReadFileError, StatError, WriteFileError } from './error';
-import { cwdAsJson } from '../../../configs/vite/setup-fs';
+import * as FS from '../fs';
+import { ReadFileError, StatError, WriteFileError } from '../error';
+import { cwdAsJson } from '../../../../configs/vite/setup-fs';
 
 const fileContents = 'super secret file';
 

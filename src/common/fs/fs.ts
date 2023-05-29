@@ -39,7 +39,7 @@ export const writeFileWithDir = (
   pathName: string,
   data: string | NodeJS.ArrayBufferView,
   options: NFS.WriteFileOptions
-) =>
+): Effect.Effect<FS, WriteFileError | MkDirError, NFS.PathOrFileDescriptor> =>
   pipe(
     mkdir(path.dirname(pathName), { recursive: true }),
     Effect.flatMap(() => writeFile(pathName, data, options))
