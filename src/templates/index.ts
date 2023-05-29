@@ -16,7 +16,7 @@ export type ConstructTemplateCtx = Ctx & { templateOutput: Template };
 
 export function constructTemplate(
   ctx: ConstructTemplateCtx
-): Effect.Effect<FS.FS, FS.StatError | TemplateFileError, WriteTemplateCtx>[] {
+): Effect.Effect<never, FS.StatError | TemplateFileError, WriteTemplateCtx>[] {
   const templateDirs = ctx.config.options?.templatesDirectories ?? [];
   /**
    * need to check fileExists for each of templateDirectories
@@ -30,17 +30,17 @@ export function constructTemplate(
     RA.fromIterable(filePaths),
     RA.map(filePath =>
       pipe(
-        FS.fileOrDirExists(filePath),
-        Effect.flatMap(() =>
-          Effect.tryCatchPromise(
-            () =>
-              // extract renderFile to effectify
-              renderFile(filePath, {
-                Name: ctx.input.name,
-                //   ...ctx.input.variables
-              }),
-            cause => new TemplateFileError({ cause })
-          )
+        // remove explicit check and just attempt to renderFile instead?
+        // simplifies testing and avoids duplicate checks
+        // FS.fileOrDirExists(filePath),
+        Effect.tryCatchPromise(
+          () =>
+            // extract renderFile to effectify
+            renderFile(filePath, {
+              Name: ctx.input.name,
+              //   ...ctx.input.variables
+            }),
+          cause => new TemplateFileError({ cause })
         ),
         // TODO: ...ctx.variables
         Effect.map(_ => {

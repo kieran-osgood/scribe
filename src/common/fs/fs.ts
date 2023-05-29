@@ -1,6 +1,14 @@
 import * as NFS from 'fs';
+import { Mode, OpenMode, PathLike } from 'fs';
 import path from 'path';
-import { MkDirError, ReadFileError, StatError, WriteFileError } from './error';
+import {
+  CloseError,
+  MkDirError,
+  OpenError,
+  ReadFileError,
+  StatError,
+  WriteFileError,
+} from './error';
 import { Abortable } from 'node:events';
 import { Context, Effect, pipe } from '@scribe/core';
 
@@ -9,6 +17,8 @@ export interface FS {
   readFile: typeof NFS.readFile;
   mkdir: typeof NFS.mkdir;
   stat: typeof NFS.stat;
+  open: typeof NFS.open;
+  close: typeof NFS.close;
 }
 
 export const FS = Context.Tag<FS>();
@@ -54,7 +64,7 @@ export const readFile = (
       } & Abortable)
     | undefined
     | null
-) =>
+): Effect.Effect<FS, ReadFileError, string | Buffer> =>
   pipe(
     FS,
     Effect.flatMap(fs =>
@@ -75,7 +85,7 @@ export const mkdir = (
   options: NFS.MakeDirectoryOptions & {
     recursive: true;
   }
-) =>
+): Effect.Effect<FS, MkDirError, string | undefined> =>
   pipe(
     FS,
     Effect.flatMap(fs =>
@@ -113,4 +123,39 @@ export const fileOrDirExists = (
   pipe(
     stat(pathLike),
     Effect.map(_ => _.isFile() || _.isDirectory())
+  );
+
+export const open = (
+  path: PathLike,
+  flags: OpenMode | undefined,
+  mode: Mode | undefined | null
+): Effect.Effect<FS, OpenError, number> =>
+  pipe(
+    FS,
+    Effect.flatMap(fs =>
+      Effect.async<FS, OpenError, number>(resume =>
+        fs.open(path, flags, mode, (error, fd) => {
+          if (error) {
+            resume(Effect.fail(new OpenError({ path, flags, mode, error })));
+          } else {
+            resume(Effect.succeed(fd));
+          }
+        })
+      )
+    )
+  );
+export const close = (fd: number): Effect.Effect<FS, CloseError, number> =>
+  pipe(
+    FS,
+    Effect.flatMap(fs =>
+      Effect.async<FS, CloseError, number>(resume =>
+        fs.close(fd, error => {
+          if (error) {
+            resume(Effect.fail(new CloseError({ error, fd })));
+          } else {
+            resume(Effect.succeed(fd));
+          }
+        })
+      )
+    )
   );

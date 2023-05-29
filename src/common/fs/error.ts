@@ -12,6 +12,18 @@ export class FileNotFoundError extends FSError('FileNotFoundError')<{
   readonly filePath: string;
 }> {}
 
+export class OpenError extends FSError('OpenError')<{
+  readonly error: NodeJS.ErrnoException;
+  readonly path: NFS.PathLike;
+  readonly flags: NFS.OpenMode | undefined;
+  readonly mode: NFS.Mode | undefined | null;
+}> {}
+
+export class CloseError extends FSError('CloseError')<{
+  readonly error: NodeJS.ErrnoException;
+  readonly fd: number;
+}> {}
+
 export class WriteFileError extends FSError('WriteFileError')<{
   readonly error: NodeJS.ErrnoException;
   readonly file: fs.PathOrFileDescriptor;

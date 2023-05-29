@@ -11,6 +11,7 @@ import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import NFS from 'fs';
 import path from 'path';
+import { TemplateFileError } from '../error';
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -98,20 +99,19 @@ describe('writeTemplate', () => {
 });
 
 describe('constructTemplate', () => {
-  it('should return fileContents formatted with variables', async () => {
-    const ctx = {
-      templateOutput: {
-        templateFileKey: 'screen',
-        output: {
-          fileName: '{{Name}}.ts', // good-scribe
-          directory: '',
-        },
-      },
-      ..._ctx,
-    } satisfies ConstructTemplateCtx;
-
-    return pipe(
+  it('should return fileContents formatted with variables', () =>
+    pipe(
       Effect.gen(function* ($) {
+        const ctx = {
+          templateOutput: {
+            templateFileKey: 'screen',
+            output: {
+              fileName: '{{Name}}.ts', // good-scribe
+              directory: '',
+            },
+          },
+          ..._ctx,
+        } satisfies ConstructTemplateCtx;
         yield* $(
           FS.writeFileWithDir(
             path.join(process.cwd(), './test/screen.scribe'),
@@ -130,6 +130,30 @@ describe('constructTemplate', () => {
       }),
       Effect.provideContext(FSMock),
       Effect.runPromise
-    );
-  });
+    ));
+
+  it("should throw if scribe file isn't readable", () =>
+    pipe(
+      Effect.gen(function* ($) {
+        const ctx = {
+          templateOutput: {
+            templateFileKey: 'screenz',
+            output: {
+              fileName: '{{Name}}.ts', // good-scribe
+              directory: '',
+            },
+          },
+          ..._ctx,
+        } satisfies ConstructTemplateCtx;
+        const result = yield* $(
+          constructTemplate(ctx),
+          Effect.collectAll,
+          Effect.flip
+        );
+
+        expect(result).toBeInstanceOf(TemplateFileError);
+      }),
+      Effect.provideContext(FSMock),
+      Effect.runPromise
+    ));
 });
