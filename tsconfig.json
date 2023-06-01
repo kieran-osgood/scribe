@@ -26,6 +26,9 @@
       ],
       "@scribe/fs": [
         "src/common/fs/index"
+      ],
+      "@scribe/cli": [
+        "src/cli/index"
       ]
     },
     "lib": [
@@ -50,9 +53,6 @@
           "Effect": {
             "importPath": "@effect/io/Effect"
           },
-          "RA": {
-            "importPath": "@scribe/core"
-          }
         }
       },
     ]

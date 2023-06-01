@@ -21,11 +21,11 @@
     "typescript"
   ],
   "scripts": {
-    "start": "ts-node main.ts",
+    "start": "ts-node ./index.ts",
     "test": "vitest",
     "lint": "eslint src --fix --ext .js,.ts,.tsx",
     "typecheck": "tsc",
-    "build": "tsup main.ts",
+    "build": "tsup index.ts",
     "ci": "run-p ci:*",
     "ci:typecheck": "pnpm run typecheck",
     "ci:lint": "pnpm run lint",

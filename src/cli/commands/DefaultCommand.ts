@@ -4,9 +4,9 @@ import * as t from 'typanion';
 import { Chunk, Effect, pipe, RA } from '@scribe/core';
 import { checkWorkingTreeClean } from '@scribe/git';
 
-import { promptUserForMissingArgs } from '../context';
+import { promptUserForMissingArgs } from '../../context';
 import { BaseCommand } from './BaseCommand';
-import { constructTemplate, Ctx, writeTemplate } from '../templates';
+import { constructTemplate, Ctx, writeTemplate } from '../../templates';
 import { Template } from '@scribe/config';
 import { green } from 'colorette';
 
