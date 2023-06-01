@@ -1,4 +1,4 @@
-import { render, renderFile } from 'template-file';
+import { render } from 'template-file';
 import path from 'path';
 
 import { Effect, pipe, RA } from '@scribe/core';
@@ -16,37 +16,41 @@ export type ConstructTemplateCtx = Ctx & { templateOutput: Template };
 
 export function constructTemplate(
   ctx: ConstructTemplateCtx
-): Effect.Effect<never, FS.StatError | TemplateFileError, WriteTemplateCtx>[] {
-  const templateDirs = ctx.config.options?.templatesDirectories ?? [];
+): Effect.Effect<
+  FS.FS,
+  FS.ReadFileError | TemplateFileError,
+  WriteTemplateCtx
+>[] {
+  const templateDirs = ctx.config.options?.templatesDirectories ?? [''];
   /**
    * need to check fileExists for each of templateDirectories
    */
 
-  const filePaths: string[] = templateDirs.map(d =>
-    path.join(process.cwd(), d, `${ctx.templateOutput.templateFileKey}.scribe`)
+  const filePaths: string[] = templateDirs.map(_ =>
+    path.join(process.cwd(), _, `${ctx.templateOutput.templateFileKey}.scribe`)
   );
 
   return pipe(
     RA.fromIterable(filePaths),
     RA.map(filePath =>
       pipe(
-        // remove explicit check and just attempt to renderFile instead?
-        // simplifies testing and avoids duplicate checks
-        // FS.fileOrDirExists(filePath),
-        Effect.tryCatchPromise(
-          () =>
-            // extract renderFile to effectify
-            renderFile(filePath, {
-              Name: ctx.input.name,
-              //   ...ctx.input.variables
-            }),
-          cause => new TemplateFileError({ cause })
+        FS.readFile(filePath, null),
+        Effect.map(String),
+        Effect.flatMap(_ =>
+          Effect.tryCatch(
+            () =>
+              // extract renderFile to effectify
+              render(_, {
+                Name: ctx.input.name,
+                //   ...ctx.input.variables
+              }),
+            cause => new TemplateFileError({ cause })
+          )
         ),
-        // TODO: ...ctx.variables
-        Effect.map(_ => {
-          // console.log('fileContents', _);
-          return { fileContents: _, ...ctx } satisfies WriteTemplateCtx;
-        })
+        Effect.map(
+          // TODO: ...ctx.variables
+          _ => ({ fileContents: _, ...ctx } satisfies WriteTemplateCtx)
+        )
       )
     )
   );

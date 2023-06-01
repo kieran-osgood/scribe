@@ -11,7 +11,6 @@ import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import NFS from 'fs';
 import path from 'path';
-import { TemplateFileError } from '../error';
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -112,6 +111,7 @@ describe('constructTemplate', () => {
           },
           ..._ctx,
         } satisfies ConstructTemplateCtx;
+
         yield* $(
           FS.writeFileWithDir(
             path.join(process.cwd(), './test/screen.scribe'),
@@ -126,7 +126,61 @@ describe('constructTemplate', () => {
           Effect.map(Chunk.map(_ => _.fileContents))
         );
 
-        expect(result).toMatchSnapshot();
+        expect(result).toMatchInlineSnapshot(`
+          {
+            "_tag": "Chunk",
+            "values": [
+              "describe('login', function() {
+            it('should ', function() {
+
+            });
+          });",
+            ],
+          }
+        `);
+      }),
+      Effect.provideContext(FSMock),
+      Effect.runPromise
+    ));
+
+  it('should check process root dir for templates', () =>
+    pipe(
+      Effect.gen(function* ($) {
+        const ctx = {
+          ..._ctx,
+          templateOutput: {
+            templateFileKey: 'screen',
+            output: {
+              fileName: '{{Name}}.ts',
+              directory: '',
+            },
+          },
+          config: {
+            templates: _ctx.config.templates,
+          },
+        } satisfies ConstructTemplateCtx;
+
+        const rootDirScribePath = path.join(process.cwd(), '', 'screen.scribe');
+        memfs.vol.writeFileSync(rootDirScribePath, screenFileContents);
+
+        const result = yield* $(
+          constructTemplate(ctx),
+          Effect.collectAll,
+          Effect.map(Chunk.map(_ => _.fileContents))
+        );
+
+        expect(result).toMatchInlineSnapshot(`
+          {
+            "_tag": "Chunk",
+            "values": [
+              "describe('login', function() {
+            it('should ', function() {
+
+            });
+          });",
+            ],
+          }
+        `);
       }),
       Effect.provideContext(FSMock),
       Effect.runPromise
@@ -137,21 +191,22 @@ describe('constructTemplate', () => {
       Effect.gen(function* ($) {
         const ctx = {
           templateOutput: {
-            templateFileKey: 'screenz',
+            templateFileKey: 'BADKEY',
             output: {
-              fileName: '{{Name}}.ts', // good-scribe
+              fileName: '', // good-scribe
               directory: '',
             },
           },
           ..._ctx,
         } satisfies ConstructTemplateCtx;
+
         const result = yield* $(
           constructTemplate(ctx),
           Effect.collectAll,
           Effect.flip
         );
 
-        expect(result).toBeInstanceOf(TemplateFileError);
+        expect(result).toBeInstanceOf(FS.ReadFileError);
       }),
       Effect.provideContext(FSMock),
       Effect.runPromise
