@@ -10,5 +10,5 @@ export const ProcessLive = Effect.provideService(Process, {
 });
 
 export const MockProcess = Effect.provideService(Process, {
-  cwd: () => 'mockdir',
+  cwd: () => '/mockdir',
 });

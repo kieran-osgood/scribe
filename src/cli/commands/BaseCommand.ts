@@ -11,9 +11,14 @@ export abstract class BaseCommand extends Command {
     validator: t.isString(),
   });
 
-  test = Option.Boolean('--DANGEROUS_TEST', process.env.NODE_ENV === 'test', {
-    hidden: true,
-  });
+  test = Option.Boolean(
+    '--DANGEROUS_TEST', //
+    // process.env.NODE_ENV === 'test'
+    false,
+    {
+      hidden: true,
+    }
+  );
 
   verbose = Option.Boolean('--verbose', false, {
     description: 'More verbose logging and error stack traces',

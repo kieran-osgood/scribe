@@ -5,7 +5,6 @@ import { BaseContext } from 'clipanion/lib/advanced/Cli';
 import memfs from 'memfs';
 import * as fs from 'fs';
 import path from 'path';
-import config from '../../../test/config/good-scribe.config';
 
 vi.mock('simple-git', () => ({
   default: () => ({
@@ -15,27 +14,34 @@ vi.mock('simple-git', () => ({
   }),
 }));
 
-vi.mock('cosmiconfig', () => ({
-  cosmiconfig: () => ({
-    load() {
-      return Promise.resolve({
-        config: config,
-        filePath: 'scribe.config.ts',
-        isEmpty: false,
-      });
-    },
-  }),
-}));
-
+// vi.mock('cosmiconfig', () => ({
+//   cosmiconfig: () => ({
+//     load() {
+//       return Promise.resolve({
+//         config: config,
+//         filePath: 'scribe.config.ts',
+//         isEmpty: false,
+//       });
+//     },
+//   }),
+// }));
+//
 beforeEach(() => {
   memfs.vol.mkdirSync(process.cwd(), { recursive: true });
   memfs.vol.mkdirSync(path.join(process.cwd(), 'test'), { recursive: true });
+
   memfs.vol.writeFileSync(
-    path.join(process.cwd(), 'test/screen.scribe'),
+    path.join(process.cwd(), 'scribe.config.ts'),
+    fs.readFileSync(
+      path.join(process.cwd(), 'test/config/good-scribe.config.ts')
+    )
+  );
+  memfs.vol.writeFileSync(
+    path.join(process.cwd(), 'screen.scribe'),
     fs.readFileSync('test/screen.scribe')
   );
   memfs.vol.writeFileSync(
-    path.join(process.cwd(), 'test/screen.test.scribe'),
+    path.join(process.cwd(), 'screen.test.scribe'),
     fs.readFileSync('test/screen.test.scribe')
   );
 });
@@ -107,12 +113,9 @@ describe('_Cli', () => {
   // });
 
   it.only('should accept template & fileName and complete', async () => {
-    const spy = vitest.spyOn(process, 'cwd');
-    spy.mockReturnValue('mockdir');
     const ctx = createCtx();
     const args = [
-      '--DANGEROUS_TEST',
-      '--config=scribe.config.ts',
+      '--config=./test/config/good-scribe.config.ts',
       '--template=screen',
       '--name=Login',
     ];
@@ -121,14 +124,13 @@ describe('_Cli', () => {
     ctx.stdout.end();
 
     const result = await getStream(ctx.stdout);
-    // expect(result).toMatchInlineSnapshot(`
-    //   "
-    //   Error: Service not found
-    //       at Module.apply (file:///Users/kieranosgood/WebstormProjects/scribe/node_modules/.pnpm/@effect+data@0.11.5/node_modules/@effect/src/internal/Context.ts:144:11)
-    //       at Module.unsafeGet (file:///Users/kieranosgood/WebstormProjects/scribe/node_modules/.pnpm/@effect+data@0.11.5/node_modules/@effect/src/Function.ts:87:19)
-    //
-    //   "
-    // `);
+    expect(result).toMatchInlineSnapshot(`
+  "[32m✅  Success!
+  [39mOutput files:
+  - /Users/kieranosgood/WebstormProjects/scribe/examples/src/screens/Login.ts
+  - /Users/kieranosgood/WebstormProjects/scribe/examples/src/screens/Login.test.ts
+  Complete"
+`);
   });
 
   // or no git repo?

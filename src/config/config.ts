@@ -8,7 +8,7 @@ import { ConfigParseError, CosmicConfigError } from './error';
 import { ScribeConfig } from './schema';
 
 export const getCosmicExplorer = () =>
-  cosmiconfig('test', {
+  cosmiconfig('scribe', {
     loaders: { '.ts': TypeScriptLoader() },
   });
 
