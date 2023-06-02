@@ -112,7 +112,7 @@ describe('_Cli', () => {
   //   expect(await getStream(stdout)).toMatchSnapshot();
   // });
 
-  it.only('should accept template & fileName and complete', async () => {
+  it('should accept template & fileName and complete', async () => {
     const ctx = createCtx();
     const args = [
       '--config=./test/config/good-scribe.config.ts',

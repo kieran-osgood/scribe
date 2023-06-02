@@ -15,6 +15,7 @@ export default defineConfig({
       include: ['main.ts', 'src'],
       exclude: ['examples/*'],
     },
+    allowOnly: true,
   },
   resolve: {
     alias: {
