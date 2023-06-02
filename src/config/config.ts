@@ -15,6 +15,7 @@ export const getCosmicExplorer = () =>
 export const readConfig = (path: string) =>
   pipe(
     Effect.tryCatchPromise(
+      // TODO: if path - load, !path - search
       () => getCosmicExplorer().load(path),
       _ =>
         new CosmicConfigError({

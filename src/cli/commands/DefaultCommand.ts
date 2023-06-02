@@ -1,7 +1,7 @@
 import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 
-import { Chunk, Effect, pipe, RA } from '@scribe/core';
+import { Effect, pipe, RA } from '@scribe/core';
 import { checkWorkingTreeClean } from '@scribe/git';
 
 import { promptUserForMissingArgs } from '../../context';
@@ -57,16 +57,19 @@ export class DefaultCommand extends BaseCommand {
           )
         )
       ),
-      Effect.flatMap(Effect.collectAll),
-      Effect.map(Chunk.flatten),
-      Effect.flatMap(Effect.forEachPar(s => s)),
+
+      Effect.flatMap(Effect.forEach(Effect.map(id => id))),
+      Effect.map(RA.flatten),
+      Effect.flatMap(Effect.forEachPar(Effect.flatMap(s => s))),
+
       Effect.map(_ => {
         const results = pipe(
           _,
-          Chunk.map(s => `- ${s}`),
-          Chunk.join('\n')
+          RA.map(s => `- ${s}`),
+          RA.join('\n')
         );
-        console.log(green(`✅  Success!\n\nOutput files:\n${results}\n`));
+        this.context.stdout.write(green(`✅  Success!\n`));
+        this.context.stdout.write(`Output files:\n${results}\n`);
       })
     );
 }
@@ -79,11 +82,8 @@ export class DefaultCommand extends BaseCommand {
 const createTemplate = (ctx: Ctx & { templateOutput: Template }) => {
   return pipe(
     Effect.gen(function* ($) {
-      const templates = yield* $(
-        pipe(constructTemplate(ctx), Effect.collectAll)
-      );
-
-      return pipe(templates, Chunk.map(writeTemplate));
+      const templates = yield* $(constructTemplate(ctx));
+      return pipe(templates, RA.map(Effect.map(writeTemplate)));
     })
   );
 };

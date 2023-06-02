@@ -39,10 +39,10 @@
     "size": "pnpm run build && size-limit"
   },
   "dependencies": {
-    "@effect/data": "^0.11.5",
-    "@effect/io": "^0.19.2",
-    "@effect/match": "^0.12.1",
-    "@effect/schema": "^0.11.1",
+    "@effect/data": "^0.12.5",
+    "@effect/io": "^0.26.0",
+    "@effect/match": "^0.24.0",
+    "@effect/schema": "^0.20.0",
     "case-anything": "^2.1.10",
     "clipanion": "^3.2.0",
     "colorette": "^2.0.20",
@@ -72,7 +72,9 @@
     "eslint": "^8.34.0",
     "eslint-plugin-communist-spelling": "^1.0.0",
     "fast-check": "^3.8.0",
+    "get-stream": "^7.0.0",
     "memfs": "^3.5.1",
+    "memorystream": "^0.3.1",
     "npm-run-all": "^4.1.5",
     "patch-package": "^6.5.1",
     "postinstall-postinstall": "^2.1.0",
@@ -92,5 +94,10 @@
       "path": "dist/main.js",
       "limit": "10 kb"
     }
-  ]
+  ],
+  "pnpm": {
+    "patchedDependencies": {
+      "clipanion@3.2.0": "patches/clipanion@3.2.0.patch"
+    }
+  }
 }

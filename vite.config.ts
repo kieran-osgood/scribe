@@ -24,6 +24,7 @@ export default defineConfig({
       '@scribe/git': path.resolve(__dirname, 'src/git/index'),
       '@scribe/commands': path.resolve(__dirname, 'src/commands/index'),
       '@scribe/fs': path.resolve(__dirname, 'src/common/fs/index'),
+      '@scribe/cli': path.resolve(__dirname, 'src/cli/index'),
     },
   },
 });

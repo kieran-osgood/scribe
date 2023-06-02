@@ -11,6 +11,7 @@ import {
 } from './error';
 import { Abortable } from 'node:events';
 import { Context, Effect, pipe } from '@scribe/core';
+import * as memfs from 'memfs';
 
 export interface FS {
   writeFile: typeof NFS.writeFile;
@@ -22,7 +23,12 @@ export interface FS {
 }
 
 export const FS = Context.Tag<FS>();
-export const FSLive = Context.make(FS, NFS);
+export const FSLive = Effect.provideService(FS, NFS);
+export const FSMock = Effect.provideService(
+  FS,
+  memfs.fs as unknown as typeof NFS
+);
+
 export const writeFile = (
   file: NFS.PathOrFileDescriptor,
   data: string | NodeJS.ArrayBufferView,

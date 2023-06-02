@@ -1,4 +1,4 @@
-import { Chunk, Context, Effect, pipe } from '@scribe/core';
+import { Effect, pipe, RA } from '@scribe/core';
 import {
   constructTemplate,
   ConstructTemplateCtx,
@@ -9,8 +9,8 @@ import {
 import * as FS from '@scribe/fs';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
-import NFS from 'fs';
 import path from 'path';
+import * as Process from '../../process';
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -27,8 +27,6 @@ beforeEach(() => {
   vol.mkdirSync(path.join(process.cwd(), './test'), { recursive: true });
 });
 afterEach(() => vol.reset());
-
-export const FSMock = Context.make(FS.FS, memfs.fs as unknown as typeof NFS);
 
 const mockConfig = {
   options: {
@@ -92,7 +90,8 @@ describe('writeTemplate', () => {
         const readResult = yield* $(FS.readFile('test/config/login.ts', null));
         expect(String(readResult)).toBe(fileContents);
       }),
-      Effect.provideContext(FSMock),
+      FS.FSMock,
+      Process.ProcessLive,
       Effect.runPromise
     ));
 });
@@ -121,25 +120,23 @@ describe('constructTemplate', () => {
         );
 
         const result = yield* $(
-          constructTemplate(ctx), //
-          Effect.collectAll,
-          Effect.map(Chunk.map(_ => _.fileContents))
+          constructTemplate(ctx),
+          Effect.map(RA.map(Effect.map(_ => _.fileContents))),
+          Effect.flatMap(Effect.all)
         );
 
         expect(result).toMatchInlineSnapshot(`
-          {
-            "_tag": "Chunk",
-            "values": [
-              "describe('login', function() {
+          [
+            "describe('login', function() {
             it('should ', function() {
 
             });
           });",
-            ],
-          }
+          ]
         `);
       }),
-      Effect.provideContext(FSMock),
+      FS.FSMock,
+      Process.ProcessLive,
       Effect.runPromise
     ));
 
@@ -165,24 +162,22 @@ describe('constructTemplate', () => {
 
         const result = yield* $(
           constructTemplate(ctx),
-          Effect.collectAll,
-          Effect.map(Chunk.map(_ => _.fileContents))
+          Effect.map(RA.map(Effect.map(_ => _.fileContents))),
+          Effect.flatMap(Effect.all)
         );
 
         expect(result).toMatchInlineSnapshot(`
-          {
-            "_tag": "Chunk",
-            "values": [
-              "describe('login', function() {
+          [
+            "describe('login', function() {
             it('should ', function() {
 
             });
           });",
-            ],
-          }
+          ]
         `);
       }),
-      Effect.provideContext(FSMock),
+      FS.FSMock,
+      Process.ProcessLive,
       Effect.runPromise
     ));
 
@@ -202,13 +197,14 @@ describe('constructTemplate', () => {
 
         const result = yield* $(
           constructTemplate(ctx),
-          Effect.collectAll,
+          Effect.flatMap(Effect.all),
           Effect.flip
         );
 
         expect(result).toBeInstanceOf(FS.ReadFileError);
       }),
-      Effect.provideContext(FSMock),
+      FS.FSMock,
+      Process.MockProcess,
       Effect.runPromise
     ));
 });

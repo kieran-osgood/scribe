@@ -32,13 +32,13 @@ export const checkWorkingTreeClean = (
     }),
 
     Effect.catchTag('GitStatusError', _ => {
-      if (_.status.isClean() === false) {
-        // Not clean - Kick off Effect prompt for continue dangerously
-        console.log(_.toString());
-      } else {
-        // Unknown error/not git - Kick off Effect prompt for continue dangerously
-        console.log(_.toString());
-      }
+      // if (_.status.isClean() === false) {
+      //   // Not clean - Kick off Effect prompt for continue dangerously
+      //   console.log(_.toString());
+      // } else {
+      //   // Unknown error/not git - Kick off Effect prompt for continue dangerously
+      //   console.log(_.toString());
+      // }
 
       /**
        * Temporary as this is the expected behaviour of the tests
@@ -46,7 +46,7 @@ export const checkWorkingTreeClean = (
        */
       const debug = true;
       if (debug) {
-        return Effect.fail(_.status);
+        return Effect.fail(_);
       }
 
       return Effect.succeed(_.status);

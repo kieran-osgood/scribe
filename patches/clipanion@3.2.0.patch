@@ -1,0 +1,13 @@
+diff --git a/package.json b/package.json
+index 9823a0386fcd7cce885454d1b2b6b2d0ce776199..83a3404bcf5284d70488f32afefad01e71a7c060 100644
+--- a/package.json
++++ b/package.json
+@@ -13,7 +13,7 @@
+     "command"
+   ],
+   "version": "3.2.0",
+-  "main": "lib/advanced/index",
++  "main": "lib/advanced/index.js",
+   "license": "MIT",
+   "sideEffects": false,
+   "repository": {

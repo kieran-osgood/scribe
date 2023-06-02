@@ -3,7 +3,7 @@ import type { ScribeConfig } from '@scribe/config';
 const config = {
   options: {
     rootOutDir: '.',
-    templatesDirectories: ['./examples'],
+    templatesDirectories: ['./test'],
   },
   templates: {
     component: {

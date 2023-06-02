@@ -2,6 +2,8 @@ import { Effect } from '@scribe/core';
 import * as Config from '@scribe/config';
 
 import * as Prompt from 'src/prompt';
+import path from 'path';
+import { Process } from './process';
 
 interface ProgramInputs {
   name: string | undefined;
@@ -11,7 +13,10 @@ interface ProgramInputs {
 
 export const promptUserForMissingArgs = (inputs: ProgramInputs) =>
   Effect.gen(function* ($) {
-    const config = yield* $(Config.readConfig(inputs.configPath));
+    const _process = yield* $(Process);
+    const config = yield* $(
+      Config.readConfig(path.join(_process.cwd(), inputs.configPath))
+    );
     const templateKeys = yield* $(
       Config.readUserTemplateOptions(inputs.configPath)
     );
