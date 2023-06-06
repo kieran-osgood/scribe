@@ -5,6 +5,7 @@ import { BaseContext } from 'clipanion/lib/advanced/Cli';
 import memfs from 'memfs';
 import * as fs from 'fs';
 import path from 'path';
+import stripAnsi from 'strip-ansi';
 
 vi.mock('simple-git', () => ({
   default: () => ({
@@ -124,13 +125,14 @@ describe('_Cli', () => {
     ctx.stdout.end();
 
     const result = await getStream(ctx.stdout);
-    expect(result).toMatchInlineSnapshot(`
-  "[32m✅  Success!
-  [39mOutput files:
-  - /Users/kieranosgood/WebstormProjects/scribe/examples/src/screens/Login.ts
-  - /Users/kieranosgood/WebstormProjects/scribe/examples/src/screens/Login.test.ts
-  Complete"
-`);
+    expect(stripAnsi(result)).toMatchInlineSnapshot(`
+    "✅  Success!
+    Output files:
+    - /Users/kieranosgood/WebstormProjects/scribe/examples/src/screens/Login.ts
+    - /Users/kieranosgood/WebstormProjects/scribe/examples/src/screens/Login.test.ts
+    Complete
+    "
+  `);
   });
 
   // or no git repo?

@@ -58,7 +58,7 @@ export abstract class BaseCommand extends Command {
 
         _ =>
           _.then(() => {
-            this.context.stdout.write('Complete');
+            this.context.stdout.write('Complete\n');
           }).catch(_ => {
             this.context.stdout.write(_.toString());
             // process.exit();
