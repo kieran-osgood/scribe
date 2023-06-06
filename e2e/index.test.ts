@@ -4,16 +4,11 @@ import stripAnsi from 'strip-ansi';
 import * as tempy from 'tempy';
 import { arrowKey, createMinimalProject } from './fixtures';
 
-const projectRoot = tempy.temporaryDirectory();
 const cliPath = path.join(process.cwd(), 'dist', 'index.js');
 const configFlag = path.join('scribe.config.ts');
 
-beforeAll(() => {
-  createMinimalProject(projectRoot);
-});
-
 describe('Scribe Cli', () => {
-  describe.only('--help', function () {
+  describe('--help', function () {
     it('should print help text', async () => {
       const t = await spawnAsync(cliPath, [`--help`]);
 
@@ -48,6 +43,9 @@ describe('Scribe Cli', () => {
 
   describe('--config & fully interactive', () => {
     it('should complete successfully', async () => {
+      const projectRoot = tempy.temporaryDirectory();
+      createMinimalProject(projectRoot);
+
       const processPromise = spawnAsync(
         cliPath,
         [
@@ -86,6 +84,33 @@ describe('Scribe Cli', () => {
           'Exiting'
       );
       expect(result.status).toBe(0);
+    });
+    describe('--template --name', () => {
+      it('should complete successfully', async () => {
+        const projectRoot = tempy.temporaryDirectory();
+        createMinimalProject(projectRoot);
+
+        const result = await spawnAsync(
+          cliPath,
+          [
+            `--config=${configFlag}`, //
+            '--template=screen',
+            '--name=Login',
+          ],
+          { cwd: projectRoot }
+        );
+
+        const stdOutAnsi = stripAnsi(result.stdout);
+        expect(stdOutAnsi).toMatch(
+          '✅  Success!\n' +
+            'Output files:\n' +
+            `- ${projectRoot}/examples/src/screens/Login.ts\n` +
+            `- ${projectRoot}/examples/src/screens/Login.test.ts\n` +
+            'Complete\n' +
+            'Exiting'
+        );
+        expect(result.status).toBe(0);
+      });
     });
   });
 });

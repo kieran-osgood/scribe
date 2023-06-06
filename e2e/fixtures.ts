@@ -1,6 +1,7 @@
 import spawnAsync, { SpawnOptions, SpawnResult } from '@expo/spawn-async';
 import path from 'path';
 import * as fs from 'fs';
+import * as child_process from 'child_process';
 
 const cliPath = path.join(process.cwd(), 'dist', 'index.js');
 
@@ -66,6 +67,9 @@ export function createMinimalProject(projectRoot: string) {
     './test/screen.test.scribe',
     './test/screen.scribe'
   );
+  child_process.spawnSync('git init');
+  child_process.spawnSync('git add .');
+  child_process.spawnSync('git commit -m ""');
 }
 
 const readAndWriteFixture = (

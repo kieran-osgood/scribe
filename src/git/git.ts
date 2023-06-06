@@ -44,10 +44,10 @@ export const checkWorkingTreeClean = (
        * Temporary as this is the expected behaviour of the tests
        * But we need to handle the confirmation behaviour above
        */
-      const debug = true;
-      if (debug) {
-        return Effect.fail(_);
-      }
+      // const debug = true;
+      // if (debug) {
+      //   return Effect.fail(_);
+      // }
       return Effect.succeed(_.status);
     })
   );
