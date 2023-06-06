@@ -21,7 +21,7 @@ export const checkWorkingTreeClean = (
           resume(Effect.fail(new GitStatusError({ status, cause })));
         }
 
-        if (status.isClean()) {
+        if (status?.isClean()) {
           resume(Effect.succeed(status));
         } else {
           resume(Effect.fail(new GitStatusError({ status })));
@@ -48,7 +48,6 @@ export const checkWorkingTreeClean = (
       if (debug) {
         return Effect.fail(_);
       }
-
       return Effect.succeed(_.status);
     })
   );
