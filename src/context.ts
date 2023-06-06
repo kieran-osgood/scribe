@@ -15,6 +15,7 @@ export const promptUserForMissingArgs = (inputs: ProgramInputs) =>
   Effect.gen(function* ($) {
     const _process = yield* $(Process);
     const config = yield* $(
+      // TODO: add validation for whether fs.isAbsolutePath
       Config.readConfig(path.join(_process.cwd(), inputs.configPath))
     );
     const templateKeys = yield* $(
