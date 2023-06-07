@@ -33,6 +33,14 @@ describe('Git', async () => {
   const { GitError } = await vi.importActual<SimpleGitModule>('simple-git');
 
   describe('checkWorkingTreeClean', () => {
+    // describe('When dir is git repo', function() {
+    //
+    // });
+
+    // describe('When dir is *not* git repo', function() {
+    //
+    // });
+
     it("The process.env.NODE_ENV is 'development'", async () =>
       pipe(
         Effect.gen(function* ($) {
