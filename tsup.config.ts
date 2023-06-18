@@ -4,7 +4,7 @@ export default defineConfig({
   // watch: true,
   treeshake: 'safest',
   format: ['cjs', 'esm'],
-  // clean: true,
+  clean: true,
   silent: true,
   // dts: true,
   env: {

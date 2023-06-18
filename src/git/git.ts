@@ -21,7 +21,7 @@ export const checkWorkingTreeClean = (
           resume(Effect.fail(new GitStatusError({ status, cause })));
         }
 
-        if (status.isClean()) {
+        if (status?.isClean()) {
           resume(Effect.succeed(status));
         } else {
           resume(Effect.fail(new GitStatusError({ status })));
@@ -44,11 +44,10 @@ export const checkWorkingTreeClean = (
        * Temporary as this is the expected behaviour of the tests
        * But we need to handle the confirmation behaviour above
        */
-      const debug = true;
-      if (debug) {
-        return Effect.fail(_);
-      }
-
+      // const debug = true;
+      // if (debug) {
+      //   return Effect.fail(_);
+      // }
       return Effect.succeed(_.status);
     })
   );

@@ -36,6 +36,7 @@ export class DefaultCommand extends BaseCommand {
 
   executeSafe = () =>
     pipe(
+      // TODO: add ignore git?
       checkWorkingTreeClean(),
       Effect.flatMap(() =>
         pipe(

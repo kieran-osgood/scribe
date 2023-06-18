@@ -9,7 +9,11 @@ import { ScribeConfig } from './schema';
 
 export const getCosmicExplorer = () =>
   cosmiconfig('scribe', {
-    loaders: { '.ts': TypeScriptLoader() },
+    loaders: {
+      '.ts': TypeScriptLoader({
+        transpileOnly: true,
+      }),
+    },
   });
 
 export const readConfig = (path: string) =>

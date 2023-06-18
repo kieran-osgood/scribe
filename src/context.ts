@@ -1,4 +1,4 @@
-import { Effect } from '@scribe/core';
+import { Boolean, Effect, pipe } from '@scribe/core';
 import * as Config from '@scribe/config';
 
 import * as Prompt from 'src/prompt';
@@ -15,7 +15,15 @@ export const promptUserForMissingArgs = (inputs: ProgramInputs) =>
   Effect.gen(function* ($) {
     const _process = yield* $(Process);
     const config = yield* $(
-      Config.readConfig(path.join(_process.cwd(), inputs.configPath))
+      // TODO: add validation for whether fs.isAbsolutePath
+      pipe(
+        Boolean.match(
+          path.isAbsolute(inputs.configPath),
+          () => path.join(_process.cwd(), inputs.configPath),
+          () => inputs.configPath
+        ),
+        Config.readConfig
+      )
     );
     const templateKeys = yield* $(
       Config.readUserTemplateOptions(inputs.configPath)

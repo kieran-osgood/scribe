@@ -4,7 +4,7 @@ import { vol } from 'memfs';
 import path from 'path';
 import * as NFS from 'fs';
 import * as FS from '../fs';
-import { ReadFileError, StatError, WriteFileError } from '../error';
+import { MkDirError, ReadFileError, StatError, WriteFileError } from '../error';
 import { cwdAsJson } from '../../../../configs/vite/setup-fs';
 
 const fileContents = 'super secret file';
@@ -108,6 +108,17 @@ describe('fs', () => {
           const result = yield* $(FS.mkdir(filePath, { recursive: true }));
           expect(result).toBe(undefined);
           expect(cwdAsJson()).toEqual(previousDirStructure);
+        }),
+        Effect.provideContext(FSMock),
+        Effect.runPromise
+      ));
+
+    it('fails with error if mkdir cb has error', () =>
+      pipe(
+        Effect.gen(function* ($) {
+          const filePath = './some/path';
+          const result = yield* $(FS.mkdir(filePath), Effect.flip);
+          expect(result).toBeInstanceOf(MkDirError);
         }),
         Effect.provideContext(FSMock),
         Effect.runPromise

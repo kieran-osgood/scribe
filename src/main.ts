@@ -5,6 +5,7 @@ import { green, red } from 'colorette';
 export function main() {
   return pipe(
     Cli.run(),
+    // TODO: remove as defects never make it here
     Effect.flatMap(() =>
       Effect.sync(() => {
         console.log(green('Exiting'));
