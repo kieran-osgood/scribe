@@ -48,9 +48,6 @@ dependencies:
   simple-git:
     specifier: ^3.18.0
     version: 3.18.0
-  stream:
-    specifier: link:@effect/io/stream
-    version: link:@effect/io/stream
   strip-ansi:
     specifier: ^7.1.0
     version: 7.1.0
