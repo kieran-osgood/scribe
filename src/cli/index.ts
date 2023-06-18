@@ -23,8 +23,7 @@ export function run(
   contextOverrides: Partial<BaseContext> = {}
 ) {
   return Effect.tryCatchPromise(
-    () =>
-      _Cli(args.slice(2), contextOverrides)
+    () => _Cli(args.slice(2), contextOverrides),
     // TODO: move defect logging here
     cause => new CliError({ cause })
   );
