@@ -56,7 +56,8 @@ export abstract class BaseCommand extends Command {
       this.executeSafe(), //
       flow(
         this.test ? FS.FSMock : FS.FSLive,
-        process.env.NODE_ENV === 'production'
+        process.env.NODE_ENV === 'production' ||
+          process.env.NODE_ENV === 'development'
           ? Process.ProcessLive
           : this.cwd.length > 0
           ? Process.createMockProcess(this.cwd)
