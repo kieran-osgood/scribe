@@ -1,7 +1,6 @@
 import path from 'path';
 import spawnAsync from '@expo/spawn-async';
 import stripAnsi from 'strip-ansi';
-import * as tempy from 'tempy';
 import { arrowKey, createMinimalProject } from './fixtures';
 
 const cliPath = path.join(process.cwd(), 'dist', 'index.js');
@@ -43,8 +42,7 @@ describe('Scribe Cli', () => {
 
   describe('--config & fully interactive', () => {
     it('should complete successfully', async () => {
-      const projectRoot = tempy.temporaryDirectory();
-      createMinimalProject(projectRoot);
+      const projectRoot = createMinimalProject();
 
       const processPromise = spawnAsync(
         cliPath,
@@ -85,18 +83,14 @@ describe('Scribe Cli', () => {
       );
       expect(result.status).toBe(0);
     });
+
     describe('--template --name', () => {
       it('should complete successfully', async () => {
-        const projectRoot = tempy.temporaryDirectory();
-        createMinimalProject(projectRoot);
+        const projectRoot = createMinimalProject();
 
         const result = await spawnAsync(
           cliPath,
-          [
-            `--config=${configFlag}`, //
-            '--template=screen',
-            '--name=Login',
-          ],
+          [`--config=${configFlag}`, '--template=screen', '--name=Login'],
           { cwd: projectRoot }
         );
 

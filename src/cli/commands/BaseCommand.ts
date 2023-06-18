@@ -12,12 +12,15 @@ export abstract class BaseCommand extends Command {
   });
 
   test = Option.Boolean(
-    '--DANGEROUS_TEST', //
-    // process.env.NODE_ENV === 'test'
+    '--test', //
     false,
-    {
-      hidden: true,
-    }
+    { hidden: true }
+  );
+
+  cwd = Option.String(
+    '--cwd', //
+    '',
+    { hidden: true }
   );
 
   verbose = Option.Boolean('--verbose', false, {
@@ -53,13 +56,19 @@ export abstract class BaseCommand extends Command {
       this.executeSafe(), //
       flow(
         this.test ? FS.FSMock : FS.FSLive,
-        this.test ? Process.MockProcess : Process.ProcessLive,
-        Effect.runPromise,
+        process.env.NODE_ENV === 'production'
+          ? Process.ProcessLive
+          : this.cwd.length > 0
+          ? Process.createMockProcess(this.cwd)
+          : Process.MockProcess,
 
+        Effect.runPromise,
         _ =>
           _.then(() => {
+            // console.log('SUCCESS');
             this.context.stdout.write('Complete\n');
           }).catch(_ => {
+            // console.log('RECOVER');
             this.context.stdout.write(_.toString());
             // process.exit();
           })

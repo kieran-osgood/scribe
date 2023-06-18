@@ -76,7 +76,6 @@ export type WriteTemplateCtx = Ctx & {
 };
 export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
-    // TODO: ensure we have safe access
     const _process = yield* $(Process);
     const fileName = render(_.templateOutput.output.fileName, {
       Name: _.input.name,

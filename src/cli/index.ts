@@ -18,11 +18,13 @@ export function _Cli(args: string[], contextOverrides?: Partial<BaseContext>) {
   return cli.runExit(args, { ...Cli.defaultContext, ...contextOverrides });
 }
 
-export function run(contextOverrides: Partial<BaseContext> = {}) {
+export function run(
+  args: string[] = process.argv.slice(2),
+  contextOverrides: Partial<BaseContext> = {}
+) {
   return Effect.tryCatchPromise(
-    () => {
-      return _Cli(process.argv.slice(2), contextOverrides).then(() => true);
-    },
+    () =>
+      _Cli(args.slice(2), contextOverrides)
     // TODO: move defect logging here
     cause => new CliError({ cause })
   );

@@ -56,10 +56,7 @@ export const writeFileWithDir = (
 export const readFile = (
   path: NFS.PathOrFileDescriptor,
   options:
-    | ({
-        encoding?: BufferEncoding;
-        flag?: string | undefined;
-      } & Abortable)
+    | ({ encoding?: BufferEncoding; flag?: string } & Abortable)
     | undefined
     | null
 ): Effect.Effect<FS, ReadFileError, string | Buffer> =>

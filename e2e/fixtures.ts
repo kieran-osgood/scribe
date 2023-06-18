@@ -1,6 +1,7 @@
 import spawnAsync, { SpawnOptions, SpawnResult } from '@expo/spawn-async';
 import path from 'path';
 import * as fs from 'fs';
+import * as tempy from 'tempy';
 import * as child_process from 'child_process';
 
 const cliPath = path.join(process.cwd(), 'dist', 'index.js');
@@ -47,29 +48,40 @@ export async function tryRunAsync(
   }
 }
 
-export function createMinimalProject(projectRoot: string) {
-  // Create the project root
-  fs.mkdirSync(projectRoot, { recursive: true });
+type CreateMinimalProjectOptions = {
+  initGit?: boolean;
+};
 
-  fs.mkdirSync(path.join(projectRoot, 'test'));
+export function createMinimalProject(
+  options: CreateMinimalProjectOptions = { initGit: true }
+) {
+  const projectRoot = tempy.temporaryDirectory();
+  const testPath = path.join(projectRoot, 'test');
+  fs.mkdirSync(testPath, { recursive: true });
+
   readAndWriteFixture(
     projectRoot,
-    'scribe.config.ts',
+    path.join(projectRoot, 'scribe.config.ts'),
     './test/scribe.config.ts'
   );
   readAndWriteFixture(
     projectRoot,
-    './test/screen.scribe',
+    path.join(testPath, `screen.scribe`),
     './test/screen.scribe'
   );
   readAndWriteFixture(
     projectRoot,
-    './test/screen.test.scribe',
+    path.join(testPath, 'screen.test.scribe'),
     './test/screen.scribe'
   );
-  child_process.spawnSync('git init');
-  child_process.spawnSync('git add .');
-  child_process.spawnSync('git commit -m ""');
+
+  if (options?.initGit) {
+    child_process.spawnSync('git init');
+    child_process.spawnSync('git add .');
+    child_process.spawnSync('git commit -m ""');
+  }
+
+  return projectRoot;
 }
 
 const readAndWriteFixture = (
@@ -77,8 +89,8 @@ const readAndWriteFixture = (
   writePath: string,
   readPath: string
 ) => {
-  const _writePath = path.join(projectRoot, writePath);
-  fs.writeFileSync(_writePath, fs.readFileSync(readPath));
+  fs.writeFileSync(writePath, fs.readFileSync(readPath));
+  fs.existsSync(writePath);
 };
 
 export const arrowKey = {
