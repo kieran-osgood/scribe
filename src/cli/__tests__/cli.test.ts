@@ -41,13 +41,7 @@ describe('_Cli', () => {
       Effect.flatMap(() =>
         Effect.tryPromise(async () => {
           const result = await stringifyStdOut(ctx.stdout);
-          expect(result).toMatchInlineSnapshot(`
-            "
-            ⚠️ Working directory not clean
-                at /Users/kieranosgood/WebstormProjects/scribe/src/git/git.ts:27:27
-                at /Users/kieranosgood/WebstormProjects/scribe/src/common/fs/fs.ts:18:30
-            "
-          `);
+          expect(result).toMatchInlineSnapshot('"⚠️ Working directory not clean"');
         })
       ),
       Effect.runPromise

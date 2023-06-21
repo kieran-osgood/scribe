@@ -1,9 +1,10 @@
 import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
-import { Effect, flow, pipe } from '@scribe/core';
+import { Effect, Either, flow, pipe } from '@scribe/core';
 import { runtimeDebug } from '@effect/data/Debug';
 import * as FS from '@scribe/fs';
 import * as Process from '../../process';
+import * as Runtime from '@effect/io/Runtime';
 
 export abstract class BaseCommand extends Command {
   configPath = Option.String('-c,--config', 'scribe.config.ts', {
@@ -29,16 +30,15 @@ export abstract class BaseCommand extends Command {
 
   constructor() {
     super();
-    runtimeDebug.minumumLogLevel = 'Info';
-    runtimeDebug.tracingEnabled = false;
 
-    if (process.env.NODE_ENV === 'development') {
-      runtimeDebug.minumumLogLevel = 'Debug';
-      runtimeDebug.tracingEnabled = true;
+    if (process.env.NODE_ENV === 'production') {
+      runtimeDebug.minumumLogLevel = 'Info';
+      runtimeDebug.tracingEnabled = false;
     }
 
     if (this.verbose) {
       runtimeDebug.minumumLogLevel = 'All';
+      runtimeDebug.tracingEnabled = true;
     }
   }
 
@@ -53,18 +53,34 @@ export abstract class BaseCommand extends Command {
       this.executeSafe(), //
       flow(
         this.test ? FS.FSMock : FS.FSLive,
-        process.env.NODE_ENV === 'production' && !this.cwd
+
+        (process.env.NODE_ENV === 'production' ||
+          process.env.NODE_ENV === 'development') &&
+          !this.cwd
           ? Process.ProcessLive
           : this.cwd.length > 0
           ? Process.createMockProcess(this.cwd)
           : Process.MockProcess,
 
-        Effect.runPromise,
+        Effect.runPromiseEither,
+
         _ =>
-          _.then(() => {
-            this.context.stdout.write('Complete\n');
-          }).catch(_ => {
-            this.context.stdout.write(_.toString());
+          _.then(error => {
+            Either.match(
+              error,
+              error => {
+                if (Runtime.isFiberFailure(error)) {
+                  this.context.stdout.write(`${error.cause?.toString()}\n`);
+                } else if (error instanceof Error) {
+                  this.context.stdout.write(`${error.message}\n`);
+                } else {
+                  this.context.stdout.write(`${error?.toString()}\n`);
+                }
+              },
+              () => {
+                this.context.stdout.write('Complete\n');
+              }
+            );
           })
       )
     );

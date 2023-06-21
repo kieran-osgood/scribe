@@ -9,6 +9,7 @@ export const checkWorkingTreeClean = (options?: TaskOptions) =>
     Process,
     Effect.flatMap(_process =>
       Effect.async<never, GitStatusError, StatusResult>(resume => {
+        // TODO: this throws if given invalid dir - need to wrap it
         const git = simpleGit({ baseDir: _process.cwd() });
 
         git.status(options, (cause, status) => {
