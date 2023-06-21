@@ -14,7 +14,7 @@ describe('GitStatusError', () => {
         status: { isClean: () => true } as StatusResult,
         cause: new GitError(),
       });
-      expect(error.toString()).toBe('unknown cause');
+      expect(error.toString()).toBe('Unknown Git error');
     });
     it('Warns if running in non-git directory', () => {
       const error = new GitStatusError({

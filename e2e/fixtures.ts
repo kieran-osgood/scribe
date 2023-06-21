@@ -25,8 +25,8 @@ export async function runAsync(
   promise.child.stderr?.pipe(process.stderr);
   try {
     return await promise;
-  } catch (error: any) {
-    if (isSpawnResult(error)) {
+  } catch (error: unknown) {
+    if (error instanceof Error && isSpawnResult(error)) {
       if (error.stdout) error.message += `\n------\nSTDOUT:\n${error.stdout}`;
       if (error.stderr) error.message += `\n------\nSTDERR:\n${error.stderr}`;
     }
@@ -40,8 +40,8 @@ export async function tryRunAsync(
 ): Promise<SpawnResult> {
   try {
     return await runAsync(args, options);
-  } catch (error: any) {
-    if (isSpawnResult(error)) {
+  } catch (error: unknown) {
+    if (error instanceof Error && isSpawnResult(error)) {
       return error;
     }
     throw error;
@@ -49,48 +49,59 @@ export async function tryRunAsync(
 }
 
 type CreateMinimalProjectOptions = {
-  initGit?: boolean;
+  git?: {
+    init: boolean;
+    dirty: boolean;
+  };
 };
 
 export function createMinimalProject(
-  options: CreateMinimalProjectOptions = { initGit: true }
+  options: CreateMinimalProjectOptions = { git: { init: true, dirty: false } }
 ) {
   const projectRoot = tempy.temporaryDirectory();
   const testPath = path.join(projectRoot, 'test');
   fs.mkdirSync(testPath, { recursive: true });
 
-  readAndWriteFixture(
+  copyFileToPath(
     projectRoot,
     path.join(projectRoot, 'scribe.config.ts'),
     './test/scribe.config.ts'
   );
-  readAndWriteFixture(
+  copyFileToPath(
     projectRoot,
     path.join(testPath, `screen.scribe`),
     './test/screen.scribe'
   );
-  readAndWriteFixture(
+  copyFileToPath(
     projectRoot,
     path.join(testPath, 'screen.test.scribe'),
     './test/screen.scribe'
   );
 
-  if (options?.initGit) {
-    child_process.spawnSync('git init');
-    child_process.spawnSync('git add .');
-    child_process.spawnSync('git commit -m ""');
+  if (options?.git?.init) {
+    const execOpts = {
+      cwd: projectRoot,
+    } satisfies child_process.ExecSyncOptionsWithBufferEncoding;
+
+    child_process.execSync('git init', execOpts);
+    if (options.git.dirty === false) {
+      child_process.execSync('git add .', execOpts);
+      child_process.execSync(
+        'git commit -m "non empty commit message"',
+        execOpts
+      );
+    }
   }
 
   return projectRoot;
 }
 
-const readAndWriteFixture = (
+const copyFileToPath = (
   projectRoot: string,
   writePath: string,
   readPath: string
 ) => {
   fs.writeFileSync(writePath, fs.readFileSync(readPath));
-  fs.existsSync(writePath);
 };
 
 export const arrowKey = {

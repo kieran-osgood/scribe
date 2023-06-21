@@ -29,9 +29,12 @@ export abstract class BaseCommand extends Command {
 
   constructor() {
     super();
-    if (process.env.NODE_ENV === 'production') {
-      runtimeDebug.minumumLogLevel = 'Info';
-      runtimeDebug.tracingEnabled = false;
+    runtimeDebug.minumumLogLevel = 'Info';
+    runtimeDebug.tracingEnabled = false;
+
+    if (process.env.NODE_ENV === 'development') {
+      runtimeDebug.minumumLogLevel = 'Debug';
+      runtimeDebug.tracingEnabled = true;
     }
 
     if (this.verbose) {
@@ -46,18 +49,11 @@ export abstract class BaseCommand extends Command {
   >;
 
   execute = (): Promise<void> => {
-    // const context = pipe(
-    //   Context.empty(),
-    //   Context.add(FS.FS, FS.FSLive),
-    //   Context.add(Process.Process, Process.ProcessLive)
-    // );
-
     return pipe(
       this.executeSafe(), //
       flow(
         this.test ? FS.FSMock : FS.FSLive,
-        process.env.NODE_ENV === 'production' ||
-          process.env.NODE_ENV === 'development'
+        process.env.NODE_ENV === 'production' && !this.cwd
           ? Process.ProcessLive
           : this.cwd.length > 0
           ? Process.createMockProcess(this.cwd)
@@ -66,12 +62,9 @@ export abstract class BaseCommand extends Command {
         Effect.runPromise,
         _ =>
           _.then(() => {
-            // console.log('SUCCESS');
             this.context.stdout.write('Complete\n');
           }).catch(_ => {
-            // console.log('RECOVER');
             this.context.stdout.write(_.toString());
-            // process.exit();
           })
       )
     );

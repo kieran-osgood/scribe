@@ -2,6 +2,7 @@ import { Effect, pipe } from '@scribe/core';
 import { checkWorkingTreeClean } from './git';
 import { beforeEach } from 'vitest';
 import GitStatusError from './error';
+import * as Process from '../process';
 
 const mockStatusImplementation = vi.fn();
 const mockConsoleLog = vi.fn();
@@ -52,6 +53,7 @@ describe('Git', async () => {
           const result = yield* $(checkWorkingTreeClean());
           expect(result.isClean()).toBe(true);
         }),
+        Process.MockProcess,
         Effect.runPromise
       ));
 
@@ -70,6 +72,7 @@ describe('Git', async () => {
           // expect(result.isClean()).toBe(true);
           // mockConsoleLog.mockRestore();
         }),
+        Process.MockProcess,
         Effect.runPromise
       ));
 
@@ -83,6 +86,7 @@ describe('Git', async () => {
             const result = yield* $(checkWorkingTreeClean());
             expect(result.isClean()).toBe(true);
           }),
+          Process.MockProcess,
           Effect.runPromise
         ));
 
@@ -103,6 +107,7 @@ describe('Git', async () => {
             // expect(result.isClean()).toBe(false);
             // mockConsoleLog.mockRestore();
           }),
+          Process.MockProcess,
           Effect.runPromise
         ));
     });
@@ -119,6 +124,7 @@ describe('Git', async () => {
           const result = yield* $(checkWorkingTreeClean([], abortController));
           expect(result.isClean()).toBe(true);
         }),
+        Process.MockProcess,
         Effect.runPromise
       ));
 
