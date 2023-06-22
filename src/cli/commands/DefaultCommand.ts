@@ -1,7 +1,7 @@
 import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 
-import { Effect, pipe, RA } from '@scribe/core';
+import { Effect, flow, Option as O, pipe, R, RA } from '@scribe/core';
 import { checkWorkingTreeClean } from '@scribe/git';
 
 import { promptUserForMissingArgs } from '../../context';
@@ -56,15 +56,16 @@ export class DefaultCommand extends BaseCommand {
       ),
 
       Effect.flatMap(_ => Effect.sync(() => this.overrideFlags(_))),
-
       Effect.flatMap(_ =>
         pipe(
-          _.config.templates[_.input.template]?.outputs ?? [],
-          RA.map(
-            templateOutput => createTemplate({ templateOutput, ..._ }), //
+          R.get(_.input.template)(_.config.templates),
+          O.map(_ => _.outputs),
+          Effect.map(
+            RA.map(
+              templateOutput => createTemplate({ templateOutput, ..._ }), //
+            ),
           ),
-          Effect.all,
-          Effect.map(RA.flatten),
+          Effect.flatMap(flow(Effect.all, Effect.map(RA.flatten))),
         ),
       ),
 
