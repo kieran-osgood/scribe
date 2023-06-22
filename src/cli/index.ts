@@ -11,7 +11,7 @@ export function _Cli(args: string[], contextOverrides?: Partial<BaseContext>) {
   });
 
   cli.register(DefaultCommand);
-  // cli.register(InitCommand);
+  // cli.register(InitCommand); // See comment in: src/config/base.ts for implementation
 
   cli.register(Builtins.HelpCommand);
   cli.register(Builtins.VersionCommand);
