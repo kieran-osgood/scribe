@@ -1,6 +1,5 @@
 import { Effect } from '@scribe/core';
 import { Builtins, Cli } from 'clipanion';
-import { CliError } from './error';
 import { BaseContext } from 'clipanion/lib/advanced/Cli';
 import { DefaultCommand } from './commands/DefaultCommand';
 
@@ -19,13 +18,6 @@ export function _Cli(args: string[], contextOverrides?: Partial<BaseContext>) {
   return cli.runExit(args, { ...Cli.defaultContext, ...contextOverrides });
 }
 
-export function run(
-  args: string[] = process.argv,
-  contextOverrides: Partial<BaseContext> = {},
-) {
-  return Effect.tryCatchPromise(
-    () => _Cli(args.slice(2), contextOverrides),
-    // TODO: move defect logging here
-    cause => new CliError({ cause }),
-  );
+export function run(args: string[], contextOverrides: Partial<BaseContext>) {
+  return Effect.tryPromise(() => _Cli(args.slice(2), contextOverrides));
 }

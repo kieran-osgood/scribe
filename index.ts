@@ -3,4 +3,4 @@
 import { Effect } from '@scribe/core';
 import * as Cli from '@scribe/cli';
 
-Effect.runPromise(Cli.run());
+Effect.runPromise(Cli.run(process.argv, {}));

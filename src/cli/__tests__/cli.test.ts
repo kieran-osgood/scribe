@@ -49,6 +49,41 @@ describe('_Cli', () => {
     );
   });
 
+  it('should complete with --template --fileName and relative config path', async () => {
+    const projectRoot = createMinimalProject({
+      git: { init: true, dirty: false },
+    });
+    const ctx = createCtx();
+
+    return pipe(
+      Effect.gen(function* ($) {
+        const args = [
+          '--template=screen',
+          '--name=Login',
+          `--cwd=${projectRoot}`,
+        ];
+        yield* $(CLI.run([...process.argv.slice(0, 2), ...args], ctx));
+        ctx.stdout.end();
+        return projectRoot;
+      }),
+      Effect.flatMap(projectRoot =>
+        Effect.tryPromise(async () => {
+          const result = await stringifyStdOut(ctx.stdout);
+
+          expect(result).toMatchInlineSnapshot(`
+            "✅  Success!
+            Output files:
+            - ${projectRoot}/examples/src/screens/Login.ts
+            - ${projectRoot}/examples/src/screens/Login.test.ts
+            Complete
+            "
+          `);
+        }),
+      ),
+      Effect.runPromise,
+    );
+  });
+
   it('should complete with --template --fileName', async () => {
     const projectRoot = createMinimalProject({
       git: { init: true, dirty: false },

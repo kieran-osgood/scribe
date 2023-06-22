@@ -73,7 +73,8 @@ export abstract class BaseCommand extends Command {
                 // Please report this with the attached error: https://github.com/kieran-osgood/scribe/issues/new.`;
 
                 if (Runtime.isFiberFailure(error)) {
-                  this.context.stdout.write(`${error.cause?.toString()}\n`);
+                  // Only runs if I have an Effect error which shouldn't happen
+                  this.context.stdout.write(`${error?.cause?.toString()}\n`);
                 } else if (error instanceof Error) {
                   this.context.stdout.write(`${error.message}\n`);
                 } else {
