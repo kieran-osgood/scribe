@@ -2,7 +2,7 @@ import { render } from 'template-file';
 import path from 'path';
 
 import { Effect, flow, pipe, RA } from '@scribe/core';
-import * as FS from '@scribe/fs';
+import * as FS from 'src/services/fs';
 import { Template } from '@scribe/config';
 
 import { promptUserForMissingArgs } from '../context';

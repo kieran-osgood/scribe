@@ -2,7 +2,7 @@ import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 import { Effect, Either, flow, pipe } from '@scribe/core';
 import { runtimeDebug } from '@effect/data/Debug';
-import * as FS from '@scribe/fs';
+import * as FS from 'src/services/fs';
 import { Process } from '@scribe/services';
 
 import * as Runtime from '@effect/io/Runtime';

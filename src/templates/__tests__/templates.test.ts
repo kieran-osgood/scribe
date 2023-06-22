@@ -6,7 +6,7 @@ import {
   writeTemplate,
   WriteTemplateCtx,
 } from '../index';
-import * as FS from '@scribe/fs';
+import * as FS from 'src/services/fs';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import path from 'path';

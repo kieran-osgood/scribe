@@ -2,7 +2,7 @@ import { Context } from '@scribe/core';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import NFS from 'fs';
-import * as FS from '@scribe/fs';
+import * as FS from 'src/services/fs';
 
 beforeEach(() => {
   vi.restoreAllMocks();
