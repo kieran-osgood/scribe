@@ -1,6 +1,6 @@
 # scribe
 
-A CLI to bootstrap files with [Mustache](https://github.com/mustache/mustache.github.com) templates.
+Standardise bootstrapping your files with [Mustache](https://github.com/mustache/mustache.github.com) templates.
 
 <div align='center'>
   <img src="docs/usage.png" alt="scribe usage example" style='margin-bottom: 25px; margin-top: 20px; height: 450px;'>
