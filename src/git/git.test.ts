@@ -121,7 +121,7 @@ describe('Git', async () => {
           });
           const abortController = new AbortController();
           abortController.abort();
-          const result = yield* $(checkWorkingTreeClean([], abortController));
+          const result = yield* $(checkWorkingTreeClean([]));
           expect(result.isClean()).toBe(true);
         }),
         Process.ProcessMock,
