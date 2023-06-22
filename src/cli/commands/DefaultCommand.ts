@@ -1,7 +1,7 @@
 import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 
-import { Effect, pipe, RA } from '@scribe/core';
+import { Effect, flow, pipe, RA } from '@scribe/core';
 import { checkWorkingTreeClean } from '@scribe/git';
 
 import { promptUserForMissingArgs } from '../../context';
@@ -59,10 +59,12 @@ export class DefaultCommand extends BaseCommand {
         )
       ),
 
-      Effect.flatMap(Effect.forEach(Effect.map(id => id))),
-      Effect.map(RA.flatten),
-      Effect.flatMap(Effect.forEachPar(Effect.flatMap(s => s))),
-
+      Effect.map(
+        flow(Effect.forEachPar(Effect.map(id => id)), Effect.map(RA.flatten))
+      ),
+      Effect.flatMap(
+        Effect.flatMap(flow(Effect.all, Effect.flatMap(Effect.all)))
+      ),
       Effect.map(_ => {
         const results = pipe(
           _,
