@@ -1,5 +1,24 @@
 # @kieran-osgood/scribe
 
+## 0.2.0
+
+### Minor Changes
+
+- cbe2c34: Fixed potential mispathing errors - Replaced dependencies to reduce size, bulked up testing - Improved error logging and formatting of output to stdout/stderr
+
+## 0.1.0
+
+### Minor Changes
+
+- cbe2c34: Allows passing of absolute paths to --config flag
+- cbe2c34: Fixed potential mispathing errors - Replaced dependencies to reduce size, bulked up testing - Improved error logging and formatting of output to stdout/stderr
+- cbe2c34: Scribe can now accept multiple output files per run.
+  If writing to any file fails, cleans up after itself.
+
+### Patch Changes
+
+- cbe2c34: Initial working prototype
+
 ## 0.1.0
 
 ### Minor Changes
