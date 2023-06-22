@@ -64,8 +64,7 @@ export class DefaultCommand extends BaseCommand {
             templateOutput => createTemplate({ templateOutput, ..._ }) //
           ),
           Effect.all,
-          Effect.map(RA.flatten),
-          Effect.flatMap(flow(Effect.all, Effect.flatMap(Effect.all)))
+          Effect.map(RA.flatten)
         )
       ),
 
@@ -82,15 +81,16 @@ export class DefaultCommand extends BaseCommand {
 }
 
 /**
- * Wrap writeTemplate with Effect.gen
- * to keep track of the filePaths without process.cwd()
- * or return array of full paths and string.replace process.cwd()
+ * Constructs and writes templates to files persistently
  */
-const createTemplate = (ctx: Ctx & { templateOutput: Template }) => {
-  return pipe(
-    Effect.gen(function* ($) {
-      const templates = yield* $(constructTemplate(ctx));
-      return pipe(templates, RA.map(Effect.map(writeTemplate)));
-    })
+const createTemplate = (ctx: Ctx & { templateOutput: Template }) =>
+  pipe(
+    constructTemplate(ctx),
+    Effect.map(RA.map(Effect.map(writeTemplate))),
+    Effect.flatMap(
+      flow(
+        Effect.all, //
+        Effect.flatMap(Effect.all)
+      )
+    )
   );
-};
