@@ -2,7 +2,7 @@ import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 
 import { Effect, flow, Option as O, pipe, R, RA } from '@scribe/core';
-import { checkWorkingTreeClean } from '@scribe/git';
+import { checkWorkingTreeClean } from 'src/services/git';
 import { Template } from '@scribe/config';
 
 import { promptUserForMissingArgs } from '../../context';
