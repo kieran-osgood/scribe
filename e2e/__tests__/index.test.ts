@@ -1,7 +1,7 @@
 import path from 'path';
 import spawnAsync from '@expo/spawn-async';
 import stripAnsi from 'strip-ansi';
-import { arrowKey, createMinimalProject } from './fixtures';
+import { arrowKey, createMinimalProject } from '../fixtures';
 
 const cliPath = path.join(process.cwd(), 'dist', 'index.js');
 const configFlag = path.join('scribe.config.ts');

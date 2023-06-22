@@ -1,8 +1,8 @@
 import { Effect, pipe } from '@scribe/core';
-import { checkWorkingTreeClean } from './git';
+import { checkWorkingTreeClean } from '../git';
 import { beforeEach } from 'vitest';
-import GitStatusError from './error';
-import * as Process from '../process';
+import GitStatusError from '../error';
+import * as Process from '../../process';
 
 const mockStatusImplementation = vi.fn();
 const mockConsoleLog = vi.fn();

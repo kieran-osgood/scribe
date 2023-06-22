@@ -1,4 +1,4 @@
-import { fmtError } from './error';
+import { fmtError } from '../error';
 import { pipe } from '@scribe/core';
 import { describe } from 'vitest';
 import * as fc from 'fast-check';

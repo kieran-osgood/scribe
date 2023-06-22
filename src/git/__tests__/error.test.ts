@@ -1,4 +1,4 @@
-import GitStatusError, { SimpleGitError } from './error';
+import GitStatusError, { SimpleGitError } from '../error';
 import { GitConstructError, GitError, StatusResult } from 'simple-git';
 
 describe('GitStatusError', () => {
