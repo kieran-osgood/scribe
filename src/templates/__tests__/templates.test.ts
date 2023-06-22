@@ -121,8 +121,7 @@ describe('constructTemplate', () => {
 
         const result = yield* $(
           constructTemplate(ctx),
-          Effect.map(RA.map(Effect.map(_ => _.fileContents))),
-          Effect.flatMap(Effect.all)
+          Effect.map(RA.map(_ => _.fileContents))
         );
 
         expect(result).toMatchInlineSnapshot(`
@@ -162,8 +161,7 @@ describe('constructTemplate', () => {
 
         const result = yield* $(
           constructTemplate(ctx),
-          Effect.map(RA.map(Effect.map(_ => _.fileContents))),
-          Effect.flatMap(Effect.all)
+          Effect.map(RA.map(_ => _.fileContents))
         );
 
         expect(result).toMatchInlineSnapshot(`
@@ -195,11 +193,7 @@ describe('constructTemplate', () => {
           ..._ctx,
         } satisfies ConstructTemplateCtx;
 
-        const result = yield* $(
-          constructTemplate(ctx),
-          Effect.flatMap(Effect.all),
-          Effect.flip
-        );
+        const result = yield* $(constructTemplate(ctx), Effect.flip);
 
         expect(result).toBeInstanceOf(FS.ReadFileError);
       }),

@@ -1,7 +1,7 @@
 import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 
-import { Effect, flow, pipe, RA } from '@scribe/core';
+import { Effect, pipe, RA } from '@scribe/core';
 import { checkWorkingTreeClean } from '@scribe/git';
 
 import { promptUserForMissingArgs } from '../../context';
@@ -35,7 +35,7 @@ export class DefaultCommand extends BaseCommand {
   });
 
   overrideFlags(
-    _: Effect.Effect.Success<ReturnType<typeof promptUserForMissingArgs>>
+    _: Effect.Effect.Success<ReturnType<typeof promptUserForMissingArgs>>,
   ) {
     this.name = _.input.name;
     this.template = _.input.template;
@@ -52,7 +52,7 @@ export class DefaultCommand extends BaseCommand {
           name: this.name,
           template: this.template,
           configPath: this.configPath,
-        })
+        }),
       ),
 
       Effect.flatMap(_ => Effect.sync(() => this.overrideFlags(_))),
@@ -61,22 +61,22 @@ export class DefaultCommand extends BaseCommand {
         pipe(
           _.config.templates[_.input.template]?.outputs ?? [],
           RA.map(
-            templateOutput => createTemplate({ templateOutput, ..._ }) //
+            templateOutput => createTemplate({ templateOutput, ..._ }), //
           ),
           Effect.all,
-          Effect.map(RA.flatten)
-        )
+          Effect.map(RA.flatten),
+        ),
       ),
 
       Effect.map(_ => {
         const results = pipe(
           _,
           RA.map(s => `- ${s}`),
-          RA.join('\n')
+          RA.join('\n'),
         );
         this.context.stdout.write(green(`✅  Success!\n`));
         this.context.stdout.write(`Output files:\n${results}\n`);
-      })
+      }),
     );
 }
 
@@ -86,11 +86,6 @@ export class DefaultCommand extends BaseCommand {
 const createTemplate = (ctx: Ctx & { templateOutput: Template }) =>
   pipe(
     constructTemplate(ctx),
-    Effect.map(RA.map(Effect.map(writeTemplate))),
-    Effect.flatMap(
-      flow(
-        Effect.all, //
-        Effect.flatMap(Effect.all)
-      )
-    )
+    Effect.map(RA.map(writeTemplate)),
+    Effect.flatMap(Effect.all),
   );

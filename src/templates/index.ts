@@ -9,64 +9,60 @@ import { promptUserForMissingArgs } from '../context';
 import { TemplateFileError } from './error';
 import { Process } from '../process';
 
+function createAbsFilePaths(ctx: ConstructTemplateCtx) {
+  return Effect.gen(function* ($) {
+    const {
+      templateOutput: { templateFileKey },
+    } = ctx;
+    // should report if templatesDirectories isn't a dir?
+    const templateDirs = ctx.config.options?.templatesDirectories ?? [''];
+    const cwd = (yield* $(Process)).cwd();
+
+    return pipe(
+      templateDirs,
+      RA.map(_ => path.join(cwd, _, `${templateFileKey}.scribe`)),
+    );
+  });
+}
+
 export type Ctx = Effect.Effect.Success<
   ReturnType<typeof promptUserForMissingArgs>
 >;
 
 export type ConstructTemplateCtx = Ctx & { templateOutput: Template };
 
-type ConstructTemplate = Effect.Effect<
-  Process,
-  never,
-  Effect.Effect<FS.FS, FS.ReadFileError | TemplateFileError, WriteTemplateCtx>[]
->;
-
-export function constructTemplate(
-  ctx: ConstructTemplateCtx
-): ConstructTemplate {
+export function constructTemplate(ctx: ConstructTemplateCtx) {
   return pipe(
-    Effect.gen(function* ($) {
-      const templateDirs = ctx.config.options?.templatesDirectories ?? [''];
-      /**
-       * need to check fileExists for each of templateDirectories
-       */
-      const _process = yield* $(Process);
-      return pipe(
-        templateDirs.map(_ =>
-          path.join(
-            _process.cwd(),
-            _,
-            `${ctx.templateOutput.templateFileKey}.scribe`
-          )
-        ),
-        RA.fromIterable
-      );
-    }),
-    Effect.map(
+    createAbsFilePaths(ctx),
+    Effect.flatMap(
       flow(
-        RA.map(filePath =>
+        RA.map(_ =>
           pipe(
-            FS.readFile(filePath, null),
+            FS.readFile(_, null), //
             Effect.map(String),
-            Effect.flatMap(_ =>
-              Effect.tryCatch(
-                () =>
-                  // extract renderFile to effectify
-                  render(_, {
-                    Name: ctx.input.name,
-                    //   ...ctx.input.variables
-                  }),
-                cause => new TemplateFileError({ cause })
-              )
-            ),
-            Effect.map(
-              // TODO: ...ctx.variables
-              _ => ({ fileContents: _, ...ctx } satisfies WriteTemplateCtx)
-            )
-          )
-        )
-      )
-    )
+          ),
+        ),
+        Effect.all,
+      ),
+    ),
+    Effect.map(
+      RA.map(_ =>
+        Effect.tryCatch(
+          () =>
+            // extract renderFile to effectify
+            render(_, {
+              Name: ctx.input.name,
+              //   ...ctx.input.variables
+            }),
+          cause => new TemplateFileError({ cause }),
+        ),
+      ),
+    ),
+    Effect.flatMap(Effect.all),
+    Effect.map(
+      // TODO: ...ctx.variables
+      RA.map(_ => ({ fileContents: _, ...ctx } satisfies WriteTemplateCtx)),
+    ),
   );
 }
 
@@ -83,12 +79,12 @@ export const writeTemplate = (_: WriteTemplateCtx) =>
 
     const relativeFilePaths = path.join(
       _.templateOutput.output.directory,
-      fileName
+      fileName,
     );
 
     const absoluteFilePath = path.join(_process.cwd(), relativeFilePaths);
 
     return yield* $(
-      FS.writeFileWithDir(absoluteFilePath, _.fileContents, null)
+      FS.writeFileWithDir(absoluteFilePath, _.fileContents, null),
     );
   });
