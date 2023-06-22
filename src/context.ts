@@ -1,9 +1,9 @@
 import { Boolean, Effect, pipe } from '@scribe/core';
 import * as Config from '@scribe/config';
+import { Process } from '@scribe/services';
 
 import * as Prompt from 'src/prompt';
 import path from 'path';
-import { Process } from './process';
 
 interface ProgramInputs {
   name: string | undefined;
@@ -13,7 +13,7 @@ interface ProgramInputs {
 
 export const promptUserForMissingArgs = (inputs: ProgramInputs) =>
   Effect.gen(function* ($) {
-    const _process = yield* $(Process);
+    const _process = yield* $(Process.Process);
     const config = yield* $(
       // TODO: add validation for whether fs.isAbsolutePath
       pipe(

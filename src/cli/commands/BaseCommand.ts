@@ -3,7 +3,8 @@ import * as t from 'typanion';
 import { Effect, Either, flow, pipe } from '@scribe/core';
 import { runtimeDebug } from '@effect/data/Debug';
 import * as FS from '@scribe/fs';
-import * as Process from '../../process';
+import { Process } from '@scribe/services';
+
 import * as Runtime from '@effect/io/Runtime';
 
 export abstract class BaseCommand extends Command {
@@ -43,7 +44,7 @@ export abstract class BaseCommand extends Command {
   }
 
   abstract executeSafe: () => Effect.Effect<
-    Process.Process | FS.FS,
+    Process.Index | FS.FS,
     unknown,
     void
   >;

@@ -26,6 +26,7 @@ export default defineConfig({
       '@scribe/commands': path.resolve(__dirname, 'src/commands/index'),
       '@scribe/fs': path.resolve(__dirname, 'src/common/fs/index'),
       '@scribe/cli': path.resolve(__dirname, 'src/cli/index'),
+      '@scribe/services': path.resolve(__dirname, 'src/services/index'),
     },
   },
 });

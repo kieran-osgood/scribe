@@ -7,7 +7,7 @@ import { Template } from '@scribe/config';
 
 import { promptUserForMissingArgs } from '../context';
 import { TemplateFileError } from './error';
-import { Process } from '../process';
+import { Process } from '@scribe/services';
 
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   return Effect.gen(function* ($) {
@@ -16,7 +16,7 @@ function createAbsFilePaths(ctx: ConstructTemplateCtx) {
     } = ctx;
     // should report if templatesDirectories isn't a dir?
     const templateDirs = ctx.config.options?.templatesDirectories ?? [''];
-    const cwd = (yield* $(Process)).cwd();
+    const cwd = (yield* $(Process.Process)).cwd();
 
     return pipe(
       templateDirs,
@@ -72,7 +72,7 @@ export type WriteTemplateCtx = Ctx & {
 };
 export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
-    const _process = yield* $(Process);
+    const _process = yield* $(Process.Process);
     const fileName = render(_.templateOutput.output.fileName, {
       Name: _.input.name,
     });

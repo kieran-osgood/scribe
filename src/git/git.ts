@@ -7,7 +7,7 @@ import simpleGit, {
 import * as Effect from '@effect/io/Effect';
 import { pipe } from '@scribe/core';
 import GitStatusError, { SimpleGitError } from './error';
-import { Process } from '../process';
+import { Process } from '@scribe/services';
 
 export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
   Effect.tryCatch(
@@ -18,7 +18,7 @@ export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
 
 export const checkWorkingTreeClean = (options?: TaskOptions) =>
   pipe(
-    Process,
+    Process.Process,
     Effect.flatMap(_ => createSimpleGit({ baseDir: _.cwd() })),
     Effect.flatMap(_ =>
       Effect.async<never, GitStatusError, StatusResult>(resume => {

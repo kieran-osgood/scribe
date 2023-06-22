@@ -10,7 +10,7 @@ import * as FS from '@scribe/fs';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import path from 'path';
-import * as Process from '../../process';
+import { Process } from '@scribe/services';
 
 beforeEach(() => {
   vi.restoreAllMocks();

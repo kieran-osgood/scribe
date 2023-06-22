@@ -15,7 +15,8 @@
       "@scribe/git": ["src/git/index"],
       "@scribe/commands": ["src/commands/index"],
       "@scribe/fs": ["src/common/fs/index"],
-      "@scribe/cli": ["src/cli/index"]
+      "@scribe/cli": ["src/cli/index"],
+      "@scribe/services": ["src/services/index"]
     },
     "lib": ["ESNext"],
     "baseUrl": ".",

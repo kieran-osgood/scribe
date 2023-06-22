@@ -1,10 +1,10 @@
 import { Context, Effect } from '@scribe/core';
 
-export interface Process {
+export interface Index {
   cwd(): string;
 }
 
-export const Process = Context.Tag<Process>();
+export const Process = Context.Tag<Index>();
 
 export const ProcessLive = Effect.provideService(Process, {
   cwd: process.cwd,
