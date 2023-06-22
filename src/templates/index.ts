@@ -15,15 +15,7 @@ export type Ctx = Effect.Effect.Success<
 
 export type ConstructTemplateCtx = Ctx & { templateOutput: Template };
 
-type ConstructTemplate = Effect.Effect<
-  Process,
-  never,
-  Effect.Effect<FS.FS, FS.ReadFileError | TemplateFileError, WriteTemplateCtx>[]
->;
-
-export function constructTemplate(
-  ctx: ConstructTemplateCtx
-): ConstructTemplate {
+export function constructTemplate(ctx: ConstructTemplateCtx) {
   return pipe(
     Effect.gen(function* ($) {
       const templateDirs = ctx.config.options?.templatesDirectories ?? [''];
@@ -66,7 +58,8 @@ export function constructTemplate(
           )
         )
       )
-    )
+    ),
+    Effect.flatMap(Effect.all)
   );
 }
 

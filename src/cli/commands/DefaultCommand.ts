@@ -1,7 +1,7 @@
 import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 
-import { Effect, flow, pipe, RA } from '@scribe/core';
+import { Effect, pipe, RA } from '@scribe/core';
 import { checkWorkingTreeClean } from '@scribe/git';
 
 import { promptUserForMissingArgs } from '../../context';
@@ -86,11 +86,6 @@ export class DefaultCommand extends BaseCommand {
 const createTemplate = (ctx: Ctx & { templateOutput: Template }) =>
   pipe(
     constructTemplate(ctx),
-    Effect.map(RA.map(Effect.map(writeTemplate))),
-    Effect.flatMap(
-      flow(
-        Effect.all, //
-        Effect.flatMap(Effect.all)
-      )
-    )
+    Effect.map(RA.map(writeTemplate)),
+    Effect.flatMap(Effect.all)
   );
