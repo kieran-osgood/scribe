@@ -5,7 +5,7 @@ import simpleGit, {
   TaskOptions,
 } from 'simple-git';
 import * as Effect from '@effect/io/Effect';
-import { pipe } from '@scribe/core';
+import { pipe } from 'src/core';
 import GitStatusError, { SimpleGitError } from './error';
 import { Process } from '@scribe/services';
 

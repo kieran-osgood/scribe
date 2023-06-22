@@ -2,7 +2,7 @@ import * as NFS from 'fs';
 import path from 'path';
 import { MkDirError, ReadFileError, StatError, WriteFileError } from './error';
 import { Abortable } from 'node:events';
-import { Context, Effect, pipe } from '@scribe/core';
+import { Context, Effect, pipe } from 'src/core';
 import * as memfs from 'memfs';
 
 export interface FS {

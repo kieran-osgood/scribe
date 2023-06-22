@@ -1,4 +1,4 @@
-import { Context, Effect, pipe } from '@scribe/core';
+import { Context, Effect, pipe } from 'src/core';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import path from 'path';

@@ -4,7 +4,7 @@ import {
   readConfig,
   readUserTemplateOptions,
 } from '../config';
-import { Effect, pipe } from '@scribe/core';
+import { Effect, pipe } from 'src/core';
 import { ConfigParseError, CosmicConfigError } from '../error';
 
 describe('config', function () {

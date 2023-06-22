@@ -2,7 +2,7 @@ import { cosmiconfig } from 'cosmiconfig';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
 import { CosmiconfigResult } from 'cosmiconfig/dist/types';
 
-import { Effect, flow, pipe, RA, S, T } from '@scribe/core';
+import { Effect, flow, pipe, RA, S, T } from 'src/core';
 
 import { ConfigParseError, CosmicConfigError } from './error';
 import { ScribeConfig } from './schema';

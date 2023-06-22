@@ -1,4 +1,4 @@
-import { Context } from '@scribe/core';
+import { Context } from 'src/core';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import NFS from 'fs';

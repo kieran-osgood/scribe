@@ -1,4 +1,4 @@
-import { Context, Effect } from '@scribe/core';
+import { Context, Effect } from 'src/core';
 
 export interface Index {
   cwd(): string;

@@ -1,4 +1,4 @@
-import { Effect } from '@scribe/core';
+import { Effect } from 'src/core';
 import { Builtins, Cli } from 'clipanion';
 import { BaseContext } from 'clipanion/lib/advanced/Cli';
 import { DefaultCommand } from './commands/DefaultCommand';

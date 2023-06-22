@@ -1,5 +1,5 @@
-import { TF } from '../common/core';
-import { TaggedClass } from '@scribe/core';
+import { TF } from '../core';
+import { TaggedClass } from 'src/core';
 import { NonEmptyReadonlyArray } from '@effect/data/ReadonlyArray';
 import { ParseErrors } from '@effect/schema/src/ParseResult';
 

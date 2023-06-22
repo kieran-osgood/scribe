@@ -1,4 +1,4 @@
-import { Effect, pipe, RA } from '@scribe/core';
+import { Effect, pipe, RA } from 'src/core';
 import {
   constructTemplate,
   ConstructTemplateCtx,

@@ -9,7 +9,7 @@
     "noImplicitOverride": true,
     "resolveJsonModule": true,
     "paths": {
-      "@scribe/core": ["src/common/core/index"],
+      "@scribe/core": ["src/core/index"],
       "@scribe/config": ["src/config/index"],
       "@scribe/reader": ["src/reader/index"],
       "@scribe/git": ["src/git/index"],

@@ -1,4 +1,4 @@
-import { Effect, pipe } from '@scribe/core';
+import { Effect, pipe } from 'src/core';
 import { checkWorkingTreeClean } from '../git';
 import { beforeEach } from 'vitest';
 import GitStatusError from '../error';

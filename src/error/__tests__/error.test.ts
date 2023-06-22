@@ -1,5 +1,5 @@
 import { fmtError } from '../error';
-import { pipe } from '@scribe/core';
+import { pipe } from 'src/core';
 import { describe } from 'vitest';
 import * as fc from 'fast-check';
 import * as S from 'fp-ts/lib/string';
