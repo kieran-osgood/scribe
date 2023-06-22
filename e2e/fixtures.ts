@@ -84,6 +84,8 @@ export function createMinimalProject(
     } satisfies child_process.ExecSyncOptionsWithBufferEncoding;
 
     child_process.execSync('git init', execOpts);
+    child_process.execSync('git config user.name "kieran"', execOpts);
+    child_process.execSync('git config user.name "ko@gmail.com"', execOpts);
     if (options.git.dirty === false) {
       child_process.execSync('git add .', execOpts);
       child_process.execSync(

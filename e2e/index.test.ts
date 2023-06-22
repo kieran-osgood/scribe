@@ -32,7 +32,6 @@ describe('Scribe Cli', () => {
 
         Select via args
           $ scribe --template screen --name Login
-        Exiting
         "
       `);
 
@@ -78,8 +77,7 @@ describe('Scribe Cli', () => {
           'Output files:\n' +
           `- ${projectRoot}/examples/src/screens/Login.ts\n` +
           `- ${projectRoot}/examples/src/screens/Login.test.ts\n` +
-          'Complete\n' +
-          'Exiting'
+          'Complete\n'
       );
       expect(result.status).toBe(0);
     });
@@ -100,8 +98,7 @@ describe('Scribe Cli', () => {
             'Output files:\n' +
             `- ${projectRoot}/examples/src/screens/Login.ts\n` +
             `- ${projectRoot}/examples/src/screens/Login.test.ts\n` +
-            'Complete\n' +
-            'Exiting'
+            'Complete\n'
         );
         expect(result.status).toBe(0);
       });
