@@ -36,5 +36,5 @@ export const promptUserForMissingArgs = (inputs: ProgramInputs) =>
       })
     );
 
-    return { config, input, templateKeys };
+    return { config, input, templateKeys } as const;
   });

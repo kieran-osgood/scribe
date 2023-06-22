@@ -34,37 +34,41 @@ export class DefaultCommand extends BaseCommand {
     required: false,
   });
 
+  overrideFlags(
+    _: Effect.Effect.Success<ReturnType<typeof promptUserForMissingArgs>>
+  ) {
+    this.name = _.input.name;
+    this.template = _.input.template;
+    return _;
+  }
+
   executeSafe = () =>
     pipe(
       // TODO: add ignore git?
       checkWorkingTreeClean(),
+
       Effect.flatMap(() =>
+        promptUserForMissingArgs({
+          name: this.name,
+          template: this.template,
+          configPath: this.configPath,
+        })
+      ),
+
+      Effect.flatMap(_ => Effect.sync(() => this.overrideFlags(_))),
+
+      Effect.flatMap(_ =>
         pipe(
-          promptUserForMissingArgs({
-            name: this.name,
-            template: this.template,
-            configPath: this.configPath,
-          }),
-          Effect.map(_ => {
-            this.name = _.input.name;
-            this.template = _.input.template;
-            return _;
-          }),
-          Effect.map(_ =>
-            pipe(
-              _.config.templates[_.input.template]?.outputs ?? [],
-              RA.map(templateOutput => createTemplate({ templateOutput, ..._ }))
-            )
-          )
+          _.config.templates[_.input.template]?.outputs ?? [],
+          RA.map(
+            templateOutput => createTemplate({ templateOutput, ..._ }) //
+          ),
+          Effect.all,
+          Effect.map(RA.flatten),
+          Effect.flatMap(flow(Effect.all, Effect.flatMap(Effect.all)))
         )
       ),
 
-      Effect.map(
-        flow(Effect.forEachPar(Effect.map(id => id)), Effect.map(RA.flatten))
-      ),
-      Effect.flatMap(
-        Effect.flatMap(flow(Effect.all, Effect.flatMap(Effect.all)))
-      ),
       Effect.map(_ => {
         const results = pipe(
           _,
