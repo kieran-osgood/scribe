@@ -9,7 +9,7 @@ import { pipe } from '@scribe/core';
 import GitStatusError, { SimpleGitError } from './error';
 import { Process } from '../process';
 
-const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
+export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
   Effect.tryCatch(
     () => simpleGit(options),
     // TODO: remove assertion

@@ -69,6 +69,9 @@ export abstract class BaseCommand extends Command {
             Either.match(
               error,
               error => {
+                // const errorMessage = `Unexpected Error
+                // Please report this with the attached error: https://github.com/kieran-osgood/scribe/issues/new.`;
+
                 if (Runtime.isFiberFailure(error)) {
                   this.context.stdout.write(`${error.cause?.toString()}\n`);
                 } else if (error instanceof Error) {
