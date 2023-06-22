@@ -1,5 +1,5 @@
 import { Data } from '@scribe/core';
-import { GitError, StatusResult } from 'simple-git';
+import { GitConstructError, GitError, StatusResult } from 'simple-git';
 
 export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
   readonly status: StatusResult;
@@ -17,5 +17,13 @@ export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
       default:
         return '❗️Unable to check Git status, are you in a git repository?';
     }
+  }
+}
+
+export class SimpleGitError extends Data.TaggedClass('SimpleGitError')<{
+  readonly cause: GitConstructError;
+}> {
+  override toString() {
+    return this.cause.message;
   }
 }

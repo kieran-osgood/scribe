@@ -1,18 +1,28 @@
-import simpleGit, { StatusResult, TaskOptions } from 'simple-git';
+import simpleGit, {
+  GitConstructError,
+  SimpleGitOptions,
+  StatusResult,
+  TaskOptions,
+} from 'simple-git';
 import * as Effect from '@effect/io/Effect';
 import { pipe } from '@scribe/core';
-import GitStatusError from './error';
+import GitStatusError, { SimpleGitError } from './error';
 import { Process } from '../process';
+
+const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
+  Effect.tryCatch(
+    () => simpleGit(options),
+    // TODO: remove assertion
+    cause => new SimpleGitError({ cause: cause as GitConstructError })
+  );
 
 export const checkWorkingTreeClean = (options?: TaskOptions) =>
   pipe(
     Process,
-    Effect.flatMap(_process =>
+    Effect.flatMap(_ => createSimpleGit({ baseDir: _.cwd() })),
+    Effect.flatMap(_ =>
       Effect.async<never, GitStatusError, StatusResult>(resume => {
-        // TODO: this throws if given invalid dir - need to wrap it
-        const git = simpleGit({ baseDir: _process.cwd() });
-
-        git.status(options, (cause, status) => {
+        _.status(options, (cause, status) => {
           // TODO: remove development flags
           if (process.env.NODE_ENV === 'development') {
             resume(Effect.succeed(status));
