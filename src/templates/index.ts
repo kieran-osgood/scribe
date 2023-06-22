@@ -1,68 +1,90 @@
-import { render, renderFile } from 'template-file';
+import { render } from 'template-file';
 import path from 'path';
 
-import { Effect, pipe, RA } from '@scribe/core';
-import { fileOrDirExists, writeFile } from '@scribe/fs';
+import { Effect, flow, pipe, RA } from 'src/core';
+import * as FS from 'src/services/fs';
 import { Template } from '@scribe/config';
 
 import { promptUserForMissingArgs } from '../context';
 import { TemplateFileError } from './error';
+import { Process } from '@scribe/services';
+
+function createAbsFilePaths(ctx: ConstructTemplateCtx) {
+  return Effect.gen(function* ($) {
+    const {
+      templateOutput: { templateFileKey },
+    } = ctx;
+    // should report if templatesDirectories isn't a dir?
+    const templateDirs = ctx.config.options?.templatesDirectories ?? [''];
+    const cwd = (yield* $(Process.Process)).cwd();
+
+    return pipe(
+      templateDirs,
+      RA.map(_ => path.join(cwd, _, `${templateFileKey}.scribe`)),
+    );
+  });
+}
 
 export type Ctx = Effect.Effect.Success<
   ReturnType<typeof promptUserForMissingArgs>
 >;
 
-export function constructTemplate(ctx: Ctx & { templateOutput: Template }) {
-  const templateDirs = ctx.config.options?.templatesDirectories ?? [];
-  /**
-   * need to check fileExists for each of templateDirectories
-   */
+export type ConstructTemplateCtx = Ctx & { templateOutput: Template };
 
-  const filePaths: string[] = templateDirs.map(d =>
-    path.join(process.cwd(), d, `${ctx.templateOutput.templateFileKey}.scribe`)
-  );
-
+export function constructTemplate(ctx: ConstructTemplateCtx) {
   return pipe(
-    filePaths,
-    RA.map(filePath =>
-      pipe(
-        fileOrDirExists(filePath),
-        Effect.flatMap(() =>
-          Effect.tryCatchPromise(
-            () =>
-              renderFile(filePath, {
-                Name: ctx.input.name,
-                //   ...ctx.input.variables
-              }),
-            cause => new TemplateFileError({ cause })
-          )
+    createAbsFilePaths(ctx),
+    Effect.flatMap(
+      flow(
+        RA.map(_ =>
+          pipe(
+            FS.readFile(_, null), //
+            Effect.map(String),
+          ),
         ),
-        // TODO: ...ctx.variables
-        Effect.map(_ => {
-          // console.log('fileContents', _);
-          return { fileContents: _, ...ctx };
-        })
-      )
-    )
+        Effect.all,
+      ),
+    ),
+    Effect.map(
+      RA.map(_ =>
+        Effect.tryCatch(
+          () =>
+            // extract renderFile to effectify
+            render(_, {
+              Name: ctx.input.name,
+              //   ...ctx.input.variables
+            }),
+          cause => new TemplateFileError({ cause }),
+        ),
+      ),
+    ),
+    Effect.flatMap(Effect.all),
+    Effect.map(
+      // TODO: ...ctx.variables
+      RA.map(_ => ({ fileContents: _, ...ctx } satisfies WriteTemplateCtx)),
+    ),
   );
 }
 
-// TODO: handle list of outputs
-export const writeTemplate = (
-  _: Ctx & { fileContents: string; templateOutput: Template }
-) =>
+export type WriteTemplateCtx = Ctx & {
+  fileContents: string;
+  templateOutput: Template;
+};
+export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
-    // TODO: ensure we have safe access
-
+    const _process = yield* $(Process.Process);
     const fileName = render(_.templateOutput.output.fileName, {
       Name: _.input.name,
     });
 
     const relativeFilePaths = path.join(
       _.templateOutput.output.directory,
-      fileName
+      fileName,
     );
-    const absoluteFilePath = path.join(process.cwd(), relativeFilePaths);
 
-    return yield* $(writeFile(absoluteFilePath, _.fileContents, null));
+    const absoluteFilePath = path.join(_process.cwd(), relativeFilePaths);
+
+    return yield* $(
+      FS.writeFileWithDir(absoluteFilePath, _.fileContents, null),
+    );
   });

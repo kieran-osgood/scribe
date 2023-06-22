@@ -1,0 +1,6 @@
+*.md
+*.lock
+*.yml
+*.yaml
+*.xml
+examples/

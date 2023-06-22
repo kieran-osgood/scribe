@@ -21,10 +21,32 @@ jobs:
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run ci
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+
+      - name: Lint
+        run: pnpm run ci:lint
+
+      - name: Typecheck
+        run: pnpm run ci:typecheck
+
+      - name: Test
+        run: pnpm run test
+
+      - name: Build
+        run: pnpm run ci:build
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
         if: always()
         with:
-          files: |
+          report_paths: '.github/tests/*.xml'
+
+#      - uses: andresz1/size-limit-action@v1
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: |
             .github/tests/*.xml
+        if: always()
