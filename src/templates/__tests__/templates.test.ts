@@ -92,7 +92,7 @@ describe('writeTemplate', () => {
       }),
       FS.FSMock,
       Process.ProcessLive,
-      Effect.runPromise
+      Effect.runPromise,
     ));
 });
 
@@ -115,13 +115,13 @@ describe('constructTemplate', () => {
           FS.writeFileWithDir(
             path.join(process.cwd(), './test/screen.scribe'),
             screenFileContents,
-            null
-          )
+            null,
+          ),
         );
 
         const result = yield* $(
           constructTemplate(ctx),
-          Effect.map(RA.map(_ => _.fileContents))
+          Effect.map(RA.map(_ => _.fileContents)),
         );
 
         expect(result).toMatchInlineSnapshot(`
@@ -136,7 +136,7 @@ describe('constructTemplate', () => {
       }),
       FS.FSMock,
       Process.ProcessLive,
-      Effect.runPromise
+      Effect.runPromise,
     ));
 
   it('should check process root dir for templates', () =>
@@ -161,7 +161,7 @@ describe('constructTemplate', () => {
 
         const result = yield* $(
           constructTemplate(ctx),
-          Effect.map(RA.map(_ => _.fileContents))
+          Effect.map(RA.map(_ => _.fileContents)),
         );
 
         expect(result).toMatchInlineSnapshot(`
@@ -176,7 +176,7 @@ describe('constructTemplate', () => {
       }),
       FS.FSMock,
       Process.ProcessLive,
-      Effect.runPromise
+      Effect.runPromise,
     ));
 
   it("should throw if scribe file isn't readable", () =>
@@ -199,6 +199,6 @@ describe('constructTemplate', () => {
       }),
       FS.FSMock,
       Process.ProcessMock,
-      Effect.runPromise
+      Effect.runPromise,
     ));
 });

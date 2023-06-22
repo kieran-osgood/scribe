@@ -16,11 +16,11 @@ describe('GitStatusError', () => {
         cause: new GitError(
           // @ts-expect-error - Don't care about the implementation only message
           {},
-          'not a git repository'
+          'not a git repository',
         ),
       });
       expect(error.toString()).toBe(
-        "You're not running within a git repository, continue?"
+        "You're not running within a git repository, continue?",
       );
     });
 
@@ -37,7 +37,7 @@ describe('GitStatusError', () => {
         status: { isClean: () => true } as StatusResult,
       });
       expect(error.toString()).toBe(
-        '❗️Unable to check Git status, are you in a git repository?'
+        '❗️Unable to check Git status, are you in a git repository?',
       );
     });
   });
@@ -49,7 +49,7 @@ describe('SimpleGitError', () => {
       const cause = new GitConstructError(
         // @ts-expect-error - Don't care about the implementation only message
         {},
-        'Git construct error'
+        'Git construct error',
       );
       const error = new SimpleGitError({ cause });
       expect(error.toString()).toBe('Git construct error');

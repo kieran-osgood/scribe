@@ -25,11 +25,11 @@ export function launchPromptInterface(options: LaunchPromptInterface) {
         S.parseEffect(Prompt),
         Effect.catchTag('ParseError', error =>
           Effect.fail(
-            new PromptError({ message: TF.formatErrors(error.errors) })
-          )
-        )
-      )
-    )
+            new PromptError({ message: TF.formatErrors(error.errors) }),
+          ),
+        ),
+      ),
+    ),
   );
 }
 
@@ -53,7 +53,7 @@ type MakeQuestionsOptions = {
 };
 
 function makeQuestionCollection(
-  options: MakeQuestionsOptions
+  options: MakeQuestionsOptions,
 ): QuestionCollection {
   const { templates, flags } = options;
 
@@ -83,7 +83,7 @@ function makeQuestionCollection(
 
 const tryInquirerPrompt = (
   questions: QuestionCollection,
-  initialAnswers?: Partial<Answers>
+  initialAnswers?: Partial<Answers>,
 ) =>
   Effect.tryCatchPromise(
     () => inquirer.prompt(questions, initialAnswers),
@@ -91,5 +91,5 @@ const tryInquirerPrompt = (
       new PromptError({
         message: `Prompt failed: ${fmtError(cause)}`,
         cause,
-      })
+      }),
   );

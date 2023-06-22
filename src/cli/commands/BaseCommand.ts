@@ -15,13 +15,13 @@ export abstract class BaseCommand extends Command {
   test = Option.Boolean(
     '--test', //
     false,
-    { hidden: true }
+    { hidden: true },
   );
 
   cwd = Option.String(
     '--cwd', //
     '',
-    { hidden: true }
+    { hidden: true },
   );
 
   verbose = Option.Boolean('--verbose', false, {
@@ -82,10 +82,10 @@ export abstract class BaseCommand extends Command {
               },
               () => {
                 this.context.stdout.write('Complete\n');
-              }
+              },
             );
-          })
-      )
+          }),
+      ),
     );
   };
 }

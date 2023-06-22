@@ -48,7 +48,7 @@ describe('Scribe Cli', () => {
         [
           `--config=${configFlag}`, //
         ],
-        { cwd: projectRoot }
+        { cwd: projectRoot },
       );
 
       const cli = processPromise.child;
@@ -77,7 +77,7 @@ describe('Scribe Cli', () => {
           'Output files:\n' +
           `- ${projectRoot}/examples/src/screens/Login.ts\n` +
           `- ${projectRoot}/examples/src/screens/Login.test.ts\n` +
-          'Complete\n'
+          'Complete\n',
       );
       expect(result.status).toBe(0);
     });
@@ -89,7 +89,7 @@ describe('Scribe Cli', () => {
         const result = await spawnAsync(
           cliPath,
           [`--config=${configFlag}`, '--template=screen', '--name=Login'],
-          { cwd: projectRoot }
+          { cwd: projectRoot },
         );
 
         const stdOutAnsi = stripAnsi(result.stdout);
@@ -98,7 +98,7 @@ describe('Scribe Cli', () => {
             'Output files:\n' +
             `- ${projectRoot}/examples/src/screens/Login.ts\n` +
             `- ${projectRoot}/examples/src/screens/Login.test.ts\n` +
-            'Complete\n'
+            'Complete\n',
         );
         expect(result.status).toBe(0);
       });

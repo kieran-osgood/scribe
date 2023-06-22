@@ -43,9 +43,9 @@ describe('_Cli', () => {
           const result = await stringifyStdOut(ctx.stdout);
 
           expect(result).toBe('⚠️ Working directory not clean\n');
-        })
+        }),
       ),
-      Effect.runPromise
+      Effect.runPromise,
     );
   });
 
@@ -79,9 +79,9 @@ describe('_Cli', () => {
             Complete
             "
           `);
-        })
+        }),
       ),
-      Effect.runPromise
+      Effect.runPromise,
     );
   });
 
@@ -120,9 +120,9 @@ describe('_Cli', () => {
               $ scribe --template screen --name Login
             "
           `);
-        })
+        }),
       ),
-      Effect.runPromise
+      Effect.runPromise,
     );
   });
 });

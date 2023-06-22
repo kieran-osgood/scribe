@@ -20,11 +20,11 @@ describe('config', function () {
       pipe(
         Effect.gen(function* ($) {
           const result = yield* $(
-            readConfig('test/config/good-scribe.config.ts')
+            readConfig('test/config/good-scribe.config.ts'),
           );
           expect(result).toMatchSnapshot();
         }),
-        Effect.runPromise
+        Effect.runPromise,
       ));
     describe('should return ConfigParseError ', () => {
       it('when reads config with invalid syntax', () =>
@@ -32,11 +32,11 @@ describe('config', function () {
           Effect.gen(function* ($) {
             const result = yield* $(
               readConfig('test/config/bad-syntax-scribe.config.ts'),
-              Effect.flip
+              Effect.flip,
             );
             expect(result).toBeInstanceOf(ConfigParseError);
           }),
-          Effect.runPromise
+          Effect.runPromise,
         ));
 
       it('when reads config with missing export', () =>
@@ -44,11 +44,11 @@ describe('config', function () {
           Effect.gen(function* ($) {
             const result = yield* $(
               readConfig('test/config/missing-export-scribe.config.ts'),
-              Effect.flip
+              Effect.flip,
             );
             expect(result).toBeInstanceOf(ConfigParseError);
           }),
-          Effect.runPromise
+          Effect.runPromise,
         ));
     });
 
@@ -58,7 +58,7 @@ describe('config', function () {
           const result = yield* $(readConfig('bad-path'), Effect.flip);
           expect(result).toBeInstanceOf(CosmicConfigError);
         }),
-        Effect.runPromise
+        Effect.runPromise,
       ));
   });
 
@@ -70,7 +70,7 @@ describe('config', function () {
           const result = yield* $(checkForTemplates(input));
           expect(result).toBe(input);
         }),
-        Effect.runPromise
+        Effect.runPromise,
       ));
 
     it('should return CosmicConfigError if empty array', () =>
@@ -79,7 +79,7 @@ describe('config', function () {
           const result = yield* $(checkForTemplates([]), Effect.flip);
           expect(result).toBeInstanceOf(CosmicConfigError);
         }),
-        Effect.runPromise
+        Effect.runPromise,
       ));
   });
 
@@ -88,13 +88,13 @@ describe('config', function () {
       pipe(
         Effect.gen(function* ($) {
           const result = yield* $(
-            readUserTemplateOptions('test/config/good-scribe.config.ts')
+            readUserTemplateOptions('test/config/good-scribe.config.ts'),
           );
           expect(result).toEqual(
-            expect.arrayContaining(['screen', 'component'])
+            expect.arrayContaining(['screen', 'component']),
           );
         }),
-        Effect.runPromise
+        Effect.runPromise,
       ));
   });
 
@@ -107,11 +107,11 @@ describe('config', function () {
               isEmpty: false,
               config: 'abc',
               filepath: '',
-            })
+            }),
           );
           expect(result).toEqual('abc');
         }),
-        Effect.runPromise
+        Effect.runPromise,
       ));
 
     it('should return CosmicConfigError if isEmpty true', () =>
@@ -123,11 +123,11 @@ describe('config', function () {
               config: {},
               filepath: '',
             }),
-            Effect.flip
+            Effect.flip,
           );
           expect(result).toBeInstanceOf(CosmicConfigError);
         }),
-        Effect.runPromise
+        Effect.runPromise,
       ));
 
     it('should return CosmicConfigError if CosmicConfigResult was null', () =>
@@ -136,7 +136,7 @@ describe('config', function () {
           const result = yield* $(extractConfig(null), Effect.flip);
           expect(result).toBeInstanceOf(CosmicConfigError);
         }),
-        Effect.runPromise
+        Effect.runPromise,
       ));
   });
 });

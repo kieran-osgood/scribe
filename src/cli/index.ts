@@ -21,11 +21,11 @@ export function _Cli(args: string[], contextOverrides?: Partial<BaseContext>) {
 
 export function run(
   args: string[] = process.argv,
-  contextOverrides: Partial<BaseContext> = {}
+  contextOverrides: Partial<BaseContext> = {},
 ) {
   return Effect.tryCatchPromise(
     () => _Cli(args.slice(2), contextOverrides),
     // TODO: move defect logging here
-    cause => new CliError({ cause })
+    cause => new CliError({ cause }),
   );
 }

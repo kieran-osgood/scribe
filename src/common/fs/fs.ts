@@ -18,13 +18,13 @@ export const FS = Context.Tag<FS>();
 export const FSLive = Effect.provideService(FS, NFS);
 export const FSMock = Effect.provideService(
   FS,
-  memfs.fs as unknown as typeof NFS
+  memfs.fs as unknown as typeof NFS,
 );
 
 export const writeFile = (
   file: NFS.PathOrFileDescriptor,
   data: string | NodeJS.ArrayBufferView,
-  options: NFS.WriteFileOptions
+  options: NFS.WriteFileOptions,
 ) =>
   pipe(
     FS,
@@ -33,24 +33,24 @@ export const writeFile = (
         fs.writeFile(file, data, options, error => {
           if (error) {
             resume(
-              Effect.fail(new WriteFileError({ file, data, options, error }))
+              Effect.fail(new WriteFileError({ file, data, options, error })),
             );
           } else {
             resume(Effect.succeed(file));
           }
         });
-      })
-    )
+      }),
+    ),
   );
 
 export const writeFileWithDir = (
   pathName: string,
   data: string | NodeJS.ArrayBufferView,
-  options: NFS.WriteFileOptions
+  options: NFS.WriteFileOptions,
 ): Effect.Effect<FS, WriteFileError | MkDirError, NFS.PathOrFileDescriptor> =>
   pipe(
     mkdir(path.dirname(pathName), { recursive: true }),
-    Effect.flatMap(() => writeFile(pathName, data, options))
+    Effect.flatMap(() => writeFile(pathName, data, options)),
   );
 
 export const readFile = (
@@ -58,7 +58,7 @@ export const readFile = (
   options:
     | ({ encoding?: BufferEncoding; flag?: string } & Abortable)
     | undefined
-    | null
+    | null,
 ): Effect.Effect<FS, ReadFileError, string | Buffer> =>
   pipe(
     FS,
@@ -71,15 +71,15 @@ export const readFile = (
             resume(Effect.succeed(data));
           }
         });
-      })
-    )
+      }),
+    ),
   );
 
 export const mkdir = (
   file: NFS.PathLike,
   options?: NFS.MakeDirectoryOptions & {
     recursive: true;
-  }
+  },
 ): Effect.Effect<FS, MkDirError, string | undefined> =>
   pipe(
     FS,
@@ -92,8 +92,8 @@ export const mkdir = (
             resume(Effect.succeed(data));
           }
         });
-      })
-    )
+      }),
+    ),
   );
 
 export const stat = (path: string) =>
@@ -107,17 +107,17 @@ export const stat = (path: string) =>
           } else {
             resume(Effect.succeed(stats));
           }
-        })
-      )
-    )
+        }),
+      ),
+    ),
   );
 
 export const fileOrDirExists = (
-  pathLike: string
+  pathLike: string,
 ): Effect.Effect<FS, StatError, boolean> =>
   pipe(
     stat(pathLike),
-    Effect.map(_ => _.isFile() || _.isDirectory())
+    Effect.map(_ => _.isFile() || _.isDirectory()),
   );
 
 // export const open = (

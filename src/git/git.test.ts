@@ -54,7 +54,7 @@ describe('Git', async () => {
           expect(result.isClean()).toBe(true);
         }),
         Process.ProcessMock,
-        Effect.runPromise
+        Effect.runPromise,
       ));
 
     // TODO: handle accepting or rejecting continue on dirty
@@ -73,7 +73,7 @@ describe('Git', async () => {
           // mockConsoleLog.mockRestore();
         }),
         Process.ProcessMock,
-        Effect.runPromise
+        Effect.runPromise,
       ));
 
     describe('The callback has no error', () => {
@@ -87,7 +87,7 @@ describe('Git', async () => {
             expect(result.isClean()).toBe(true);
           }),
           Process.ProcessMock,
-          Effect.runPromise
+          Effect.runPromise,
         ));
 
       // TODO: handle accepting or rejecting continue on dirty
@@ -108,7 +108,7 @@ describe('Git', async () => {
             // mockConsoleLog.mockRestore();
           }),
           Process.ProcessMock,
-          Effect.runPromise
+          Effect.runPromise,
         ));
     });
 
@@ -125,7 +125,7 @@ describe('Git', async () => {
           expect(result.isClean()).toBe(true);
         }),
         Process.ProcessMock,
-        Effect.runPromise
+        Effect.runPromise,
       ));
 
     describe('When returning GitStatusError ', () => {

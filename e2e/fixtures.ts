@@ -7,7 +7,7 @@ import * as child_process from 'child_process';
 const cliPath = path.join(process.cwd(), 'dist', 'index.js');
 
 function isSpawnResult(
-  errorOrResult: Error
+  errorOrResult: Error,
 ): errorOrResult is Error & SpawnResult {
   return (
     'pid' in errorOrResult &&
@@ -18,7 +18,7 @@ function isSpawnResult(
 
 export async function runAsync(
   args: string[],
-  options?: SpawnOptions
+  options?: SpawnOptions,
 ): Promise<SpawnResult> {
   const promise = spawnAsync(cliPath, args, options);
   promise.child.stdout?.pipe(process.stdout);
@@ -36,7 +36,7 @@ export async function runAsync(
 
 export async function tryRunAsync(
   args: string[],
-  options?: SpawnOptions
+  options?: SpawnOptions,
 ): Promise<SpawnResult> {
   try {
     return await runAsync(args, options);
@@ -56,7 +56,7 @@ type CreateMinimalProjectOptions = {
 };
 
 export function createMinimalProject(
-  options: CreateMinimalProjectOptions = { git: { init: true, dirty: false } }
+  options: CreateMinimalProjectOptions = { git: { init: true, dirty: false } },
 ) {
   const projectRoot = tempy.temporaryDirectory();
   const testPath = path.join(projectRoot, 'test');
@@ -65,17 +65,17 @@ export function createMinimalProject(
   copyFileToPath(
     projectRoot,
     path.join(projectRoot, 'scribe.config.ts'),
-    './test/scribe.config.ts'
+    './test/scribe.config.ts',
   );
   copyFileToPath(
     projectRoot,
     path.join(testPath, `screen.scribe`),
-    './test/screen.scribe'
+    './test/screen.scribe',
   );
   copyFileToPath(
     projectRoot,
     path.join(testPath, 'screen.test.scribe'),
-    './test/screen.scribe'
+    './test/screen.scribe',
   );
 
   if (options?.git?.init) {
@@ -90,7 +90,7 @@ export function createMinimalProject(
       child_process.execSync('git add .', execOpts);
       child_process.execSync(
         'git commit -m "non empty commit message"',
-        execOpts
+        execOpts,
       );
     }
   }
@@ -101,7 +101,7 @@ export function createMinimalProject(
 const copyFileToPath = (
   projectRoot: string,
   writePath: string,
-  readPath: string
+  readPath: string,
 ) => {
   fs.writeFileSync(writePath, fs.readFileSync(readPath));
 };

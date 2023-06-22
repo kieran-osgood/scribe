@@ -7,7 +7,7 @@ import * as S from 'fp-ts/lib/string';
 describe('formatErrorMessage', () => {
   it('should format the errors if it was a Error instance', () => {
     pipe(new Error('An error instance!'), fmtError, e =>
-      expect(e).toBe('An error instance!')
+      expect(e).toBe('An error instance!'),
     );
   });
 
@@ -16,9 +16,9 @@ describe('formatErrorMessage', () => {
       fc.property(fc.anything({ withObjectString: true }), _ =>
         S.Eq.equals(
           fmtError(_),
-          typeof _?.toString === 'function' ? _?.toString() : 'Unknown Error'
-        )
+          typeof _?.toString === 'function' ? _?.toString() : 'Unknown Error',
+        ),
       ),
-      { seed: 1734679579, path: '8:1:78:78', endOnFailure: true }
+      { seed: 1734679579, path: '8:1:78:78', endOnFailure: true },
     ));
 });

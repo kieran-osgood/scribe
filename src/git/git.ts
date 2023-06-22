@@ -13,7 +13,7 @@ export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
   Effect.tryCatch(
     () => simpleGit(options),
     // TODO: remove assertion
-    cause => new SimpleGitError({ cause: cause as GitConstructError })
+    cause => new SimpleGitError({ cause: cause as GitConstructError }),
   );
 
 export const checkWorkingTreeClean = (options?: TaskOptions) =>
@@ -36,8 +36,8 @@ export const checkWorkingTreeClean = (options?: TaskOptions) =>
             resume(Effect.fail(new GitStatusError({ status })));
           }
         });
-      })
-    )
+      }),
+    ),
 
     // TODO: prompt for continue on dirty
     // Effect.catchTag('GitStatusError', _ => {

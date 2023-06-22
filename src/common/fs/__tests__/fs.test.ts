@@ -33,7 +33,7 @@ describe('fs', () => {
           expect(String(result)).toBe(fileContents);
         }),
         Effect.provideContext(FSMock),
-        Effect.runPromise
+        Effect.runPromise,
       ));
 
     it('throw error if file doesnt exist', () =>
@@ -45,7 +45,7 @@ describe('fs', () => {
           expect(result).toBeInstanceOf(ReadFileError);
         }),
         Effect.provideContext(FSMock),
-        Effect.runPromise
+        Effect.runPromise,
       ));
   });
 
@@ -56,14 +56,14 @@ describe('fs', () => {
           const filePath = './template3.txt';
 
           expect(
-            yield* $(FS.writeFile(filePath, fileContents, null)) //
+            yield* $(FS.writeFile(filePath, fileContents, null)), //
           ).toBe('./template3.txt');
           expect(
-            yield* $(FS.readFile(filePath, { encoding: 'utf8' })) //
+            yield* $(FS.readFile(filePath, { encoding: 'utf8' })), //
           ).toEqual(fileContents);
         }),
         Effect.provideContext(FSMock),
-        Effect.runPromise
+        Effect.runPromise,
       ));
 
     it('should write file to path and read it back', () =>
@@ -72,12 +72,12 @@ describe('fs', () => {
           const filePath = '/some/nonexistent/path/template4.txt';
 
           const result = yield* $(
-            pipe(FS.writeFile(filePath, fileContents, null), Effect.flip)
+            pipe(FS.writeFile(filePath, fileContents, null), Effect.flip),
           );
           expect(result).toBeInstanceOf(WriteFileError);
         }),
         Effect.provideContext(FSMock),
-        Effect.runPromise
+        Effect.runPromise,
       ));
   });
 
@@ -95,7 +95,7 @@ describe('fs', () => {
           expect(exists).toBe(true);
         }),
         Effect.provideContext(FSMock),
-        Effect.runPromise
+        Effect.runPromise,
       ));
 
     it('returns undefined if dir already exists', () =>
@@ -110,7 +110,7 @@ describe('fs', () => {
           expect(cwdAsJson()).toEqual(previousDirStructure);
         }),
         Effect.provideContext(FSMock),
-        Effect.runPromise
+        Effect.runPromise,
       ));
 
     it('fails with error if mkdir cb has error', () =>
@@ -121,7 +121,7 @@ describe('fs', () => {
           expect(result).toBeInstanceOf(MkDirError);
         }),
         Effect.provideContext(FSMock),
-        Effect.runPromise
+        Effect.runPromise,
       ));
   });
 });
@@ -133,16 +133,16 @@ describe('writeFileWithDir', () => {
         const filePath = './path/to/some/long/path/template5.txt';
 
         const result = yield $(
-          FS.writeFileWithDir(filePath, fileContents, null)
+          FS.writeFileWithDir(filePath, fileContents, null),
         );
         expect(result).toBe(filePath);
 
         const readResult = yield* $(
-          FS.readFile(path.join('path/to/some/long/path/template5.txt'), null)
+          FS.readFile(path.join('path/to/some/long/path/template5.txt'), null),
         );
         expect(String(readResult)).toEqual(fileContents);
       }),
       Effect.provideContext(FSMock),
-      Effect.runPromise
+      Effect.runPromise,
     ));
 });

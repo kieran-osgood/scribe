@@ -20,20 +20,20 @@ export const promptUserForMissingArgs = (inputs: ProgramInputs) =>
         Boolean.match(
           path.isAbsolute(inputs.configPath),
           () => path.join(_process.cwd(), inputs.configPath),
-          () => inputs.configPath
+          () => inputs.configPath,
         ),
-        Config.readConfig
-      )
+        Config.readConfig,
+      ),
     );
     const templateKeys = yield* $(
-      Config.readUserTemplateOptions(inputs.configPath)
+      Config.readUserTemplateOptions(inputs.configPath),
     );
 
     const input = yield* $(
       Prompt.launchPromptInterface({
         templates: templateKeys,
         flags: { template: inputs.template, name: inputs.name },
-      })
+      }),
     );
 
     return { config, input, templateKeys } as const;

@@ -24,13 +24,13 @@ export const readConfig = (path: string) =>
       _ =>
         new CosmicConfigError({
           error: `[read config failed] ${_}`,
-        })
+        }),
     ),
     Effect.flatMap(extractConfig),
     Effect.flatMap(S.parseEffect(ScribeConfig)),
     Effect.catchTag('ParseError', _ =>
-      Effect.fail(new ConfigParseError({ errors: _.errors, path }))
-    )
+      Effect.fail(new ConfigParseError({ errors: _.errors, path })),
+    ),
   );
 
 export const checkForTemplates = (_: string[]) =>
@@ -40,7 +40,7 @@ export const checkForTemplates = (_: string[]) =>
     () =>
       new CosmicConfigError({
         error: 'No template options found',
-      })
+      }),
   );
 
 /**
@@ -50,13 +50,17 @@ export const checkForTemplates = (_: string[]) =>
 export const readUserTemplateOptions = flow(
   readConfig,
   Effect.flatMap(config =>
-    pipe(RA.fromRecord(config.templates), RA.map(T.getFirst), checkForTemplates)
-  )
+    pipe(
+      RA.fromRecord(config.templates),
+      RA.map(T.getFirst),
+      checkForTemplates,
+    ),
+  ),
 );
 
 export const extractConfig = (_: CosmiconfigResult) =>
   Effect.cond(
     () => _ !== null && Boolean(_?.isEmpty) !== true,
     () => _?.config as unknown,
-    () => new CosmicConfigError({ error: 'Empty Config' })
+    () => new CosmicConfigError({ error: 'Empty Config' }),
   );

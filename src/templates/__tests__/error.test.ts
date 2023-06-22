@@ -4,7 +4,9 @@ describe('error', () => {
   describe(TemplateFileError.name, () => {
     it('toString', () => {
       const result = new TemplateFileError({ cause: '' }).toString();
-      expect(result).toMatchInlineSnapshot('"Writing to file failed, please report this."');
+      expect(result).toMatchInlineSnapshot(
+        '"Writing to file failed, please report this."',
+      );
     });
   });
 });
