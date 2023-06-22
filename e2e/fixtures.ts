@@ -59,23 +59,24 @@ export function createMinimalProject(
   options: CreateMinimalProjectOptions = { git: { init: true, dirty: false } },
 ) {
   const projectRoot = tempy.temporaryDirectory();
-  const testPath = path.join(projectRoot, 'test');
+  const testPath = path.join(projectRoot, 'test-fixtures');
   fs.mkdirSync(testPath, { recursive: true });
 
   copyFileToPath(
     projectRoot,
     path.join(projectRoot, 'scribe.config.ts'),
-    './test/scribe.config.ts',
+    './test-fixtures/scribe.config.ts',
   );
   copyFileToPath(
     projectRoot,
     path.join(testPath, `screen.scribe`),
-    './test/screen.scribe',
+    './test-fixtures/screen.scribe',
   );
   copyFileToPath(
     projectRoot,
     path.join(testPath, 'screen.test.scribe'),
-    './test/screen.scribe',
+    // TODO: WE'RE READING THE WRONG FILE
+    './test-fixtures/screen.scribe',
   );
 
   if (options?.git?.init) {
