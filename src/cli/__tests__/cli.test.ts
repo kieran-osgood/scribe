@@ -41,7 +41,8 @@ describe('_Cli', () => {
       Effect.flatMap(() =>
         Effect.tryPromise(async () => {
           const result = await stringifyStdOut(ctx.stdout);
-          expect(result).toMatchInlineSnapshot('"⚠️ Working directory not clean"');
+
+          expect(result).toBe('⚠️ Working directory not clean\n');
         })
       ),
       Effect.runPromise

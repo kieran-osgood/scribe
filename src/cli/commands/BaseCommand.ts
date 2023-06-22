@@ -59,8 +59,8 @@ export abstract class BaseCommand extends Command {
           !this.cwd
           ? Process.ProcessLive
           : this.cwd.length > 0
-          ? Process.createMockProcess(this.cwd)
-          : Process.MockProcess,
+          ? Process.createProcessMock(this.cwd)
+          : Process.ProcessMock,
 
         Effect.runPromiseEither,
 

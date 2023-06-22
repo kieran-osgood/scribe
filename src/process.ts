@@ -10,11 +10,11 @@ export const ProcessLive = Effect.provideService(Process, {
   cwd: process.cwd,
 });
 
-export const MockProcess = Effect.provideService(Process, {
+export const ProcessMock = Effect.provideService(Process, {
   cwd: () => '/mockdir',
 });
 
-export const createMockProcess = (cwd: string) =>
+export const createProcessMock = (cwd: string) =>
   Effect.provideService(Process, {
     cwd: () => cwd,
   });

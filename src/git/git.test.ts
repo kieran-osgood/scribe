@@ -53,7 +53,7 @@ describe('Git', async () => {
           const result = yield* $(checkWorkingTreeClean());
           expect(result.isClean()).toBe(true);
         }),
-        Process.MockProcess,
+        Process.ProcessMock,
         Effect.runPromise
       ));
 
@@ -72,7 +72,7 @@ describe('Git', async () => {
           // expect(result.isClean()).toBe(true);
           // mockConsoleLog.mockRestore();
         }),
-        Process.MockProcess,
+        Process.ProcessMock,
         Effect.runPromise
       ));
 
@@ -86,7 +86,7 @@ describe('Git', async () => {
             const result = yield* $(checkWorkingTreeClean());
             expect(result.isClean()).toBe(true);
           }),
-          Process.MockProcess,
+          Process.ProcessMock,
           Effect.runPromise
         ));
 
@@ -107,7 +107,7 @@ describe('Git', async () => {
             // expect(result.isClean()).toBe(false);
             // mockConsoleLog.mockRestore();
           }),
-          Process.MockProcess,
+          Process.ProcessMock,
           Effect.runPromise
         ));
     });
@@ -124,7 +124,7 @@ describe('Git', async () => {
           const result = yield* $(checkWorkingTreeClean([], abortController));
           expect(result.isClean()).toBe(true);
         }),
-        Process.MockProcess,
+        Process.ProcessMock,
         Effect.runPromise
       ));
 

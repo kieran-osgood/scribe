@@ -204,7 +204,7 @@ describe('constructTemplate', () => {
         expect(result).toBeInstanceOf(FS.ReadFileError);
       }),
       FS.FSMock,
-      Process.MockProcess,
+      Process.ProcessMock,
       Effect.runPromise
     ));
 });
