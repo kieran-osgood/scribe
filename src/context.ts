@@ -10,21 +10,20 @@ interface ProgramInputs {
   template: string | undefined;
   configPath: string;
 }
-
 export const promptUserForMissingArgs = (inputs: ProgramInputs) =>
   Effect.gen(function* ($) {
     const _process = yield* $(Process.Process);
     const config = yield* $(
-      // TODO: add validation for whether fs.isAbsolutePath
       pipe(
+        path.isAbsolute(inputs.configPath),
         Boolean.match(
-          path.isAbsolute(inputs.configPath),
           () => path.join(_process.cwd(), inputs.configPath),
           () => inputs.configPath,
         ),
         Config.readConfig,
       ),
     );
+
     const templateKeys = yield* $(
       Config.readUserTemplateOptions(inputs.configPath),
     );
