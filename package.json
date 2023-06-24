@@ -1,7 +1,7 @@
 {
   "name": "@kieran-osgood/scribe",
   "version": "0.2.0",
-  "description": "",
+  "description": "Scribe is a file templating CLI based on Mustache Templates.",
   "private": false,
   "main": "dist/index.js",
   "module": "dist/index.mjs",
