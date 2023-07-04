@@ -1,6 +1,6 @@
 import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
-import { Effect, Either, flow, pipe } from 'src/core';
+import { Context, Effect, Either, flow, pipe } from '@scribe/core';
 import { runtimeDebug } from '@effect/data/Debug';
 import * as FS from 'src/services/fs';
 import { Process } from '@scribe/services';
@@ -44,27 +44,26 @@ export abstract class BaseCommand extends Command {
   }
 
   abstract executeSafe: () => Effect.Effect<
-    Process.Index | FS.FS,
+    Process.Process | FS.FS,
     unknown,
     void
   >;
 
+  // TODO: extract to module - replace manual service adding in tests
+  private createContext() {
+    return pipe(
+      Context.empty(),
+      Context.add(Process.Process, Process.getProcess(this.cwd)),
+      Context.add(FS.FS, FS.getFS(this.test)),
+    );
+  }
+
   execute = (): Promise<void> => {
     return pipe(
-      this.executeSafe(), //
+      this.executeSafe(),
       flow(
-        this.test ? FS.FSMock : FS.FSLive,
-
-        (process.env.NODE_ENV === 'production' ||
-          process.env.NODE_ENV === 'development') &&
-          !this.cwd
-          ? Process.ProcessLive
-          : this.cwd.length > 0
-          ? Process.createProcessMock(this.cwd)
-          : Process.ProcessMock,
-
+        Effect.provideContext(this.createContext()),
         Effect.runPromiseEither,
-
         _ =>
           _.then(error => {
             Either.match(

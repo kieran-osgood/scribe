@@ -87,8 +87,9 @@ describe('writeTemplate', () => {
         } satisfies WriteTemplateCtx;
         const res = writeTemplate(ctx);
         const result = yield* $(res);
+        const _process = yield $(Process.Process);
         expect(result).toBe(
-          path.join(process.cwd(), '/test-fixtures/config/login.ts'),
+          path.join(_process.cwd(), '/test-fixtures/config/login.ts'),
         );
 
         const readResult = yield* $(
@@ -96,8 +97,9 @@ describe('writeTemplate', () => {
         );
         expect(String(readResult)).toBe(fileContents);
       }),
-      FS.FSMock,
-      Process.ProcessLive,
+      Effect.provideService(FS.FS, FS.FSMock),
+      // TODO: ProcessLive in use?
+      Effect.provideService(Process.Process, Process.ProcessLive),
       Effect.runPromise,
     ));
 });
@@ -140,8 +142,8 @@ describe('constructTemplate', () => {
           ]
         `);
       }),
-      FS.FSMock,
-      Process.ProcessLive,
+      Effect.provideService(FS.FS, FS.FSMock),
+      Effect.provideService(Process.Process, Process.ProcessLive),
       Effect.runPromise,
     ));
 
@@ -180,8 +182,8 @@ describe('constructTemplate', () => {
           ]
         `);
       }),
-      FS.FSMock,
-      Process.ProcessLive,
+      Effect.provideService(FS.FS, FS.FSMock),
+      Effect.provideService(Process.Process, Process.ProcessLive),
       Effect.runPromise,
     ));
 
@@ -203,8 +205,8 @@ describe('constructTemplate', () => {
 
         expect(result).toBeInstanceOf(FS.ReadFileError);
       }),
-      FS.FSMock,
-      Process.ProcessMock,
+      Effect.provideService(FS.FS, FS.FSMock),
+      Effect.provideService(Process.Process, Process.ProcessLive),
       Effect.runPromise,
     ));
 });

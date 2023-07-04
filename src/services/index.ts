@@ -1,1 +1,1 @@
-export * as Process from './process';
+export * as Process from './process/process';

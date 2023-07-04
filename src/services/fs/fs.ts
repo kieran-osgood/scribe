@@ -15,11 +15,12 @@ export interface FS {
 }
 
 export const FS = Context.Tag<FS>();
-export const FSLive = Effect.provideService(FS, NFS);
-export const FSMock = Effect.provideService(
-  FS,
-  memfs.fs as unknown as typeof NFS,
-);
+export const FSLive = NFS;
+export const FSMock = memfs.fs as unknown as typeof NFS;
+
+export const getFS = (test: boolean) => {
+  return test ? FSMock : FSLive;
+};
 
 export const writeFile = (
   file: NFS.PathOrFileDescriptor,
