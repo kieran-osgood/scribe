@@ -52,7 +52,7 @@ $ scribe --template screen --name Login
 
 with an input template like the following:
 
-```scribe
+```mustache
 import * as React from 'react';
 
 type {{Name}}Props = {}
@@ -66,7 +66,7 @@ function {{Name}}Screen() {
 
 Would output:
 
-```ts
+```tsx
 import * as React from 'react';
 
 type LoginProps = {}
@@ -77,41 +77,3 @@ function LoginScreen() {
   )
 }
 ```
-
-## Arguments
-
-## Syntax
-
-## Roadmap
-
-### Features
-
-- init command to create a shell Config
-- Migrate from zod to schema
-  - Investigate issue with error messaging when can't locate the files from prompt
-```shell
-./main.js
-? Pick your template screen
-? File name: Login
-Error: {"error":"Parsing prompt failed: {\"_errors\":[],\"template\":{\"_errors\":[\"Required\"]},\"name\":{\"_errors\":[\"Required\"]}}","cause":{"issues":[{"code":"invalid_type","expected":"string","received":"undefined","path":["template"],"message":"Required"},{"code":"invalid_type","expected":"string","received":"undefined","path":["name"],"message":"Required"}],"name":"ZodError"},"_tag":"PromptError"}
-```
-  
-- Unify clipanion with yargs
-- Add option to continue despite dirty git
-- Barrel exports for TS
-    - https://github.com/bencoveney/barrelsby
-- make sure stat doesn't fail 
-```shell
-./main.js --template screen --name login
-Error: {"error":{"errno":-2,"code":"ENOENT","syscall":"open","path":"/Users/kieranosgood/WebstormProjects/scribe/dist/examples/src/screens/login.ts"},"_tag":"ErrnoError"}
-```
-
-### DX tasks
-
-- Add coverage reporting
-- Add examples folder with template samples
-- Add tests to:
-    - config
-    - args
-    - git
-- Setup serviceLayer
