@@ -1,7 +1,7 @@
 import { Command, Option } from 'clipanion';
 import * as t from 'typanion';
 
-import { Effect, flow, Option as O, pipe, R, RA } from 'src/core';
+import { Effect, flow, pipe, R, RA } from 'src/core';
 import { checkWorkingTreeClean } from 'src/services/git';
 import { Template } from '@scribe/config';
 
@@ -34,12 +34,11 @@ export class DefaultCommand extends BaseCommand {
     required: false,
   });
 
-  overrideFlags(
+  private rewriteFlagsWithUserInput(
     _: Effect.Effect.Success<ReturnType<typeof promptUserForMissingArgs>>,
   ) {
     this.name = _.input.name;
     this.template = _.input.template;
-    return _;
   }
 
   executeSafe = () =>
@@ -48,26 +47,17 @@ export class DefaultCommand extends BaseCommand {
       checkWorkingTreeClean(),
 
       Effect.flatMap(() =>
-        promptUserForMissingArgs({
-          name: this.name,
-          template: this.template,
-          configPath: this.configPath,
-        }),
-      ),
-
-      Effect.flatMap(_ => Effect.sync(() => this.overrideFlags(_))),
-      Effect.flatMap(_ =>
         pipe(
-          R.get(_.input.template)(_.config.templates),
-          O.map(_ => _.outputs),
-          Effect.map(
-            RA.map(
-              templateOutput => createTemplate({ templateOutput, ..._ }), //
-            ),
-          ),
-          Effect.flatMap(flow(Effect.all, Effect.map(RA.flatten))),
+          promptUserForMissingArgs({
+            name: this.name,
+            template: this.template,
+            configPath: this.configPath,
+          }),
+          Effect.tap(_ => Effect.sync(() => this.rewriteFlagsWithUserInput(_))),
         ),
       ),
+
+      Effect.flatMap(createTemplates),
 
       Effect.map(_ => {
         const results = pipe(
@@ -90,3 +80,19 @@ const createTemplate = (ctx: Ctx & { templateOutput: Template }) =>
     Effect.map(RA.map(writeTemplate)),
     Effect.flatMap(Effect.all),
   );
+
+const createTemplates = (ctx: Ctx) => {
+  return pipe(
+    R.get(ctx.input.template)(ctx.config.templates),
+    Effect.map(_ => _.outputs),
+    Effect.flatMap(
+      flow(
+        RA.map(
+          templateOutput => createTemplate({ templateOutput, ...ctx }), //
+        ),
+        Effect.all,
+        Effect.map(RA.flatten),
+      ),
+    ),
+  );
+};
