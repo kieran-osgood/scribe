@@ -1,6 +1,7 @@
-import path from 'path';
 import spawnAsync from '@expo/spawn-async';
+import path from 'path';
 import stripAnsi from 'strip-ansi';
+
 import { arrowKey, createMinimalProject } from '../fixtures';
 
 const cliPath = path.join(process.cwd(), 'dist', 'index.js');

@@ -1,4 +1,10 @@
+import { Process } from '@scribe/services';
+import * as memfs from 'memfs';
+import { vol } from 'memfs';
+import path from 'path';
 import { Effect, pipe, RA } from 'src/core';
+import * as FS from 'src/services/fs';
+
 import {
   constructTemplate,
   ConstructTemplateCtx,
@@ -6,11 +12,6 @@ import {
   writeTemplate,
   WriteTemplateCtx,
 } from '../index';
-import * as FS from 'src/services/fs';
-import * as memfs from 'memfs';
-import { vol } from 'memfs';
-import path from 'path';
-import { Process } from '@scribe/services';
 
 beforeEach(() => {
   vi.restoreAllMocks();

@@ -1,6 +1,7 @@
 import { Effect, flow, pipe, S, TaggedClass, TF } from '@scribe/core';
-import { fmtError } from '../../error';
 import inquirer, { Answers, QuestionCollection } from 'inquirer';
+
+import { fmtError } from '../../error';
 
 type Flags = { template: string | undefined; name: string | undefined };
 

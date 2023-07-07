@@ -1,13 +1,12 @@
-import { render } from 'template-file';
+import { Template } from '@scribe/config';
+import { Process } from '@scribe/services';
 import path from 'path';
-
 import { Effect, flow, pipe, RA } from 'src/core';
 import * as FS from 'src/services/fs';
-import { Template } from '@scribe/config';
+import { render } from 'template-file';
 
 import { promptUserForMissingArgs } from '../context';
 import { TemplateFileError } from './error';
-import { Process } from '@scribe/services';
 
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   return Effect.gen(function* ($) {

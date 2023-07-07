@@ -1,13 +1,14 @@
+import * as Effect from '@effect/io/Effect';
+import { Process } from '@scribe/services';
 import simpleGit, {
   GitConstructError,
   SimpleGitOptions,
   StatusResult,
   TaskOptions,
 } from 'simple-git';
-import * as Effect from '@effect/io/Effect';
 import { pipe } from 'src/core';
+
 import GitStatusError, { SimpleGitError } from './error';
-import { Process } from '@scribe/services';
 
 export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
   Effect.tryCatch(

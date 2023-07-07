@@ -1,10 +1,11 @@
+import { Effect, pipe } from 'src/core';
+
 import {
   checkForTemplates,
   extractConfig,
   readConfig,
   readUserTemplateOptions,
 } from '../config';
-import { Effect, pipe } from 'src/core';
 import { ConfigParseError, CosmicConfigError } from '../error';
 
 describe('config', function () {

@@ -1,11 +1,10 @@
-import { Command, Option } from 'clipanion';
-import * as t from 'typanion';
-import { Context, Effect, Either, flow, pipe } from '@scribe/core';
 import { runtimeDebug } from '@effect/data/Debug';
-import * as FS from 'src/services/fs';
-import { Process } from '@scribe/services';
-
 import * as Runtime from '@effect/io/Runtime';
+import { Context, Effect, Either, flow, pipe } from '@scribe/core';
+import { Process } from '@scribe/services';
+import { Command, Option } from 'clipanion';
+import * as FS from 'src/services/fs';
+import * as t from 'typanion';
 
 export abstract class BaseCommand extends Command {
   configPath = Option.String('-c,--config', 'scribe.config.ts', {

@@ -1,9 +1,11 @@
-import * as NFS from 'fs';
-import path from 'path';
-import { MkDirError, ReadFileError, StatError, WriteFileError } from './error';
 import { Abortable } from 'node:events';
-import { Context, Effect, pipe } from 'src/core';
+
+import * as NFS from 'fs';
 import * as memfs from 'memfs';
+import path from 'path';
+import { Context, Effect, pipe } from 'src/core';
+
+import { MkDirError, ReadFileError, StatError, WriteFileError } from './error';
 
 export interface FS {
   writeFile: typeof NFS.writeFile;

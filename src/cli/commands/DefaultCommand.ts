@@ -1,14 +1,13 @@
+import { Template } from '@scribe/config';
 import { Command, Option } from 'clipanion';
-import * as t from 'typanion';
-
+import { green } from 'colorette';
 import { Effect, flow, pipe, R, RA } from 'src/core';
 import { checkWorkingTreeClean } from 'src/services/git';
-import { Template } from '@scribe/config';
+import * as t from 'typanion';
 
 import { promptUserForMissingArgs } from '../../context';
-import { BaseCommand } from './BaseCommand';
 import { constructTemplate, Ctx, writeTemplate } from '../../templates';
-import { green } from 'colorette';
+import { BaseCommand } from './BaseCommand';
 
 export class DefaultCommand extends BaseCommand {
   static override paths = [Command.Default];

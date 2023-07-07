@@ -1,8 +1,8 @@
 import spawnAsync, { SpawnOptions, SpawnResult } from '@expo/spawn-async';
-import path from 'path';
-import * as fs from 'fs';
-import * as tempy from 'tempy';
 import * as child_process from 'child_process';
+import * as fs from 'fs';
+import path from 'path';
+import * as tempy from 'tempy';
 
 const cliPath = path.join(process.cwd(), 'dist', 'index.js');
 

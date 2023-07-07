@@ -1,11 +1,12 @@
-import { Context, Effect, pipe } from 'src/core';
+import * as NFS from 'fs';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import path from 'path';
-import * as NFS from 'fs';
-import * as FS from '../fs';
-import { MkDirError, ReadFileError, StatError, WriteFileError } from '../error';
+import { Context, Effect, pipe } from 'src/core';
+
 import { cwdAsJson } from '../../../../configs/vite/setup-fs';
+import { MkDirError, ReadFileError, StatError, WriteFileError } from '../error';
+import * as FS from '../fs';
 
 const fileContents = 'super secret file';
 

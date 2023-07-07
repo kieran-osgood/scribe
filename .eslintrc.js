@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 module.exports = {
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   overrides: [],
@@ -6,7 +7,7 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'communist-spelling'],
+  plugins: ['@typescript-eslint', 'communist-spelling', 'simple-import-sort'],
   rules: {
     'communist-spelling/communist-spelling': 'error',
     semi: ['error', 'always'],
@@ -14,6 +15,8 @@ module.exports = {
     'array-bracket-spacing': ['error', 'never'],
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'error',
   },
-  ignorePatterns: ['.*', 'examples/**.*'],
+  ignorePatterns: ['examples/**/*.*', 'dist'],
 };

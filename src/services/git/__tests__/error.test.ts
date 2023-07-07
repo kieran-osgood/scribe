@@ -1,5 +1,6 @@
-import GitStatusError, { SimpleGitError } from '../error';
 import { GitConstructError, GitError, StatusResult } from 'simple-git';
+
+import GitStatusError, { SimpleGitError } from '../error';
 
 describe('GitStatusError', () => {
   describe('toString', () => {

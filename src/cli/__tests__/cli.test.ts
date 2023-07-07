@@ -1,9 +1,10 @@
 import * as CLI from '@scribe/cli';
-import { Effect, pipe } from 'src/core';
-import getStream from 'get-stream';
 import { BaseContext } from 'clipanion/lib/advanced/Cli';
-import stripAnsi from 'strip-ansi';
+import getStream from 'get-stream';
+import { Effect, pipe } from 'src/core';
 import { PassThrough, Writable } from 'stream';
+import stripAnsi from 'strip-ansi';
+
 import { createMinimalProject } from '../../../e2e/fixtures';
 
 function createCtx(): BaseContext {

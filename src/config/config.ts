@@ -1,12 +1,11 @@
 import { cosmiconfig } from 'cosmiconfig';
-import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
 import { CosmiconfigResult } from 'cosmiconfig/dist/types';
-
+import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
 import { Effect, flow, pipe, RA, S, T } from 'src/core';
 
+import PackageJson from '../../package.json';
 import { ConfigParseError, CosmicConfigError } from './error';
 import { ScribeConfig } from './schema';
-import PackageJson from '../../package.json';
 
 export const getCosmicExplorer = () =>
   cosmiconfig(PackageJson.name, {

@@ -1,7 +1,8 @@
-import { TF } from '../core';
-import { TaggedClass } from 'src/core';
 import { NonEmptyReadonlyArray } from '@effect/data/ReadonlyArray';
 import { ParseErrors } from '@effect/schema/src/ParseResult';
+import { TaggedClass } from 'src/core';
+
+import { TF } from '../core';
 
 export class CosmicConfigError extends TaggedClass('CosmicConfigError')<{
   readonly error:

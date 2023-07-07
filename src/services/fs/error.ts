@@ -1,7 +1,8 @@
-import { Data } from 'src/core';
+import { Abortable } from 'node:events';
+
 import * as fs from 'fs';
 import NFS from 'fs';
-import { Abortable } from 'node:events';
+import { Data } from 'src/core';
 
 export const tagName = <K extends string>(k: K) =>
   `@scribe/core/fs/${k}` as const;

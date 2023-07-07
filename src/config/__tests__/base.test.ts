@@ -1,4 +1,5 @@
 import { S } from 'src/core';
+
 import BaseConfig from '../base';
 import { ScribeConfig } from '../schema';
 
