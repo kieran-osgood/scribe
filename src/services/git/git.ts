@@ -23,7 +23,7 @@ export const checkWorkingTreeClean = (options?: TaskOptions) =>
     Effect.flatMap(_ => createSimpleGit({ baseDir: _.cwd() })),
     Effect.flatMap(_ =>
       Effect.async<never, GitStatusError, StatusResult>(resume => {
-        _.status(options, (cause, status) => {
+        void _.status(options, (cause, status) => {
           // TODO: remove development flags
           if (process.env.NODE_ENV === 'development') {
             resume(Effect.succeed(status));

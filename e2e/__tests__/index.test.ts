@@ -59,7 +59,7 @@ describe('Scribe Cli', () => {
       }
       // cli.stderr?.pipe(process.stderr);
 
-      cli.stdout?.on('data', data => {
+      cli.stdout?.on('data', (data: { toString(): string }) => {
         if (/Pick your template/.test(data.toString())) {
           cli.stdin?.write(`${arrowKey.down}\n`);
         } else if (/File name/.test(data.toString())) {

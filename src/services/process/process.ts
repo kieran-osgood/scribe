@@ -1,18 +1,18 @@
 import { Context } from 'src/core';
 
 export interface Process {
-  cwd(): string;
+  cwd: () => string;
 }
 
 export const Process = Context.Tag<Process>();
 
 export const ProcessLive = {
-  cwd: process.cwd,
-};
+  cwd: () => process.cwd(),
+} satisfies Process;
 
 export const ProcessMock = {
   cwd: () => '/mockdir',
-};
+} satisfies Process;
 
 export const createProcessMock = (cwd: string) => ({ cwd: () => cwd });
 

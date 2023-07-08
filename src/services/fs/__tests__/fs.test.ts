@@ -133,7 +133,7 @@ describe('writeFileWithDir', () => {
       Effect.gen(function* ($) {
         const filePath = './path/to/some/long/path/template5.txt';
 
-        const result = yield $(
+        const result = yield* $(
           FS.writeFileWithDir(filePath, fileContents, null),
         );
         expect(result).toBe(filePath);

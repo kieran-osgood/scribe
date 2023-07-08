@@ -86,9 +86,8 @@ describe('writeTemplate', () => {
           templateOutput,
           ..._ctx,
         } satisfies WriteTemplateCtx;
-        const res = writeTemplate(ctx);
-        const result = yield* $(res);
-        const _process = yield $(Process.Process);
+        const result = yield* $(writeTemplate(ctx));
+        const _process = yield* $(Process.Process);
         expect(result).toBe(
           path.join(_process.cwd(), '/test-fixtures/config/login.ts'),
         );

@@ -19,6 +19,7 @@ export const readConfig = (path: string) =>
     Effect.tryCatchPromise(
       // TODO: if path - load, !path - search
       () => getCosmicExplorer().load(path),
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       _ => new CosmicConfigError({ error: `[read config failed] ${_}` }),
     ),
     Effect.flatMap(extractConfig),

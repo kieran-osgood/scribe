@@ -73,11 +73,13 @@ export abstract class BaseCommand extends Command {
 
                 if (Runtime.isFiberFailure(error)) {
                   // Only runs if I have an Effect error which shouldn't happen
-                  this.context.stdout.write(`${error?.cause?.toString()}\n`);
+                  this.context.stdout.write(
+                    `${error.cause?.toString() ?? ''}\n`,
+                  );
                 } else if (error instanceof Error) {
                   this.context.stdout.write(`${error.message}\n`);
                 } else {
-                  this.context.stdout.write(`${error?.toString()}\n`);
+                  this.context.stdout.write(`${error?.toString() ?? ''}\n`);
                 }
               },
               () => {

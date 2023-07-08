@@ -1,6 +1,7 @@
 import { Template } from '@scribe/config';
 import { Command, Option } from 'clipanion';
 import { green } from 'colorette';
+import { PathOrFileDescriptor } from 'fs';
 import { Effect, flow, pipe, R, RA } from 'src/core';
 import { checkWorkingTreeClean } from 'src/services/git';
 import * as t from 'typanion';
@@ -40,28 +41,33 @@ export class DefaultCommand extends BaseCommand {
     this.template = _.input.template;
   }
 
+  printOutput(_: PathOrFileDescriptor[]) {
+    const results = pipe(
+      _,
+      RA.map(s => `- ${String(s)}`),
+      RA.join('\n'),
+    );
+    this.context.stdout.write(green(`✅  Success!\n`));
+    this.context.stdout.write(`Output files:\n${results}\n`);
+  }
+
   executeSafe = () =>
     pipe(
-      // TODO: add ignore git?
+      // TODO: add ignore git
       checkWorkingTreeClean(),
-
       Effect.flatMap(() =>
-        pipe(
-          promptUserForMissingArgs({
-            name: this.name,
-            template: this.template,
-            configPath: this.configPath,
-          }),
-          Effect.tap(_ => Effect.sync(() => this.rewriteFlagsWithUserInput(_))),
-        ),
+        promptUserForMissingArgs({
+          name: this.name,
+          template: this.template,
+          configPath: this.configPath,
+        }),
       ),
-
+      Effect.tap(_ => Effect.sync(() => this.rewriteFlagsWithUserInput(_))),
       Effect.flatMap(createTemplates),
-
       Effect.map(_ => {
         const results = pipe(
           _,
-          RA.map(s => `- ${s}`),
+          RA.map(s => `- ${String(s)}`),
           RA.join('\n'),
         );
         this.context.stdout.write(green(`✅  Success!\n`));
