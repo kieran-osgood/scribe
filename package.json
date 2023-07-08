@@ -23,7 +23,7 @@
   "scripts": {
     "start": "ts-node ./index.ts",
     "test": "pnpm run build && chmod +x ./dist/index.js && vitest",
-    "lint": "eslint src --fix --ext .js,.ts,.tsx",
+    "lint": "eslint .",
     "typecheck": "tsc",
     "build": "tsup index.ts",
     "ci": "run-s ci:*",
@@ -35,7 +35,8 @@
     "release:publish": "changeset publish",
     "changeset": "changeset",
     "postinstall": "patch-package",
-    "size": "pnpm run build && size-limit"
+    "size": "pnpm run build && size-limit",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@effect/data": "^0.12.5",
@@ -95,7 +96,8 @@
     "unionfs": "^4.4.0",
     "vite": "^4.4.2",
     "vite-node": "^0.29.8",
-    "vitest": "0.31.1"
+    "vitest": "0.31.1",
+    "husky": "^8.0.0"
   },
   "size-limit": [
     {
