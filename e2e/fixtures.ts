@@ -53,31 +53,48 @@ type CreateMinimalProjectOptions = {
     init: boolean;
     dirty: boolean;
   };
+  fixtures?: {
+    configFile: boolean;
+    templateFiles: boolean;
+  };
 };
 
 export function createMinimalProject(
-  options: CreateMinimalProjectOptions = { git: { init: true, dirty: false } },
+  options: CreateMinimalProjectOptions = {
+    fixtures: {
+      configFile: true,
+      templateFiles: true,
+    },
+    git: { init: true, dirty: false },
+  },
 ) {
   const projectRoot = tempy.temporaryDirectory();
   const testPath = path.join(projectRoot, 'test-fixtures');
   fs.mkdirSync(testPath, { recursive: true });
 
-  copyFileToPath(
-    projectRoot,
-    path.join(projectRoot, 'scribe.config.ts'),
-    './test-fixtures/scribe.config.ts',
-  );
-  copyFileToPath(
-    projectRoot,
-    path.join(testPath, `screen.scribe`),
-    './test-fixtures/screen.scribe',
-  );
-  copyFileToPath(
-    projectRoot,
-    path.join(testPath, 'screen.test.scribe'),
-    // TODO: WE'RE READING THE WRONG FILE
-    './test-fixtures/screen.scribe',
-  );
+  // Allows git commit to pass even when fixtures are all off
+  fs.writeFileSync(path.join(projectRoot, 'dummyfile'), 'dummy');
+
+  if (options.fixtures?.configFile) {
+    copyFileToPath(
+      projectRoot,
+      path.join(projectRoot, 'scribe.config.ts'),
+      './test-fixtures/scribe.config.ts',
+    );
+  }
+  if (options.fixtures?.templateFiles) {
+    copyFileToPath(
+      projectRoot,
+      path.join(testPath, `screen.scribe`),
+      './test-fixtures/screen.scribe',
+    );
+    copyFileToPath(
+      projectRoot,
+      path.join(testPath, 'screen.test.scribe'),
+      // TODO: WE'RE READING THE WRONG FILE
+      './test-fixtures/screen.scribe',
+    );
+  }
 
   if (options?.git?.init) {
     const execOpts = {
