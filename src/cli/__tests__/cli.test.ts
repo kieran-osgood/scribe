@@ -18,22 +18,33 @@ const createCtx = (): BaseContext => ({
   colorDepth: 0,
 });
 
-interface MyFixtures {
+type CliTestFixtures = {
   cliCtx: BaseContext;
-}
-
-const CliTest = test.extend<MyFixtures>({
+};
+const CliTest = test.extend<CliTestFixtures>({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   cliCtx: async ({ task }, use) => {
     const ctx = createCtx();
-    // use the fixture value
     await use(ctx);
   },
 });
 
-const parseWritable = (writeable: Writable) => {
-  return Effect.tryPromise(async () => stripAnsi(await getStream(writeable)));
+const parseWritable = (writeable: Writable) =>
+  Effect.tryPromise(async () => stripAnsi(await getStream(writeable)));
+
+type RunCliPromise = {
+  cliCtx: BaseContext;
+  args: string[];
 };
+const runCliPromise = ({ cliCtx, args }: RunCliPromise) =>
+  pipe(
+    Effect.gen(function* ($) {
+      yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
+      cliCtx.stdout.end();
+      return yield* $(parseWritable(cliCtx.stdout));
+    }),
+    Effect.runPromise,
+  );
 
 describe('_Cli', () => {
   describe('Default Command', () => {
@@ -41,21 +52,14 @@ describe('_Cli', () => {
       const projectRoot = createMinimalProject({
         git: { init: true, dirty: true },
       });
+      const args = [
+        '--template=screen',
+        '--name=Login',
+        `--config=${projectRoot}/scribe.config.ts`,
+        `--cwd=${projectRoot}`,
+      ];
 
-      const result = pipe(
-        Effect.gen(function* ($) {
-          const args = [
-            '--template=screen',
-            '--name=Login',
-            `--config=${projectRoot}/scribe.config.ts`,
-            `--cwd=${projectRoot}`,
-          ];
-          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
-          cliCtx.stdout.end();
-          return yield* $(parseWritable(cliCtx.stdout));
-        }),
-        Effect.runPromise,
-      );
+      const result = runCliPromise({ cliCtx, args });
 
       expect(await result).toMatchInlineSnapshot(`
             "We caught an error during execution, this probably isn't a bug.
@@ -75,20 +79,13 @@ describe('_Cli', () => {
         const projectRoot = createMinimalProject({
           git: { init: true, dirty: false },
         });
+        const args = [
+          '--template=screen',
+          '--name=Login',
+          `--cwd=${projectRoot}`,
+        ];
 
-        const result = pipe(
-          Effect.gen(function* ($) {
-            const args = [
-              '--template=screen',
-              '--name=Login',
-              `--cwd=${projectRoot}`,
-            ];
-            yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
-            cliCtx.stdout.end();
-            return yield* $(parseWritable(cliCtx.stdout));
-          }),
-          Effect.runPromise,
-        );
+        const result = runCliPromise({ cliCtx, args });
 
         expect(await result).toMatchInlineSnapshot(`
             "✅  Success!
@@ -106,21 +103,14 @@ describe('_Cli', () => {
         const projectRoot = createMinimalProject({
           git: { init: true, dirty: false },
         });
+        const args = [
+          '--template=screen',
+          '--name=Login',
+          `--config=${projectRoot}/scribe.config.ts`,
+          `--cwd=${projectRoot}`,
+        ];
 
-        const result = pipe(
-          Effect.gen(function* ($) {
-            const args = [
-              '--template=screen',
-              '--name=Login',
-              `--config=${projectRoot}/scribe.config.ts`,
-              `--cwd=${projectRoot}`,
-            ];
-            yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
-            cliCtx.stdout.end();
-            return yield* $(parseWritable(cliCtx.stdout));
-          }),
-          Effect.runPromise,
-        );
+        const result = runCliPromise({ cliCtx, args });
 
         expect(await result).toMatchInlineSnapshot(`
             "✅  Success!
@@ -143,56 +133,26 @@ describe('_Cli', () => {
         },
       });
 
-      const result = pipe(
-        Effect.gen(function* ($) {
-          const args = ['init', `--cwd=${projectRoot}`];
-          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
-          cliCtx.stdout.end();
-          return yield* $(parseWritable(cliCtx.stdout));
-        }),
-        Effect.runPromise,
-      );
+      const args = ['init', `--cwd=${projectRoot}`];
+
+      const result = runCliPromise({ cliCtx, args });
 
       expect(await result).toMatchInlineSnapshot(
         `"Scribe config created: ${projectRoot}/scribe.config.ts"`,
       );
 
       const file = fs.readFileSync(path.join(projectRoot, 'scribe.config.ts'));
-      expect(String(file)).toMatchInlineSnapshot(`
-              "import { ScribeConfig } from './index.js';
-
-              const BaseConfig = {
-                options: {
-                  rootOutDir: '.',
-                  templatesDirectories: ['.'],
-                },
-                templates: {},
-              } satisfies ScribeConfig;
-
-              export default BaseConfig;
-              "
-            `);
+      expect(String(file)).toMatchSnapshot();
     });
 
     CliTest("should fail if file doesn't exist", async ({ cliCtx, expect }) => {
       const projectRoot = createMinimalProject({
         git: { init: true, dirty: false },
-        fixtures: {
-          configFile: true,
-          templateFiles: false,
-        },
+        fixtures: { configFile: true, templateFiles: false },
       });
+      const args = ['init', `--cwd=${projectRoot}`];
 
-      const result = pipe(
-        Effect.gen(function* ($) {
-          const args = ['init', `--cwd=${projectRoot}`];
-          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
-          cliCtx.stdout.end();
-
-          return yield* $(parseWritable(cliCtx.stdout));
-        }),
-        Effect.runPromise,
-      );
+      const result = runCliPromise({ cliCtx, args });
 
       expect(await result).toMatchInlineSnapshot(`
               "We caught an error during execution, this probably isn't a bug.
@@ -206,64 +166,15 @@ describe('_Cli', () => {
             `);
 
       const file = fs.readFileSync(path.join(projectRoot, 'scribe.config.ts'));
-      expect(String(file)).toMatchInlineSnapshot(`
-        "import type { ScribeConfig } from '@scribe/config';
-
-        const config = {
-          options: {
-            rootOutDir: '.',
-            templatesDirectories: ['./test-fixtures'],
-          },
-          templates: {
-            component: {
-              outputs: [
-                {
-                  templateFileKey: 'component',
-                  output: {
-                    directory: 'examples/src/components',
-                    fileName: '{{Name}}.ts',
-                  },
-                },
-              ],
-            },
-            screen: {
-              outputs: [
-                {
-                  templateFileKey: 'screen',
-                  output: {
-                    directory: 'examples/src/screens',
-                    fileName: '{{Name}}.ts',
-                  },
-                },
-                {
-                  templateFileKey: 'screen.test',
-                  output: {
-                    directory: 'examples/src/screens',
-                    fileName: '{{Name}}.test.ts',
-                  },
-                },
-              ],
-            },
-          },
-        } satisfies ScribeConfig;
-
-        export default config;
-        "
-      `);
+      expect(String(file)).toMatchSnapshot();
     });
   });
 
   describe('Help Command', () => {
     CliTest('should print --help', async ({ cliCtx, expect }) => {
-      const result = pipe(
-        Effect.gen(function* ($) {
-          const args = ['--help'];
-          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
-          cliCtx.stdout.end();
-          return yield* $(parseWritable(cliCtx.stdout));
-        }),
-        Effect.runPromise,
-      );
+      const args = ['--help'];
+
+      const result = runCliPromise({ cliCtx, args });
 
       expect(await result).toMatchInlineSnapshot(`
         "━━━ scribe ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
