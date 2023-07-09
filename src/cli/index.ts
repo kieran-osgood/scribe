@@ -2,7 +2,7 @@ import { Builtins, Cli } from 'clipanion';
 import { BaseContext } from 'clipanion/lib/advanced/Cli';
 import { Effect } from 'src/core';
 
-import { DefaultCommand } from './commands/DefaultCommand';
+import { DefaultCommand, InitCommand } from './commands';
 
 export function _Cli(args: string[], contextOverrides?: Partial<BaseContext>) {
   const cli = new Cli({
@@ -12,7 +12,7 @@ export function _Cli(args: string[], contextOverrides?: Partial<BaseContext>) {
   });
 
   cli.register(DefaultCommand);
-  // cli.register(InitCommand); // See comment in: src/config/base.ts for implementation
+  cli.register(InitCommand);
 
   cli.register(Builtins.HelpCommand);
   cli.register(Builtins.VersionCommand);

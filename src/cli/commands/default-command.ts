@@ -8,7 +8,7 @@ import * as t from 'typanion';
 
 import { promptUserForMissingArgs } from '../../context';
 import { constructTemplate, Ctx, writeTemplate } from '../../templates';
-import { BaseCommand } from './BaseCommand';
+import { BaseCommand } from './base-command';
 
 export class DefaultCommand extends BaseCommand {
   static override paths = [Command.Default];

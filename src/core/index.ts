@@ -10,6 +10,7 @@ export * as Option from '@effect/data/Option';
 export * as RA from '@effect/data/ReadonlyArray';
 export * as R from '@effect/data/ReadonlyRecord';
 export * as T from '@effect/data/Tuple';
+export * as Cause from '@effect/io/Cause';
 export * as Layer from '@effect/io/Layer';
 export * as Stream from '@effect/stream/Stream';
 
