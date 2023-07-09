@@ -89,6 +89,11 @@ If you think this might be a bug, please report it here: ${githubIssueUri}.\n\n`
 
               if (isWithError(result.cause.cause.error)) {
                 error = result.cause.cause.error.error.toString();
+
+                // lol...look into any helpers to recursively pretty print
+                if (isWithError(result.cause.cause.error.error)) {
+                  error = result.cause.cause.error.error.error.toString();
+                }
               }
 
               stdout.write(error);

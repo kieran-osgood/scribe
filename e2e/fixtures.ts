@@ -58,16 +58,17 @@ type CreateMinimalProjectOptions = {
     templateFiles: boolean;
   };
 };
-
-export function createMinimalProject(
-  options: CreateMinimalProjectOptions = {
-    fixtures: {
-      configFile: true,
-      templateFiles: true,
-    },
-    git: { init: true, dirty: false },
+const defaultMinimalProjectOptions = {
+  fixtures: {
+    configFile: true,
+    templateFiles: true,
   },
-) {
+  git: { init: true, dirty: false },
+} satisfies CreateMinimalProjectOptions;
+
+export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
+  const options = { ...defaultMinimalProjectOptions, ..._options };
+
   const projectRoot = tempy.temporaryDirectory();
   const testPath = path.join(projectRoot, 'test-fixtures');
   fs.mkdirSync(testPath, { recursive: true });

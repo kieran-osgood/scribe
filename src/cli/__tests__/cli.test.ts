@@ -155,7 +155,7 @@ describe('_Cli', () => {
           Effect.tryPromise(async () => {
             const result = await stringifyStdOut(ctx.stdout);
             expect(result).toMatchInlineSnapshot(
-              `"success ${projectRoot}/scribe.config.ts"`,
+              `"Scribe config created: ${projectRoot}/scribe.config.ts"`,
             );
 
             const file = fs.readFileSync(
@@ -177,6 +177,41 @@ describe('_Cli', () => {
             `);
           }),
         ),
+        Effect.runPromise,
+      );
+    });
+
+    it.only("should fail if file doesn't exist", async ctx => {
+      const projectRoot = createMinimalProject({
+        git: { init: true, dirty: false },
+        fixtures: {
+          configFile: true,
+          templateFiles: false,
+        },
+      });
+      const cliCtx = createCtx();
+
+      return pipe(
+        Effect.gen(function* ($) {
+          const args = ['init', `--cwd=${projectRoot}`];
+          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
+          cliCtx.stdout.end();
+
+          const result = yield* $(
+            Effect.tryPromise(() => stringifyStdOut(cliCtx.stdout)),
+          );
+
+          ctx.expect(result).toMatchInlineSnapshot(`
+              "We caught an error during execution, this probably isn't a bug.
+              Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
+
+              If you think this might be a bug, please report it here: https://github.com/kieran-osgood/scribe/issues/new.
+
+              You can enable verbose logging with --v, --verbose.
+
+              Error: File ${projectRoot}/scribe.config.ts already exists."
+            `);
+        }),
         Effect.runPromise,
       );
     });
@@ -217,3 +252,55 @@ describe('_Cli', () => {
     });
   });
 });
+
+/**
+ *
+ *
+ const file = fs.readFileSync(
+ path.join(projectRoot, 'scribe.config.ts'),
+ );
+ expect(String(file)).toMatchInlineSnapshot(`
+ "import type { ScribeConfig } from '@scribe/config';
+
+ const config = {
+                options: {
+                  rootOutDir: '.',
+                  templatesDirectories: ["./test-fixtures"],
+                },
+                templates: {
+                  component: {
+                    outputs: [
+                      {
+                        templateFileKey: 'component',
+                        output: {
+                          directory: 'examples/src/components',
+                          fileName: '{{Name}}.ts',
+                        },
+                      },
+                    ],
+                  },
+                  screen: {
+                    outputs: [
+                      {
+                        templateFileKey: 'screen',
+                        output: {
+                          directory: 'examples/src/screens',
+                          fileName: '{{Name}}.ts',
+                        },
+                      },
+                      {
+                        templateFileKey: 'screen.test',
+                        output: {
+                          directory: 'examples/src/screens',
+                          fileName: '{{Name}}.test.ts',
+                        },
+                      },
+                    ],
+                  },
+                },
+              } satisfies ScribeConfig;
+
+ export default config;
+ "
+ `);
+ */
