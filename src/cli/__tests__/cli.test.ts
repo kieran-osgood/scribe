@@ -35,6 +35,7 @@ describe('_Cli', () => {
           '--name=Login',
           `--config=${projectRoot}/scribe.config.ts`,
           `--cwd=${projectRoot}`,
+          // `--test=true`,
         ];
         yield* $(CLI.run([...process.argv.slice(0, 2), ...args], ctx));
         ctx.stdout.end();
@@ -43,7 +44,16 @@ describe('_Cli', () => {
         Effect.tryPromise(async () => {
           const result = await stringifyStdOut(ctx.stdout);
 
-          expect(result).toBe('⚠️ Working directory not clean\n');
+          expect(result).toMatchInlineSnapshot(`
+            "We caught an error during execution, this probably isn't a bug.
+            Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
+
+            If you think this might be a bug, please report it here: https://github.com/kieran-osgood/scribe/issues/new.
+
+            You can enable verbose logging with --v, --verbose.
+
+            ⚠️ Working directory not clean"
+          `);
         }),
       ),
       Effect.runPromise,
@@ -76,7 +86,6 @@ describe('_Cli', () => {
             Output files:
             - ${projectRoot}/examples/src/screens/Login.ts
             - ${projectRoot}/examples/src/screens/Login.test.ts
-            Complete
             "
           `);
         }),
@@ -112,7 +121,6 @@ describe('_Cli', () => {
             Output files:
             - ${projectRoot}/examples/src/screens/Login.ts
             - ${projectRoot}/examples/src/screens/Login.test.ts
-            Complete
             "
           `);
         }),
@@ -134,28 +142,21 @@ describe('_Cli', () => {
         Effect.tryPromise(async () => {
           const result = await stringifyStdOut(ctx.stdout);
           expect(result).toMatchInlineSnapshot(`
-            "Scribe generates files based on mustache templates.
+        "━━━ scribe ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          $ scribe <command>
 
-            ━━━ Usage ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        ━━━ General commands ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-            $ scribe
+          scribe [-c,--config #0] [--verbose] [-n,--name #0] [-t,--template #0]
+            Scribe generates files based on mustache templates.
 
-            ━━━ Options ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          scribe init [-c,--config #0] [--verbose]
+            Generates a scribe.config.ts file.
 
-              -c,--config #0      Path to the config (default: scribe.config.ts)
-              --verbose           More verbose logging and error stack traces
-              -n,--name #0        The key of templates to generate.
-              -t,--template #0    Specify the name of the template to generate. Must be a key under templates in config.
-
-            ━━━ Examples ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-            Interactively select template to use
-              $ scribe
-
-            Select via args
-              $ scribe --template screen --name Login
-            "
-          `);
+        You can also print more details about any of these commands by calling them with 
+        the \`-h,--help\` flag right after the command name.
+        "
+      `);
         }),
       ),
       Effect.runPromise,

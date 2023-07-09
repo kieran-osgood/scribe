@@ -13,26 +13,19 @@ describe('Scribe Cli', () => {
       const t = await spawnAsync(cliPath, [`--help`]);
 
       expect(stripAnsi(t.stdout)).toMatchInlineSnapshot(`
-        "Scribe generates files based on mustache templates.
+        "━━━ scribe ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          $ scribe <command>
 
-        ━━━ Usage ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        ━━━ General commands ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        $ scribe
+          scribe [-c,--config #0] [--verbose] [-n,--name #0] [-t,--template #0]
+            Scribe generates files based on mustache templates.
 
-        ━━━ Options ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          scribe init [-c,--config #0] [--verbose]
+            Generates a scribe.config.ts file.
 
-          -c,--config #0      Path to the config (default: scribe.config.ts)
-          --verbose           More verbose logging and error stack traces
-          -n,--name #0        The key of templates to generate.
-          -t,--template #0    Specify the name of the template to generate. Must be a key under templates in config.
-
-        ━━━ Examples ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-        Interactively select template to use
-          $ scribe
-
-        Select via args
-          $ scribe --template screen --name Login
+        You can also print more details about any of these commands by calling them with 
+        the \`-h,--help\` flag right after the command name.
         "
       `);
 
@@ -77,8 +70,7 @@ describe('Scribe Cli', () => {
         '✅  Success!\n' +
           'Output files:\n' +
           `- ${projectRoot}/examples/src/screens/Login.ts\n` +
-          `- ${projectRoot}/examples/src/screens/Login.test.ts\n` +
-          'Complete\n',
+          `- ${projectRoot}/examples/src/screens/Login.test.ts\n`,
       );
       expect(result.status).toBe(0);
     });
@@ -98,8 +90,7 @@ describe('Scribe Cli', () => {
           '✅  Success!\n' +
             'Output files:\n' +
             `- ${projectRoot}/examples/src/screens/Login.ts\n` +
-            `- ${projectRoot}/examples/src/screens/Login.test.ts\n` +
-            'Complete\n',
+            `- ${projectRoot}/examples/src/screens/Login.test.ts\n`,
         );
         expect(result.status).toBe(0);
       });

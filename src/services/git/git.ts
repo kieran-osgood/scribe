@@ -14,7 +14,7 @@ export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
   Effect.tryCatch(
     () => simpleGit(options),
     // TODO: remove assertion
-    cause => new SimpleGitError({ cause: cause as GitConstructError }),
+    error => new SimpleGitError({ error: error as GitConstructError }),
   );
 
 export const checkWorkingTreeClean = (options?: TaskOptions) =>
@@ -23,14 +23,14 @@ export const checkWorkingTreeClean = (options?: TaskOptions) =>
     Effect.flatMap(_ => createSimpleGit({ baseDir: _.cwd() })),
     Effect.flatMap(_ =>
       Effect.async<never, GitStatusError, StatusResult>(resume => {
-        void _.status(options, (cause, status) => {
+        void _.status(options, (error, status) => {
           // TODO: remove development flags
           if (process.env.NODE_ENV === 'development') {
             resume(Effect.succeed(status));
           }
 
-          if (cause) {
-            resume(Effect.fail(new GitStatusError({ status, cause })));
+          if (error) {
+            resume(Effect.fail(new GitStatusError({ status, error })));
           } else if (status?.isClean()) {
             resume(Effect.succeed(status));
           } else {

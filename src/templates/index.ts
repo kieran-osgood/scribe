@@ -53,7 +53,7 @@ export function constructTemplate(ctx: ConstructTemplateCtx) {
               Name: ctx.input.name,
               //   ...ctx.input.variables
             }),
-          cause => new TemplateFileError({ cause }),
+          error => new TemplateFileError({ error }),
         ),
       ),
     ),

@@ -46,7 +46,7 @@ export abstract class BaseCommand extends Command {
     );
 
   private handleExecutionResult =
-    ({ stderr, verbose }: { stderr: Writable; verbose: boolean }) =>
+    ({ stdout, verbose }: { stdout: Writable; verbose: boolean }) =>
     (commandEffect: Effect.Effect<Process.Process | FS.FS, unknown, void>) =>
       Effect.gen(function* ($) {
         const githubIssueUri =
@@ -59,12 +59,12 @@ export abstract class BaseCommand extends Command {
           const errorWasManaged = failOrCause._tag === 'Left';
 
           if (!errorWasManaged || Runtime.isFiberFailure(failOrCause)) {
-            stderr.write(
+            stdout.write(
               `Unexpected Error
 Please report this with the attached error: ${githubIssueUri}.`,
             );
           } else {
-            stderr.write(
+            stdout.write(
               `We caught an error during execution, this probably isn't a bug.
 Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
 
@@ -73,27 +73,35 @@ If you think this might be a bug, please report it here: ${githubIssueUri}.\n\n`
           }
 
           if (!verbose) {
-            stderr.write(
+            stdout.write(
               'You can enable verbose logging with --v, --verbose.\n\n',
             );
           }
 
           if (errorWasManaged) {
             if (
+              !verbose &&
               Cause.isAnnotatedType(result.cause) &&
-              Cause.isFailType(result.cause.cause) &&
-              !verbose
+              Cause.isFailType(result.cause.cause)
             ) {
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-              stderr.write(result.cause.cause.error.error.toString());
+              let error =
+                result.cause.cause.error?.toString() ?? 'Unable to parse error';
+
+              if (isWithError(result.cause.cause.error)) {
+                error = result.cause.cause.error.error.toString();
+              }
+
+              stdout.write(error);
             } else {
-              stderr.write(Cause.pretty(result.cause));
+              stdout.write(Cause.pretty(result.cause));
             }
           }
 
-          yield* $(Effect.sync(() => process.exit(1)));
+          yield* $(
+            Effect.sync(() => {
+              if (process.env.NODE_ENV !== 'test') return process.exit(1);
+            }),
+          );
           return undefined;
         }
 
@@ -104,7 +112,7 @@ If you think this might be a bug, please report it here: ${githubIssueUri}.\n\n`
     return pipe(
       this.executeSafe(),
       this.handleExecutionResult({
-        stderr: this.context.stderr,
+        stdout: this.context.stdout,
         verbose: this.verbose,
       }),
       Effect.provideContext(this.createContext()),
@@ -112,3 +120,15 @@ If you think this might be a bug, please report it here: ${githubIssueUri}.\n\n`
     );
   };
 }
+
+type ContainsError = {
+  error: Error;
+};
+
+const isWithError = (object: unknown): object is ContainsError => {
+  return (
+    Boolean(object) &&
+    typeof object === 'object' &&
+    Boolean((object as Record<string, unknown>)['error'])
+  );
+};
