@@ -6,48 +6,58 @@ import path from 'path';
 import { Effect, pipe } from 'src/core';
 import { PassThrough, Writable } from 'stream';
 import stripAnsi from 'strip-ansi';
+import { test } from 'vitest';
 
 import { createMinimalProject } from '../../../e2e/fixtures';
 
-function createCtx(): BaseContext {
-  return {
-    stdout: new PassThrough(),
-    stdin: new PassThrough(),
-    env: process.env,
-    stderr: process.stderr,
-    colorDepth: 0,
-  };
+const createCtx = (): BaseContext => ({
+  stdout: new PassThrough(),
+  stdin: new PassThrough(),
+  env: process.env,
+  stderr: process.stderr,
+  colorDepth: 0,
+});
+
+interface MyFixtures {
+  cliCtx: BaseContext;
 }
 
-async function stringifyStdOut(stdout: Writable) {
-  return stripAnsi(await getStream(stdout));
-}
+const CliTest = test.extend<MyFixtures>({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  cliCtx: async ({ task }, use) => {
+    const ctx = createCtx();
+    // use the fixture value
+    await use(ctx);
+  },
+});
+
+const parseWritable = (writeable: Writable) => {
+  return Effect.tryPromise(async () => stripAnsi(await getStream(writeable)));
+};
 
 describe('_Cli', () => {
   describe('Default Command', () => {
-    it('should warn on dirty git', async () => {
+    CliTest('should warn on dirty git', async ({ cliCtx, expect }) => {
       const projectRoot = createMinimalProject({
         git: { init: true, dirty: true },
       });
-      const ctx = createCtx();
 
-      return pipe(
+      const result = pipe(
         Effect.gen(function* ($) {
           const args = [
             '--template=screen',
             '--name=Login',
             `--config=${projectRoot}/scribe.config.ts`,
             `--cwd=${projectRoot}`,
-            // `--test=true`,
           ];
-          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], ctx));
-          ctx.stdout.end();
+          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
+          cliCtx.stdout.end();
+          return yield* $(parseWritable(cliCtx.stdout));
         }),
-        Effect.flatMap(() =>
-          Effect.tryPromise(async () => {
-            const result = await stringifyStdOut(ctx.stdout);
+        Effect.runPromise,
+      );
 
-            expect(result).toMatchInlineSnapshot(`
+      expect(await result).toMatchInlineSnapshot(`
             "We caught an error during execution, this probably isn't a bug.
             Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
 
@@ -57,84 +67,74 @@ describe('_Cli', () => {
 
             ⚠️ Working directory not clean"
           `);
-          }),
-        ),
-        Effect.runPromise,
-      );
     });
 
-    it('should complete with --template --fileName and relative config path', async () => {
-      const projectRoot = createMinimalProject({
-        git: { init: true, dirty: false },
-      });
-      const ctx = createCtx();
+    CliTest(
+      'should complete with --template --fileName and relative config path',
+      async ({ cliCtx, expect }) => {
+        const projectRoot = createMinimalProject({
+          git: { init: true, dirty: false },
+        });
 
-      return pipe(
-        Effect.gen(function* ($) {
-          const args = [
-            '--template=screen',
-            '--name=Login',
-            `--cwd=${projectRoot}`,
-          ];
-          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], ctx));
-          ctx.stdout.end();
-          return projectRoot;
-        }),
-        Effect.flatMap(projectRoot =>
-          Effect.tryPromise(async () => {
-            const result = await stringifyStdOut(ctx.stdout);
+        const result = pipe(
+          Effect.gen(function* ($) {
+            const args = [
+              '--template=screen',
+              '--name=Login',
+              `--cwd=${projectRoot}`,
+            ];
+            yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
+            cliCtx.stdout.end();
+            return yield* $(parseWritable(cliCtx.stdout));
+          }),
+          Effect.runPromise,
+        );
 
-            expect(result).toMatchInlineSnapshot(`
+        expect(await result).toMatchInlineSnapshot(`
             "✅  Success!
             Output files:
             - ${projectRoot}/examples/src/screens/Login.ts
             - ${projectRoot}/examples/src/screens/Login.test.ts
             "
           `);
+      },
+    );
+
+    CliTest(
+      'should complete with --template --fileName',
+      async ({ cliCtx, expect }) => {
+        const projectRoot = createMinimalProject({
+          git: { init: true, dirty: false },
+        });
+
+        const result = pipe(
+          Effect.gen(function* ($) {
+            const args = [
+              '--template=screen',
+              '--name=Login',
+              `--config=${projectRoot}/scribe.config.ts`,
+              `--cwd=${projectRoot}`,
+            ];
+            yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
+            cliCtx.stdout.end();
+            return yield* $(parseWritable(cliCtx.stdout));
           }),
-        ),
-        Effect.runPromise,
-      );
-    });
+          Effect.runPromise,
+        );
 
-    it('should complete with --template --fileName', async () => {
-      const projectRoot = createMinimalProject({
-        git: { init: true, dirty: false },
-      });
-      const ctx = createCtx();
-
-      return pipe(
-        Effect.gen(function* ($) {
-          const args = [
-            '--template=screen',
-            '--name=Login',
-            `--config=${projectRoot}/scribe.config.ts`,
-            `--cwd=${projectRoot}`,
-          ];
-          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], ctx));
-          ctx.stdout.end();
-          return projectRoot;
-        }),
-        Effect.flatMap(projectRoot =>
-          Effect.tryPromise(async () => {
-            const result = await stringifyStdOut(ctx.stdout);
-
-            expect(result).toMatchInlineSnapshot(`
+        expect(await result).toMatchInlineSnapshot(`
             "✅  Success!
             Output files:
             - ${projectRoot}/examples/src/screens/Login.ts
             - ${projectRoot}/examples/src/screens/Login.test.ts
             "
           `);
-          }),
-        ),
-        Effect.runPromise,
-      );
-    });
+      },
+    );
   });
 
   describe('Init Command', () => {
-    it('should write base config file', async () => {
+    CliTest('should write base config file', async ({ cliCtx, expect }) => {
       const projectRoot = createMinimalProject({
         git: { init: true, dirty: false },
         fixtures: {
@@ -142,26 +142,23 @@ describe('_Cli', () => {
           templateFiles: false,
         },
       });
-      const ctx = createCtx();
 
-      return pipe(
+      const result = pipe(
         Effect.gen(function* ($) {
           const args = ['init', `--cwd=${projectRoot}`];
-          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], ctx));
-          ctx.stdout.end();
-          return projectRoot;
+          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
+          cliCtx.stdout.end();
+          return yield* $(parseWritable(cliCtx.stdout));
         }),
-        Effect.flatMap(projectRoot =>
-          Effect.tryPromise(async () => {
-            const result = await stringifyStdOut(ctx.stdout);
-            expect(result).toMatchInlineSnapshot(
-              `"Scribe config created: ${projectRoot}/scribe.config.ts"`,
-            );
+        Effect.runPromise,
+      );
 
-            const file = fs.readFileSync(
-              path.join(projectRoot, 'scribe.config.ts'),
-            );
-            expect(String(file)).toMatchInlineSnapshot(`
+      expect(await result).toMatchInlineSnapshot(
+        `"Scribe config created: ${projectRoot}/scribe.config.ts"`,
+      );
+
+      const file = fs.readFileSync(path.join(projectRoot, 'scribe.config.ts'));
+      expect(String(file)).toMatchInlineSnapshot(`
               "import { ScribeConfig } from './index.js';
 
               const BaseConfig = {
@@ -175,13 +172,9 @@ describe('_Cli', () => {
               export default BaseConfig;
               "
             `);
-          }),
-        ),
-        Effect.runPromise,
-      );
     });
 
-    it.only("should fail if file doesn't exist", async ctx => {
+    CliTest("should fail if file doesn't exist", async ({ cliCtx, expect }) => {
       const projectRoot = createMinimalProject({
         git: { init: true, dirty: false },
         fixtures: {
@@ -189,19 +182,19 @@ describe('_Cli', () => {
           templateFiles: false,
         },
       });
-      const cliCtx = createCtx();
 
-      return pipe(
+      const result = pipe(
         Effect.gen(function* ($) {
           const args = ['init', `--cwd=${projectRoot}`];
           yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
           cliCtx.stdout.end();
 
-          const result = yield* $(
-            Effect.tryPromise(() => stringifyStdOut(cliCtx.stdout)),
-          );
+          return yield* $(parseWritable(cliCtx.stdout));
+        }),
+        Effect.runPromise,
+      );
 
-          ctx.expect(result).toMatchInlineSnapshot(`
+      expect(await result).toMatchInlineSnapshot(`
               "We caught an error during execution, this probably isn't a bug.
               Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
 
@@ -211,25 +204,68 @@ describe('_Cli', () => {
 
               Error: File ${projectRoot}/scribe.config.ts already exists."
             `);
+
+      const file = fs.readFileSync(path.join(projectRoot, 'scribe.config.ts'));
+      expect(String(file)).toMatchInlineSnapshot(`
+        "import type { ScribeConfig } from '@scribe/config';
+
+        const config = {
+          options: {
+            rootOutDir: '.',
+            templatesDirectories: ['./test-fixtures'],
+          },
+          templates: {
+            component: {
+              outputs: [
+                {
+                  templateFileKey: 'component',
+                  output: {
+                    directory: 'examples/src/components',
+                    fileName: '{{Name}}.ts',
+                  },
+                },
+              ],
+            },
+            screen: {
+              outputs: [
+                {
+                  templateFileKey: 'screen',
+                  output: {
+                    directory: 'examples/src/screens',
+                    fileName: '{{Name}}.ts',
+                  },
+                },
+                {
+                  templateFileKey: 'screen.test',
+                  output: {
+                    directory: 'examples/src/screens',
+                    fileName: '{{Name}}.test.ts',
+                  },
+                },
+              ],
+            },
+          },
+        } satisfies ScribeConfig;
+
+        export default config;
+        "
+      `);
+    });
+  });
+
+  describe('Help Command', () => {
+    CliTest('should print --help', async ({ cliCtx, expect }) => {
+      const result = pipe(
+        Effect.gen(function* ($) {
+          const args = ['--help'];
+          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
+          cliCtx.stdout.end();
+          return yield* $(parseWritable(cliCtx.stdout));
         }),
         Effect.runPromise,
       );
-    });
-  });
-  describe('Help Command', () => {
-    it('should print --help', async () => {
-      const ctx = createCtx();
 
-      return pipe(
-        Effect.gen(function* ($) {
-          const args = ['--help'];
-          yield* $(CLI.run([...process.argv.slice(0, 2), ...args], ctx));
-          ctx.stdout.end();
-        }),
-        Effect.flatMap(() =>
-          Effect.tryPromise(async () => {
-            const result = await stringifyStdOut(ctx.stdout);
-            expect(result).toMatchInlineSnapshot(`
+      expect(await result).toMatchInlineSnapshot(`
         "━━━ scribe ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           $ scribe <command>
 
@@ -245,62 +281,6 @@ describe('_Cli', () => {
         the \`-h,--help\` flag right after the command name.
         "
       `);
-          }),
-        ),
-        Effect.runPromise,
-      );
     });
   });
 });
-
-/**
- *
- *
- const file = fs.readFileSync(
- path.join(projectRoot, 'scribe.config.ts'),
- );
- expect(String(file)).toMatchInlineSnapshot(`
- "import type { ScribeConfig } from '@scribe/config';
-
- const config = {
-                options: {
-                  rootOutDir: '.',
-                  templatesDirectories: ["./test-fixtures"],
-                },
-                templates: {
-                  component: {
-                    outputs: [
-                      {
-                        templateFileKey: 'component',
-                        output: {
-                          directory: 'examples/src/components',
-                          fileName: '{{Name}}.ts',
-                        },
-                      },
-                    ],
-                  },
-                  screen: {
-                    outputs: [
-                      {
-                        templateFileKey: 'screen',
-                        output: {
-                          directory: 'examples/src/screens',
-                          fileName: '{{Name}}.ts',
-                        },
-                      },
-                      {
-                        templateFileKey: 'screen.test',
-                        output: {
-                          directory: 'examples/src/screens',
-                          fileName: '{{Name}}.test.ts',
-                        },
-                      },
-                    ],
-                  },
-                },
-              } satisfies ScribeConfig;
-
- export default config;
- "
- `);
- */
