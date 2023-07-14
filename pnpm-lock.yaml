@@ -11,20 +11,20 @@ patchedDependencies:
 
 dependencies:
   '@effect/data':
-    specifier: ^0.12.5
-    version: 0.12.5
+    specifier: ^0.12.10
+    version: 0.12.10
   '@effect/io':
-    specifier: ^0.26.0
-    version: 0.26.0
+    specifier: ^0.26.2
+    version: 0.26.2
   '@effect/match':
-    specifier: ^0.24.0
-    version: 0.24.0
+    specifier: ^0.24.5
+    version: 0.24.5
   '@effect/schema':
-    specifier: ^0.20.0
-    version: 0.20.0
+    specifier: ^0.20.3
+    version: 0.20.3
   '@effect/stream':
-    specifier: ^0.22.0
-    version: 0.22.0
+    specifier: ^0.22.2
+    version: 0.22.2
   case-anything:
     specifier: ^2.1.10
     version: 2.1.10
@@ -604,50 +604,36 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
-  /@effect/data@0.12.5:
-    resolution: {integrity: sha512-gmHSsG4earpIWufwCNT1R1pZ5BIe7z0bMmexnAFOT9csc8bwTSzk1e5QAd/65/vyczf/cMMrXgjpasdxlJ5POA==}
+  /@effect/data@0.12.10:
+    resolution: {integrity: sha512-zIz/DgumH2LgGdr1Wc9ChET5JSG0k/G5kDc8rn4a6yIJ0v2d5rfnbRWIJO2fWmdFvc+128JyaBvYguIyz9JaAQ==}
     dev: false
 
-  /@effect/io@0.25.13:
-    resolution: {integrity: sha512-NdZFSaNbG6AN8bzSAPdmi95AXgHWr4dH58R8viqbFBb0zmfQ/PQq+5XEsC++qy/qpT/ZLzpvJJWhW9jf1atq2g==}
+  /@effect/io@0.26.2:
+    resolution: {integrity: sha512-PdqtgmfEw88kX1UKZZvK42dpMZPSCPmdWAAzN17yCzfEsA3HoPjjxo9jLyzfjtUcU+tWO0tF/GY7pcDVLcJZAg==}
     dependencies:
-      '@effect/data': 0.12.5
+      '@effect/data': 0.12.10
     dev: false
 
-  /@effect/io@0.26.0:
-    resolution: {integrity: sha512-umwZ/sRoV7zb/8WwoiK7xWoypqvY6C1EXWEGORpViAFUTx3/bXc9i7JtdttTWVokXb3qogrxGX2SHopB20I4vQ==}
+  /@effect/match@0.24.5:
+    resolution: {integrity: sha512-mMoQLGt8s0AmXQR1yUTdBCbdzNIn8d5Ujf1o0T4mldiap4/eq3pf8cvyQm8dHK1Y8KyT4dA2ukJq56rSMIBZXA==}
     dependencies:
-      '@effect/data': 0.12.5
+      '@effect/data': 0.12.10
+      '@effect/schema': 0.20.3
     dev: false
 
-  /@effect/match@0.24.0:
-    resolution: {integrity: sha512-5Ws5chniAYnVuMbzlmndqGcbQVrfo0sdkwGaSVov7R3pXZA6gKyBY09Xl9xywgcNjFJ/0UYwVnjs95MEmBhYdQ==}
+  /@effect/schema@0.20.3:
+    resolution: {integrity: sha512-pjJW9QkHZd2/fq7Bhd6pAOidMJ0OUODOeUlesPDK0jpo62AaU9g+IGXt3v5NU8rXSX77igZgfK08XhmofwHn0A==}
     dependencies:
-      '@effect/data': 0.12.5
-      '@effect/schema': 0.19.3
-    dev: false
-
-  /@effect/schema@0.19.3:
-    resolution: {integrity: sha512-jR7o19HBX7PBYRLV1G6ZlM90giRe+lZkA6BqVNamkhNfVsHU4MnGr2lqM2H4fy4MgR744GGXuxCDjVdydkMvAw==}
-    dependencies:
-      '@effect/data': 0.12.5
-      '@effect/io': 0.25.13
+      '@effect/data': 0.12.10
+      '@effect/io': 0.26.2
       fast-check: 3.10.0
     dev: false
 
-  /@effect/schema@0.20.0:
-    resolution: {integrity: sha512-uiqNI/xpXhER0blFzX/rPnCSjiW4zHQxVgiEctVRxK9Gz1Pa+VI/wsv5FJzjmiKprtIcmcLwD9NtU1akp5w42w==}
+  /@effect/stream@0.22.2:
+    resolution: {integrity: sha512-86dww4iOSGPEYh0bOlsmCcXUbRAUQo/E9ioedfVvNs/XLuCV8yrrTE1yXuW9kMeXJOHZZgtHpSGhltlzari1zg==}
     dependencies:
-      '@effect/data': 0.12.5
-      '@effect/io': 0.26.0
-      fast-check: 3.10.0
-    dev: false
-
-  /@effect/stream@0.22.0:
-    resolution: {integrity: sha512-kmn3CquMfrCVDtU4hrEzvP+rreBt0g0T41QapDvNmFD7bnhJXGoeLTNRZr6MVnKg4M/ubVWlhZ+Qa7IMKezRgg==}
-    dependencies:
-      '@effect/data': 0.12.5
-      '@effect/io': 0.26.0
+      '@effect/data': 0.12.10
+      '@effect/io': 0.26.2
     dev: false
 
   /@esbuild/android-arm64@0.17.11:
