@@ -16,9 +16,12 @@ export function _Cli(args: string[], contextOverrides?: Partial<BaseContext>) {
 
   cli.register(Builtins.HelpCommand);
   cli.register(Builtins.VersionCommand);
+
   return cli.runExit(args, { ...Cli.defaultContext, ...contextOverrides });
 }
 
-export function run(args: string[], contextOverrides: Partial<BaseContext>) {
+type ContextOverrides = Partial<BaseContext>;
+
+export function run(args: string[], contextOverrides: ContextOverrides = {}) {
   return Effect.tryPromise(() => _Cli(args.slice(2), contextOverrides));
 }
