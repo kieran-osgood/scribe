@@ -1,5 +1,5 @@
 import * as Config from '@scribe/config';
-import { Boolean, Effect, pipe } from '@scribe/core';
+import { Effect, pipe } from '@scribe/core';
 import { Process, Prompt } from '@scribe/services';
 import path from 'path';
 
@@ -22,12 +22,12 @@ export const promptUserForMissingArgs = (flags: Flags) =>
 const constructConfigPath = (filePath: string) =>
   pipe(
     Process.Process,
-    Effect.map(_process =>
+    Effect.flatMap(_process =>
       pipe(
-        path.isAbsolute(filePath),
-        Boolean.match(
-          () => path.join(_process.cwd(), filePath),
-          () => filePath,
+        Effect.if(
+          path.isAbsolute(filePath),
+          Effect.succeed(filePath),
+          Effect.succeed(path.join(_process.cwd(), filePath)),
         ),
       ),
     ),
