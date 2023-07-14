@@ -4,7 +4,7 @@ import { FS, Process } from '@scribe/services';
 import path from 'path';
 import { render } from 'template-file';
 
-import { promptUserForMissingArgs } from '../context';
+import { DefaultCommand } from '../cli/commands';
 import { TemplateFileError } from './error';
 
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
@@ -23,9 +23,10 @@ function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   });
 }
 
-export type Ctx = Effect.Effect.Success<
-  ReturnType<typeof promptUserForMissingArgs>
->;
+type PromptUserForMissingArgs = InstanceType<
+  typeof DefaultCommand
+>['promptUserForMissingArgs'];
+export type Ctx = Effect.Effect.Success<ReturnType<PromptUserForMissingArgs>>;
 
 export type ConstructTemplateCtx = Ctx & { templateOutput: Template };
 

@@ -1,12 +1,13 @@
+import * as Config from '@scribe/config';
 import { Template } from '@scribe/config';
 import { Effect, flow, pipe, R, RA } from '@scribe/core';
-import { Git } from '@scribe/services';
+import { Git, Process, Prompt } from '@scribe/services';
 import { Command, Option } from 'clipanion';
 import { green } from 'colorette';
 import { PathOrFileDescriptor } from 'fs';
+import path from 'path';
 import * as t from 'typanion';
 
-import { promptUserForMissingArgs } from '../../context';
 import { constructTemplate, Ctx, writeTemplate } from '../../templates';
 import { BaseCommand } from './base-command';
 
@@ -35,7 +36,11 @@ export class DefaultCommand extends BaseCommand {
   });
 
   private rewriteFlagsWithUserInput(
-    _: Effect.Effect.Success<ReturnType<typeof promptUserForMissingArgs>>,
+    _: Effect.Effect.Success<
+      ReturnType<
+        InstanceType<typeof DefaultCommand>['promptUserForMissingArgs']
+      >
+    >,
   ) {
     this.name = _.input.name;
     this.template = _.input.template;
@@ -51,17 +56,31 @@ export class DefaultCommand extends BaseCommand {
     this.context.stdout.write(`Output files:\n${results}\n`);
   }
 
+  promptUserForMissingArgs = () => {
+    const _config = this.configPath;
+    const _name = this.name;
+    const _template = this.template;
+
+    return Effect.gen(function* ($) {
+      const configPath = yield* $(constructConfigPath(_config));
+      const config = yield* $(Config.readConfig(configPath));
+      const templates = yield* $(Config.readUserTemplateOptions(configPath));
+      const input = yield* $(
+        Prompt.launchPromptInterface({
+          templates,
+          flags: { name: _name, template: _template },
+        }),
+      );
+
+      return { config, input, templateKeys: templates } as const;
+    });
+  };
+
   executeSafe = () =>
     pipe(
       // TODO: add ignore git
       Git.checkWorkingTreeClean(),
-      Effect.flatMap(() =>
-        promptUserForMissingArgs({
-          name: this.name,
-          template: this.template,
-          configPath: this.configPath,
-        }),
-      ),
+      Effect.flatMap(() => this.promptUserForMissingArgs()),
       Effect.tap(_ => Effect.sync(() => this.rewriteFlagsWithUserInput(_))),
       Effect.flatMap(createTemplates),
       Effect.map(_ => {
@@ -101,3 +120,17 @@ const createTemplates = (ctx: Ctx) => {
     ),
   );
 };
+
+const constructConfigPath = (filePath: string) =>
+  pipe(
+    Process.Process,
+    Effect.flatMap(_process =>
+      pipe(
+        Effect.if(
+          path.isAbsolute(filePath),
+          Effect.succeed(filePath),
+          Effect.succeed(path.join(_process.cwd(), filePath)),
+        ),
+      ),
+    ),
+  );
