@@ -70,7 +70,7 @@ export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
   const options = { ...defaultMinimalProjectOptions, ..._options };
 
   const projectRoot = tempy.temporaryDirectory();
-  const testPath = path.join(projectRoot, 'test-fixtures');
+  const testPath = path.join(projectRoot, 'src', 'test-fixtures');
   fs.mkdirSync(testPath, { recursive: true });
 
   // Allows git commit to pass even when fixtures are all off
@@ -80,20 +80,20 @@ export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
     copyFileToPath(
       projectRoot,
       path.join(projectRoot, 'scribe.config.ts'),
-      './test-fixtures/scribe.config.ts',
+      './src/test-fixtures/scribe.config.ts',
     );
   }
   if (options.fixtures?.templateFiles) {
     copyFileToPath(
       projectRoot,
       path.join(testPath, `screen.scribe`),
-      './test-fixtures/screen.scribe',
+      './src/test-fixtures/screen.scribe',
     );
     copyFileToPath(
       projectRoot,
       path.join(testPath, 'screen.test.scribe'),
       // TODO: WE'RE READING THE WRONG FILE
-      './test-fixtures/screen.scribe',
+      './src/test-fixtures/screen.scribe',
     );
   }
 

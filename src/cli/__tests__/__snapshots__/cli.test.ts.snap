@@ -6,7 +6,7 @@ exports[`_Cli > Init Command > should fail if file doesn't exist 2`] = `
 const config = {
   options: {
     rootOutDir: '.',
-    templatesDirectories: ['./test-fixtures'],
+    templatesDirectories: ['./src/test-fixtures'],
   },
   templates: {
     component: {

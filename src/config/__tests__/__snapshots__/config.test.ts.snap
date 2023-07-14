@@ -5,7 +5,7 @@ exports[`config > readConfig > should return valid config 1`] = `
   "options": {
     "rootOutDir": ".",
     "templatesDirectories": [
-      "./test-fixtures",
+      "./src/test-fixtures",
     ],
   },
   "templates": {
