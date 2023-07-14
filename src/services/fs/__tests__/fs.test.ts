@@ -1,12 +1,20 @@
 import { Context, Effect, pipe } from '@scribe/core';
 import * as NFS from 'fs';
 import * as memfs from 'memfs';
-import { vol } from 'memfs';
+import { DirectoryJSON, vol } from 'memfs';
 import path from 'path';
 
-import { cwdAsJson } from '../../../../configs/vite/setup-fs';
 import { MkDirError, ReadFileError, StatError, WriteFileError } from '../error';
 import * as FS from '../fs';
+
+/**
+ * Provides a JSON representation of the current working directory
+ * in the in-memory file system.
+ *
+ * @return {DirectoryJSON}
+ */
+export const cwdAsJson = (): DirectoryJSON =>
+  vol.toJSON(process.cwd(), undefined, true);
 
 const fileContents = 'super secret file';
 
