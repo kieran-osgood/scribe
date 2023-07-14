@@ -1,4 +1,4 @@
-import { TemplateFileError } from '../error';
+import { TemplateFileError } from './error';
 
 describe('error', () => {
   describe(TemplateFileError.name, () => {

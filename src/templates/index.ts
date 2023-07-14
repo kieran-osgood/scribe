@@ -1,18 +1,18 @@
+import { TemplateFile } from '@scribe/adapters';
 import { Template } from '@scribe/config';
-import { Effect, flow, pipe, RA } from '@scribe/core';
+import { Effect, pipe, RA } from '@scribe/core';
 import { FS, Process } from '@scribe/services';
 import path from 'path';
 import { render } from 'template-file';
 
 import { DefaultCommand } from '../cli/commands';
-import { TemplateFileError } from './error';
 
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   return Effect.gen(function* ($) {
     const {
       templateOutput: { templateFileKey },
     } = ctx;
-    // should report if templatesDirectories isn't a dir?
+    // TODO: should report if templatesDirectories isn't a dir?
     const templateDirs = ctx.config.options?.templatesDirectories ?? [''];
     const cwd = (yield* $(Process.Process)).cwd();
 
@@ -33,29 +33,16 @@ export type ConstructTemplateCtx = Ctx & { templateOutput: Template };
 export function constructTemplate(ctx: ConstructTemplateCtx) {
   return pipe(
     createAbsFilePaths(ctx),
-    Effect.flatMap(
-      flow(
-        RA.map(_ =>
-          pipe(
-            FS.readFile(_, null), //
-            Effect.map(String),
-          ),
-        ),
+    Effect.flatMap(_ =>
+      pipe(
+        _,
+        RA.map(_ => pipe(FS.readFile(_, null), Effect.map(String))),
         Effect.all,
       ),
     ),
     Effect.map(
-      RA.map(_ =>
-        Effect.tryCatch(
-          () =>
-            // extract renderFile to effectify
-            render(_, {
-              Name: ctx.input.name,
-              //   ...ctx.input.variables
-            }),
-          error => new TemplateFileError({ error }),
-        ),
-      ),
+      // TODO: spread in ctx.input.variables
+      RA.map(_ => TemplateFile.render(_, { Name: ctx.input.name })),
     ),
     Effect.flatMap(Effect.all),
     Effect.map(

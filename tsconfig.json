@@ -9,6 +9,7 @@
     "noImplicitOverride": true,
     "resolveJsonModule": true,
     "paths": {
+      "@scribe/adapters": ["src/adapters/index"],
       "@scribe/core": ["src/core/index"],
       "@scribe/config": ["src/config/index"],
       "@scribe/reader": ["src/reader/index"],

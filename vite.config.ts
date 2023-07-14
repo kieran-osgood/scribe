@@ -18,6 +18,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '@scribe/adapters': path.resolve(__dirname, 'src/adapters/index'),
       '@scribe/core': path.resolve(__dirname, 'src/core/index'),
       '@scribe/config': path.resolve(__dirname, 'src/config/index'),
       '@scribe/prompt': path.resolve(__dirname, 'src/prompt/index'),
