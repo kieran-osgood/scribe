@@ -1,6 +1,6 @@
+import { pipe } from '@scribe/core';
 import * as fc from 'fast-check';
 import * as S from 'fp-ts/lib/string';
-import { pipe } from 'src/core';
 import { describe } from 'vitest';
 
 import { fmtError } from '../error';

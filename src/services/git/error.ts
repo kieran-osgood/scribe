@@ -1,5 +1,5 @@
+import { Data } from '@scribe/core';
 import { GitConstructError, GitError, StatusResult } from 'simple-git';
-import { Data } from 'src/core';
 
 export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
   readonly status: StatusResult;

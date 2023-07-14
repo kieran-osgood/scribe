@@ -1,4 +1,4 @@
-import { Data } from 'src/core';
+import { Data } from '@scribe/core';
 
 export class TemplateFileError extends Data.TaggedClass('TemplateFileError')<{
   readonly error?: unknown;

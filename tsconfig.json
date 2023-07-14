@@ -43,7 +43,7 @@
     ".eslintrc.js",
     "."
   ],
-  "exclude": ["examples/**/*.*"],
+  "exclude": ["examples"],
   "ts-node": {
     "swc": true,
     "require": ["tsconfig-paths/register"]

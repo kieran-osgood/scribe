@@ -5,7 +5,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],
-  ignorePatterns: ['examples/**/*.*', 'dist'],
+  ignorePatterns: ['examples', 'dist', 'node_modules', 'html'],
   root: true,
   overrides: [],
   parser: '@typescript-eslint/parser',

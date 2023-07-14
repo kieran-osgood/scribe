@@ -1,8 +1,7 @@
 import * as Config from '@scribe/config';
-import { Process } from '@scribe/services';
+import { Boolean, Effect, pipe } from '@scribe/core';
+import { Process, Prompt } from '@scribe/services';
 import path from 'path';
-import { Boolean, Effect, pipe } from 'src/core';
-import * as Prompt from 'src/services/prompt';
 
 interface Flags {
   name: string | undefined;

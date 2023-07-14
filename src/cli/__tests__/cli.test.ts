@@ -1,9 +1,9 @@
 import * as CLI from '@scribe/cli';
+import { Effect, pipe } from '@scribe/core';
 import { BaseContext } from 'clipanion/lib/advanced/Cli';
 import * as fs from 'fs';
 import getStream from 'get-stream';
 import path from 'path';
-import { Effect, pipe } from 'src/core';
 import { PassThrough, Writable } from 'stream';
 import stripAnsi from 'strip-ansi';
 import { test } from 'vitest';

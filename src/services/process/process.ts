@@ -1,4 +1,4 @@
-import { Context } from 'src/core';
+import { Context } from '@scribe/core';
 
 export interface Process {
   cwd: () => string;

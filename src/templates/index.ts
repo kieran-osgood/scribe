@@ -1,8 +1,7 @@
 import { Template } from '@scribe/config';
-import { Process } from '@scribe/services';
+import { Effect, flow, pipe, RA } from '@scribe/core';
+import { FS, Process } from '@scribe/services';
 import path from 'path';
-import { Effect, flow, pipe, RA } from 'src/core';
-import * as FS from 'src/services/fs';
 import { render } from 'template-file';
 
 import { promptUserForMissingArgs } from '../context';

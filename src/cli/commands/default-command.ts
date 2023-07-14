@@ -1,9 +1,9 @@
 import { Template } from '@scribe/config';
+import { Effect, flow, pipe, R, RA } from '@scribe/core';
+import { Git } from '@scribe/services';
 import { Command, Option } from 'clipanion';
 import { green } from 'colorette';
 import { PathOrFileDescriptor } from 'fs';
-import { Effect, flow, pipe, R, RA } from 'src/core';
-import { checkWorkingTreeClean } from 'src/services/git';
 import * as t from 'typanion';
 
 import { promptUserForMissingArgs } from '../../context';
@@ -54,7 +54,7 @@ export class DefaultCommand extends BaseCommand {
   executeSafe = () =>
     pipe(
       // TODO: add ignore git
-      checkWorkingTreeClean(),
+      Git.checkWorkingTreeClean(),
       Effect.flatMap(() =>
         promptUserForMissingArgs({
           name: this.name,

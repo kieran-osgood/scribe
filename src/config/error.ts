@@ -1,6 +1,6 @@
 import { NonEmptyReadonlyArray } from '@effect/data/ReadonlyArray';
 import { ParseErrors } from '@effect/schema/src/ParseResult';
-import { TaggedClass } from 'src/core';
+import { TaggedClass } from '@scribe/core';
 
 import { TF } from '../core';
 

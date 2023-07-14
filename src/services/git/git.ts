@@ -1,4 +1,5 @@
 import * as Effect from '@effect/io/Effect';
+import { pipe } from '@scribe/core';
 import { Process } from '@scribe/services';
 import simpleGit, {
   GitConstructError,
@@ -6,7 +7,6 @@ import simpleGit, {
   StatusResult,
   TaskOptions,
 } from 'simple-git';
-import { pipe } from 'src/core';
 
 import GitStatusError, { SimpleGitError } from './error';
 

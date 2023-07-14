@@ -1,8 +1,7 @@
 import { runtimeDebug } from '@effect/data/Debug';
 import { Cause, Context, Effect, pipe, Runtime } from '@scribe/core';
-import { Process } from '@scribe/services';
+import { FS, Process } from '@scribe/services';
 import { Command, Option } from 'clipanion';
-import * as FS from 'src/services/fs';
 import { Writable } from 'stream';
 import * as t from 'typanion';
 

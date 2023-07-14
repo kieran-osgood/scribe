@@ -1,7 +1,7 @@
+import { Effect, pipe } from '@scribe/core';
 import { Process } from '@scribe/services';
 import * as resp from 'simple-git/dist/typings/response';
 import * as types from 'simple-git/dist/typings/types';
-import { Effect, pipe } from 'src/core';
 import { beforeEach, vi } from 'vitest';
 
 import GitStatusError from '../error';

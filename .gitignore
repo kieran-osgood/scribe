@@ -134,3 +134,6 @@ examples/src/screens/*
 .github/tests/*.xml
 
 tsconfig.vitest-temp.json
+
+# Vite
+html

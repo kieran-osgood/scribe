@@ -1,8 +1,8 @@
+import { Context, Effect, pipe } from '@scribe/core';
 import * as NFS from 'fs';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import path from 'path';
-import { Context, Effect, pipe } from 'src/core';
 
 import { cwdAsJson } from '../../../../configs/vite/setup-fs';
 import { MkDirError, ReadFileError, StatError, WriteFileError } from '../error';

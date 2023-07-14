@@ -1,10 +1,8 @@
-import { Git, Process } from '@scribe/services';
+import { Effect, pipe } from '@scribe/core';
+import { FS, Git, Process } from '@scribe/services';
 import { Command } from 'clipanion';
 import path from 'path';
-import { Effect, pipe } from 'src/core';
 
-import * as FS from '../../services/fs';
-import { AccessError } from '../../services/fs';
 import { BaseCommand } from './base-command';
 
 export class InitCommand extends BaseCommand {
@@ -21,7 +19,7 @@ export class InitCommand extends BaseCommand {
 
   private createFileExistsError = (_process: Process.Process) => {
     return new FS.FileExistsError({
-      error: new AccessError({
+      error: new FS.AccessError({
         error: new Error(
           `File ${this.createConfigPath(_process)} already exists.`,
         ),

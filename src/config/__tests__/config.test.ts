@@ -1,4 +1,4 @@
-import { Effect, pipe } from 'src/core';
+import { Effect, pipe } from '@scribe/core';
 
 import {
   checkForTemplates,
