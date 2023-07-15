@@ -65,7 +65,7 @@ const _ctx = {
     template: 'screen',
     name: 'login',
   },
-  templateKeys: ['screen'],
+  templates: ['screen'],
 } satisfies Ctx;
 
 const templateOutput = {
@@ -82,7 +82,7 @@ describe('writeTemplate', () => {
       Effect.gen(function* ($) {
         const ctx = {
           fileContents,
-          templateOutput,
+          output: templateOutput,
           ..._ctx,
         } satisfies WriteTemplateCtx;
         const result = yield* $(writeTemplate(ctx));
@@ -108,7 +108,7 @@ describe('constructTemplate', () => {
     pipe(
       Effect.gen(function* ($) {
         const ctx = {
-          templateOutput: {
+          output: {
             templateFileKey: 'screen',
             output: {
               fileName: '{{Name}}.ts', // good-scribe
@@ -151,7 +151,7 @@ describe('constructTemplate', () => {
       Effect.gen(function* ($) {
         const ctx = {
           ..._ctx,
-          templateOutput: {
+          output: {
             templateFileKey: 'screen',
             output: {
               fileName: '{{Name}}.ts',
@@ -190,7 +190,7 @@ describe('constructTemplate', () => {
     pipe(
       Effect.gen(function* ($) {
         const ctx = {
-          templateOutput: {
+          output: {
             templateFileKey: 'BADKEY',
             output: {
               fileName: '', // good-scribe

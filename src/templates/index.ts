@@ -10,7 +10,7 @@ import { DefaultCommand } from '../cli/commands';
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   return Effect.gen(function* ($) {
     const {
-      templateOutput: { templateFileKey },
+      output: { templateFileKey },
     } = ctx;
     // TODO: should report if templatesDirectories isn't a dir?
     const templateDirs = ctx.config.options?.templatesDirectories ?? [''];
@@ -28,7 +28,7 @@ type PromptUserForMissingArgs = InstanceType<
 >['promptUserForMissingArgs'];
 export type Ctx = Effect.Effect.Success<ReturnType<PromptUserForMissingArgs>>;
 
-export type ConstructTemplateCtx = Ctx & { templateOutput: Template };
+export type ConstructTemplateCtx = Ctx & { output: Template };
 
 export function constructTemplate(ctx: ConstructTemplateCtx) {
   return pipe(
@@ -54,19 +54,16 @@ export function constructTemplate(ctx: ConstructTemplateCtx) {
 
 export type WriteTemplateCtx = Ctx & {
   fileContents: string;
-  templateOutput: Template;
+  output: Template;
 };
 export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
     const _process = yield* $(Process.Process);
-    const fileName = render(_.templateOutput.output.fileName, {
+    const fileName = render(_.output.output.fileName, {
       Name: _.input.name,
     });
 
-    const relativeFilePaths = path.join(
-      _.templateOutput.output.directory,
-      fileName,
-    );
+    const relativeFilePaths = path.join(_.output.output.directory, fileName);
 
     const absoluteFilePath = path.join(_process.cwd(), relativeFilePaths);
 

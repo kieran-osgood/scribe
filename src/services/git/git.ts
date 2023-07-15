@@ -40,13 +40,13 @@ export const checkWorkingTreeClean = (options?: TaskOptions) =>
       }),
     ),
 
-    // TODO: prompt for continue on dirty
+    // TODO: inquirer for continue on dirty
     // Effect.catchTag('GitStatusError', _ => {
     //   // if (_.status.isClean() === false) {
-    //   //   // Not clean - Kick off Effect prompt for continue dangerously
+    //   //   // Not clean - Kick off Effect inquirer for continue dangerously
     //   //   console.log(_.toString());
     //   // } else {
-    //   //   // Unknown error/not git - Kick off Effect prompt for continue dangerously
+    //   //   // Unknown error/not git - Kick off Effect inquirer for continue dangerously
     //   //   console.log(_.toString());
     //   // }
 

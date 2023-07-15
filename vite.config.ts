@@ -21,7 +21,7 @@ export default defineConfig({
       '@scribe/adapters': path.resolve(__dirname, 'src/adapters/index'),
       '@scribe/core': path.resolve(__dirname, 'src/core/index'),
       '@scribe/config': path.resolve(__dirname, 'src/config/index'),
-      '@scribe/prompt': path.resolve(__dirname, 'src/prompt/index'),
+      '@scribe/prompt': path.resolve(__dirname, 'src/inquirer/index'),
       '@scribe/git': path.resolve(__dirname, 'src/git/index'),
       '@scribe/commands': path.resolve(__dirname, 'src/commands/index'),
       '@scribe/fs': path.resolve(__dirname, 'src/common/fs/index'),

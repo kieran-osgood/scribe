@@ -1,15 +1,24 @@
+import { Inquirer, PromptError } from '@scribe/adapters';
 import * as Config from '@scribe/config';
-import { Template } from '@scribe/config';
-import { Effect, flow, pipe, R, RA } from '@scribe/core';
-import { Git, Process, Prompt } from '@scribe/services';
+import { Effect, pipe, R, RA, S, TF } from '@scribe/core';
+import { FS, Git, Process } from '@scribe/services';
 import { Command, Option } from 'clipanion';
 import { green } from 'colorette';
 import { PathOrFileDescriptor } from 'fs';
+import { QuestionCollection } from 'inquirer';
 import path from 'path';
 import * as t from 'typanion';
 
 import { constructTemplate, Ctx, writeTemplate } from '../../templates';
 import { BaseCommand } from './base-command';
+
+const Prompt = S.struct({
+  template: S.string,
+  name: S.string,
+});
+
+export type Prompt = S.To<typeof Prompt>;
+type Flags = { template: string | undefined; name: string | undefined };
 
 export class DefaultCommand extends BaseCommand {
   static override paths = [Command.Default];
@@ -35,18 +44,79 @@ export class DefaultCommand extends BaseCommand {
     required: false,
   });
 
-  private rewriteFlagsWithUserInput(
-    _: Effect.Effect.Success<
-      ReturnType<
-        InstanceType<typeof DefaultCommand>['promptUserForMissingArgs']
-      >
-    >,
-  ) {
-    this.name = _.input.name;
-    this.template = _.input.template;
-  }
+  promptUserForMissingArgs = () => {
+    const { configPath, template, name, launchPrompt } = this;
 
-  printOutput(_: PathOrFileDescriptor[]) {
+    return pipe(
+      Effect.gen(function* ($) {
+        const _configPath = yield* $(createConfigPathAbsolute(configPath));
+        const templates = yield* $(Config.readUserTemplateOptions(_configPath));
+        const input = yield* $(
+          launchPrompt({ templates, flags: { name, template } }),
+        );
+
+        const config = yield* $(Config.readConfig(configPath));
+        return { config, input, templates } as const;
+      }),
+      Effect.tap(_ =>
+        Effect.sync(() => {
+          this.name = _.input.name;
+          this.template = _.input.template;
+        }),
+      ),
+    );
+  };
+
+  launchPrompt = (options: { templates: string[]; flags: Flags }) =>
+    pipe(
+      this.createQuestionCollection(options),
+      Inquirer.prompt,
+      Effect.map(_ => ({
+        // TODO: need to validate this in test
+        name: options.flags.name,
+        template: options.flags.template,
+        ..._,
+      })),
+      Effect.flatMap(_ =>
+        pipe(
+          S.parseEffect(Prompt)(_),
+          Effect.catchTag('ParseError', error =>
+            Effect.fail(
+              new PromptError({ message: TF.formatErrors(error.errors) }),
+            ),
+          ),
+        ),
+      ),
+    );
+
+  createQuestionCollection = (options: {
+    templates: string[];
+    flags: Flags;
+  }): QuestionCollection => [
+    {
+      name: 'template',
+      type: 'list',
+      message: 'Pick your template',
+      choices: options.templates,
+      when: () =>
+        Boolean(options.flags.template) === false ||
+        typeof options.flags.template !== 'string',
+    },
+    {
+      name: 'name',
+      type: 'input',
+      message: 'File name:',
+      when: () =>
+        Boolean(options.flags.name) === false ||
+        typeof options.flags.name !== 'string',
+      validate: (s: string) => {
+        if (/^([A-Za-z\-_\d])+$/.test(s)) return true;
+        return 'File name may only include letters, numbers & underscores.';
+      },
+    },
+  ];
+
+  print = (_: PathOrFileDescriptor[]) => {
     const results = pipe(
       _,
       RA.map(s => `- ${String(s)}`),
@@ -54,26 +124,6 @@ export class DefaultCommand extends BaseCommand {
     );
     this.context.stdout.write(green(`✅  Success!\n`));
     this.context.stdout.write(`Output files:\n${results}\n`);
-  }
-
-  promptUserForMissingArgs = () => {
-    const _config = this.configPath;
-    const _name = this.name;
-    const _template = this.template;
-
-    return Effect.gen(function* ($) {
-      const configPath = yield* $(constructConfigPath(_config));
-      const config = yield* $(Config.readConfig(configPath));
-      const templates = yield* $(Config.readUserTemplateOptions(configPath));
-      const input = yield* $(
-        Prompt.launchPromptInterface({
-          templates,
-          flags: { name: _name, template: _template },
-        }),
-      );
-
-      return { config, input, templateKeys: templates } as const;
-    });
   };
 
   executeSafe = () =>
@@ -81,56 +131,47 @@ export class DefaultCommand extends BaseCommand {
       // TODO: add ignore git
       Git.checkWorkingTreeClean(),
       Effect.flatMap(() => this.promptUserForMissingArgs()),
-      Effect.tap(_ => Effect.sync(() => this.rewriteFlagsWithUserInput(_))),
-      Effect.flatMap(createTemplates),
-      Effect.map(_ => {
-        const results = pipe(
-          _,
-          RA.map(s => `- ${String(s)}`),
-          RA.join('\n'),
-        );
-        this.context.stdout.write(green(`✅  Success!\n`));
-        this.context.stdout.write(`Output files:\n${results}\n`);
-      }),
+      Effect.flatMap(writeAllTemplates),
+      Effect.map(this.print),
     );
 }
 
 /**
  * Constructs and writes templates to files persistently
  */
-const createTemplate = (ctx: Ctx & { templateOutput: Template }) =>
+const writeAllTemplates = (ctx: Ctx) =>
   pipe(
-    constructTemplate(ctx),
-    Effect.map(RA.map(writeTemplate)),
-    Effect.flatMap(Effect.all),
-  );
-
-const createTemplates = (ctx: Ctx) => {
-  return pipe(
     R.get(ctx.input.template)(ctx.config.templates),
-    Effect.map(_ => _.outputs),
-    Effect.flatMap(
-      flow(
-        RA.map(
-          templateOutput => createTemplate({ templateOutput, ...ctx }), //
+    Effect.flatMap(_ =>
+      pipe(
+        _.outputs,
+        RA.map(output =>
+          pipe(
+            constructTemplate({ output, ...ctx }),
+            Effect.map(RA.map(writeTemplate)),
+            Effect.flatMap(Effect.all),
+          ),
         ),
         Effect.all,
         Effect.map(RA.flatten),
       ),
     ),
   );
-};
 
-const constructConfigPath = (filePath: string) =>
+const createConfigPathAbsolute = (filePath: string) =>
   pipe(
     Process.Process,
     Effect.flatMap(_process =>
-      pipe(
-        Effect.if(
-          path.isAbsolute(filePath),
+      Effect.if(
+        path.isAbsolute(filePath),
+        Effect.ifEffect(
+          FS.isFile(filePath),
           Effect.succeed(filePath),
-          Effect.succeed(path.join(_process.cwd(), filePath)),
+          // absolute directory, so set the filePath to default location
+          // TODO: use search from cosmic config to handle this
+          Effect.succeed(path.join(_process.cwd(), 'scribe.config.ts')),
         ),
+        Effect.succeed(path.join(_process.cwd(), filePath)),
       ),
     ),
   );

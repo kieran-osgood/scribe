@@ -73,6 +73,7 @@ describe('_Cli', () => {
           `);
     });
 
+    // TODO: fix logic so this test runs without the <rootDir>/scribe.config.ts
     CliTest(
       'should complete with --template --fileName and relative config path',
       async ({ cliCtx, expect }) => {
