@@ -139,7 +139,7 @@ export class DefaultCommand extends BaseCommand {
 /**
  * Constructs and writes templates to files persistently
  */
-const writeAllTemplates = (ctx: Ctx) =>
+export const writeAllTemplates = (ctx: Ctx) =>
   pipe(
     R.get(ctx.input.template)(ctx.config.templates),
     Effect.flatMap(_ =>
@@ -158,7 +158,7 @@ const writeAllTemplates = (ctx: Ctx) =>
     ),
   );
 
-const createConfigPathAbsolute = (filePath: string) =>
+export const createConfigPathAbsolute = (filePath: string) =>
   pipe(
     Process.Process,
     Effect.flatMap(_process =>
