@@ -1,6 +1,5 @@
-import { pipe } from '@scribe/core';
+import { pipe, String } from '@scribe/core';
 import * as fc from 'fast-check';
-import * as S from 'fp-ts/lib/string';
 import { describe } from 'vitest';
 
 import { fmtError } from '../error';
@@ -15,7 +14,7 @@ describe('formatErrorMessage', () => {
   it('non Error values should stringify', () =>
     fc.assert(
       fc.property(fc.anything({ withObjectString: true }), _ =>
-        S.Eq.equals(
+        String.Equivalence(
           fmtError(_),
           typeof _?.toString === 'function' ? _?.toString() : 'Unknown Error',
         ),

@@ -49,7 +49,6 @@
     "colorette": "^2.0.20",
     "cosmiconfig": "^8.1.0",
     "cosmiconfig-typescript-loader": "^4.3.0",
-    "fp-ts": "^2.13.1",
     "fp-ts-std": "^0.15.1",
     "inquirer": "8.0.0",
     "simple-git": "^3.18.0",
@@ -126,7 +125,10 @@
       "plugin:@typescript-eslint/recommended-requiring-type-checking"
     ],
     "ignorePatterns": [
-      "examples", "dist", "node_modules", "html"
+      "examples",
+      "dist",
+      "node_modules",
+      "html"
     ],
     "root": true,
     "overrides": [],
@@ -140,20 +142,25 @@
       "project": true
     },
     "plugins": [
-      "@typescript-eslint", "communist-spelling", "simple-import-sort"
+      "@typescript-eslint",
+      "communist-spelling",
+      "simple-import-sort"
     ],
     "rules": {
       "@typescript-eslint/no-unused-vars": "error",
       "array-bracket-spacing": [
-        "error", "never"
+        "error",
+        "never"
       ],
       "communist-spelling/communist-spelling": "error",
       "no-unused-vars": "off",
       "object-curly-spacing": [
-        "error", "always"
+        "error",
+        "always"
       ],
       "semi": [
-        "error", "always"
+        "error",
+        "always"
       ],
       "simple-import-sort/exports": "error",
       "simple-import-sort/imports": "error"
