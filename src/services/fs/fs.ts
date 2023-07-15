@@ -115,12 +115,28 @@ export const stat = (path: string) =>
     ),
   );
 
-export const fileOrDirExists = (
+export const isFileOrDirectory = (
   pathLike: string,
 ): Effect.Effect<FS, StatError, boolean> =>
   pipe(
     stat(pathLike),
     Effect.map(_ => _.isFile() || _.isDirectory()),
+  );
+
+export const isFile = (
+  pathLike: string,
+): Effect.Effect<FS, StatError, boolean> =>
+  pipe(
+    stat(pathLike),
+    Effect.map(_ => _.isFile()),
+  );
+
+export const isDirectory = (
+  pathLike: string,
+): Effect.Effect<FS, StatError, boolean> =>
+  pipe(
+    stat(pathLike),
+    Effect.map(_ => _.isDirectory()),
   );
 
 // export const open = (

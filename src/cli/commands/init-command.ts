@@ -38,7 +38,7 @@ export class InitCommand extends BaseCommand {
           Process.Process,
           Effect.flatMap(_process =>
             pipe(
-              FS.fileOrDirExists(this.createConfigPath(_process)),
+              FS.isFileOrDirectory(this.createConfigPath(_process)),
               // TODO: add ignore file exists
               Effect.flatMap(_ =>
                 _

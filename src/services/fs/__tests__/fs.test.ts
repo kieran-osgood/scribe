@@ -95,12 +95,15 @@ describe('fs', () => {
       pipe(
         Effect.gen(function* ($) {
           const filePath = './mkdir/nested/path';
-          const statError = yield* $(FS.fileOrDirExists(filePath), Effect.flip);
+          const statError = yield* $(
+            FS.isFileOrDirectory(filePath),
+            Effect.flip,
+          );
           expect(statError).toBeInstanceOf(StatError);
 
           yield* $(FS.mkdir(filePath, { recursive: true }));
 
-          const exists = yield* $(FS.fileOrDirExists(filePath));
+          const exists = yield* $(FS.isFileOrDirectory(filePath));
           expect(exists).toBe(true);
         }),
         Effect.provideContext(FSMock),
