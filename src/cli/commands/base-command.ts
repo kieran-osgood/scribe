@@ -83,25 +83,18 @@ If you think this might be a bug, please report it here: ${githubIssueUri}.\n\n`
               Cause.isAnnotatedType(result.cause) &&
               Cause.isFailType(result.cause.cause)
             ) {
-              let error =
-                result.cause.cause.error?.toString() ?? 'Unable to parse error';
+              const errorMessage =
+                extractNestedError(result.cause.cause) ||
+                'Unable to extract error.';
 
-              if (isWithError(result.cause.cause.error)) {
-                error = result.cause.cause.error.error.toString();
-
-                // lol...look into any helpers to recursively pretty print
-                if (isWithError(result.cause.cause.error.error)) {
-                  error = result.cause.cause.error.error.error.toString();
-                }
-              }
-
-              stdout.write(error);
+              stdout.write(errorMessage);
             } else {
               stdout.write(Cause.pretty(result.cause));
             }
           }
 
           yield* $(
+            // TODO: add exit to Process.Process
             Effect.sync(() => {
               if (process.env.NODE_ENV !== 'test') return process.exit(1);
             }),
@@ -125,14 +118,15 @@ If you think this might be a bug, please report it here: ${githubIssueUri}.\n\n`
   };
 }
 
-type ContainsError = {
-  error: Error;
-};
+const isWithError = (object: unknown): object is { error: Error } =>
+  Boolean(object) &&
+  typeof object === 'object' &&
+  Boolean((object as Record<string, unknown>)['error']);
 
-const isWithError = (object: unknown): object is ContainsError => {
-  return (
-    Boolean(object) &&
-    typeof object === 'object' &&
-    Boolean((object as Record<string, unknown>)['error'])
-  );
+const extractNestedError = (object: Cause.Fail<unknown> | Error): string => {
+  if (isWithError(object)) {
+    return extractNestedError(object.error);
+  }
+
+  return object?.toString?.();
 };
