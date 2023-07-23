@@ -35,9 +35,9 @@ Standardise bootstrapping your files with [Mustache](https://github.com/mustache
 ## Installation
 
 ```shell
-npm i -D scribe
-pnpm i -D scribe
-yarn add -D scribe
+npm i -D @kieran-osgood/scribe
+pnpm i -D @kieran-osgood/scribe
+yarn add -D @kieran-osgood/scribe
 ```
 ## Usage
 
