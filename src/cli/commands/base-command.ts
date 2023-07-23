@@ -55,12 +55,13 @@ export abstract class BaseCommand extends Command {
 
         if (result._tag === 'Failure') {
           const failOrCause = Cause.failureOrCause(result.cause);
-          const errorWasManaged = failOrCause._tag === 'Left';
+          const isDie =
+            failOrCause._tag === 'Left' || Runtime.isFiberFailure(failOrCause);
 
-          if (!errorWasManaged || Runtime.isFiberFailure(failOrCause)) {
+          if (!isDie) {
             stdout.write(
               `Unexpected Error
-Please report this with the attached error: ${githubIssueUri}.`,
+Please report this with the attached error: ${githubIssueUri}.\n\n`,
             );
           } else {
             stdout.write(
@@ -77,27 +78,29 @@ If you think this might be a bug, please report it here: ${githubIssueUri}.\n\n`
             );
           }
 
-          if (errorWasManaged) {
-            if (
-              !verbose &&
-              Cause.isAnnotatedType(result.cause) &&
-              Cause.isFailType(result.cause.cause)
-            ) {
-              const errorMessage =
-                extractNestedError(result.cause.cause) ||
-                'Unable to extract error.';
-
-              stdout.write(errorMessage);
-            } else {
-              stdout.write(Cause.pretty(result.cause));
-            }
+          if (
+            !verbose &&
+            Cause.isAnnotatedType(result.cause) &&
+            Cause.isFailType(result.cause.cause)
+          ) {
+            stdout.write(
+              extractNestedError(result.cause.cause) ||
+                'Unable to extract error.',
+            );
+          } else {
+            stdout.write(Cause.pretty(result.cause));
           }
 
           yield* $(
             // TODO: add exit to Process.Process
-            Effect.sync(() => {
-              if (process.env.NODE_ENV !== 'test') return process.exit(1);
-            }),
+            pipe(
+              Process.Process,
+              Effect.flatMap(_ =>
+                Effect.sync(() => {
+                  if (process.env.NODE_ENV !== 'test') return _.exit(1);
+                }),
+              ),
+            ),
           );
           return undefined;
         }
@@ -118,15 +121,15 @@ If you think this might be a bug, please report it here: ${githubIssueUri}.\n\n`
   };
 }
 
-const isWithError = (object: unknown): object is { error: Error } =>
+const hasErrorProperty = (object: unknown): object is { error: Error } =>
   Boolean(object) &&
   typeof object === 'object' &&
   Boolean((object as Record<string, unknown>)['error']);
 
 const extractNestedError = (object: Cause.Fail<unknown> | Error): string => {
-  if (isWithError(object)) {
+  if (hasErrorProperty(object)) {
     return extractNestedError(object.error);
   }
 
-  return object?.toString?.();
+  return object?.toString?.() ?? 'Error extraction failed';
 };
