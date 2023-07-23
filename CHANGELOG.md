@@ -1,5 +1,13 @@
 # @kieran-osgood/scribe
 
+## 0.3.0
+
+### Minor Changes
+
+- 557b452: (NEW): Init Command - bootstraps a basic `scribe.config.ts` file in the cwd.
+
+  Improves logging across all commands in error events.
+
 ## 0.2.0
 
 ### Minor Changes
