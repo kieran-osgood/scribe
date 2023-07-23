@@ -6,8 +6,8 @@ export default defineConfig({
   format: ['cjs', 'esm'],
   clean: true,
   silent: true,
-  // dts: true,
   env: {
     NODE_ENV: 'production',
   },
+  minify: 'terser', // ~171kb -> ~70kb
 });
