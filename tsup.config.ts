@@ -3,7 +3,7 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   // watch: true,
   treeshake: 'safest',
-  format: ['cjs', 'esm'],
+  format: ['cjs'],
   clean: true,
   silent: true,
   env: {
