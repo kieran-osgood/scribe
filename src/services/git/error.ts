@@ -1,16 +1,16 @@
-import { Data } from 'src/core';
+import { Data } from '@scribe/core';
 import { GitConstructError, GitError, StatusResult } from 'simple-git';
 
 export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
   readonly status: StatusResult;
-  readonly cause?: Error;
+  readonly error?: Error;
 }> {
   override toString(): string {
     switch (true) {
       case this.status?.isClean() === false:
         return '⚠️ Working directory not clean';
-      case this.cause instanceof GitError:
-        if (this.cause?.message.includes('not a git repository')) {
+      case this.error instanceof GitError:
+        if (this.error?.message.includes('not a git repository')) {
           return "You're not running within a git repository, continue?";
         }
         return 'Unknown Git error';
@@ -21,9 +21,9 @@ export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
 }
 
 export class SimpleGitError extends Data.TaggedClass('SimpleGitError')<{
-  readonly cause: GitConstructError;
+  readonly error: GitConstructError;
 }> {
   override toString() {
-    return this.cause.message;
+    return this.error.message;
   }
 }

@@ -1,12 +1,11 @@
-import { defineConfig } from 'vitest/config';
 import path from 'path';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
     globals: true,
     outputFile: process.env.CI ? '.github/tests/run.xml' : undefined,
     reporters: process.env.CI ? 'junit' : undefined,
-    setupFiles: ['./configs/vite/setup-fs'],
     watch: false,
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache', 'examples'],
     coverage: {
@@ -19,9 +18,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '@scribe/adapters': path.resolve(__dirname, 'src/adapters/index'),
       '@scribe/core': path.resolve(__dirname, 'src/core/index'),
       '@scribe/config': path.resolve(__dirname, 'src/config/index'),
-      '@scribe/prompt': path.resolve(__dirname, 'src/prompt/index'),
+      '@scribe/prompt': path.resolve(__dirname, 'src/inquirer/index'),
       '@scribe/git': path.resolve(__dirname, 'src/git/index'),
       '@scribe/commands': path.resolve(__dirname, 'src/commands/index'),
       '@scribe/fs': path.resolve(__dirname, 'src/common/fs/index'),

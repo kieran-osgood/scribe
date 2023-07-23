@@ -1,5 +1,6 @@
-import GitStatusError, { SimpleGitError } from '../error';
 import { GitConstructError, GitError, StatusResult } from 'simple-git';
+
+import GitStatusError, { SimpleGitError } from '../error';
 
 describe('GitStatusError', () => {
   describe('toString', () => {
@@ -13,7 +14,7 @@ describe('GitStatusError', () => {
     it('should warn if running in non-git repo', () => {
       const error = new GitStatusError({
         status: { isClean: () => true } as StatusResult,
-        cause: new GitError(
+        error: new GitError(
           // @ts-expect-error - Don't care about the implementation only message
           {},
           'not a git repository',
@@ -27,7 +28,7 @@ describe('GitStatusError', () => {
     it('should warn if GitError is thrown', () => {
       const error = new GitStatusError({
         status: { isClean: () => true } as StatusResult,
-        cause: new GitError(),
+        error: new GitError(),
       });
       expect(error.toString()).toBe('Unknown Git error');
     });
@@ -51,7 +52,7 @@ describe('SimpleGitError', () => {
         {},
         'Git construct error',
       );
-      const error = new SimpleGitError({ cause });
+      const error = new SimpleGitError({ error: cause });
       expect(error.toString()).toBe('Git construct error');
     });
   });

@@ -3,11 +3,11 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   // watch: true,
   treeshake: 'safest',
-  format: ['cjs', 'esm'],
+  format: ['cjs'],
   clean: true,
   silent: true,
-  // dts: true,
   env: {
     NODE_ENV: 'production',
   },
+  minify: 'terser', // ~171kb -> ~70kb
 });

@@ -1,9 +1,12 @@
-import type { ScribeConfig } from '@scribe/config';
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`_Cli > Init Command > should fail if file doesn't exist 2`] = `
+"import type { ScribeConfig } from '@scribe/config';
 
 const config = {
   options: {
     rootOutDir: '.',
-    templatesDirectories: ['./test-fixtures'],
+    templatesDirectories: ['./src/test-fixtures'],
   },
   templates: {
     component: {
@@ -39,3 +42,20 @@ const config = {
 } satisfies ScribeConfig;
 
 export default config;
+"
+`;
+
+exports[`_Cli > Init Command > should write base config file 2`] = `
+"import { ScribeConfig } from './index.js';
+
+const BaseConfig = {
+  options: {
+    rootOutDir: '.',
+    templatesDirectories: ['.'],
+  },
+  templates: {},
+} satisfies ScribeConfig;
+
+export default BaseConfig;
+"
+`;

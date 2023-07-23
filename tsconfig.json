@@ -9,6 +9,7 @@
     "noImplicitOverride": true,
     "resolveJsonModule": true,
     "paths": {
+      "@scribe/adapters": ["src/adapters/index"],
       "@scribe/core": ["src/core/index"],
       "@scribe/config": ["src/config/index"],
       "@scribe/reader": ["src/reader/index"],
@@ -39,7 +40,11 @@
       }
     ]
   },
-  "exclude": ["examples/**/*.*"],
+  "include": [
+    ".eslintrc.js",
+    "."
+  ],
+  "exclude": ["examples"],
   "ts-node": {
     "swc": true,
     "require": ["tsconfig-paths/register"]

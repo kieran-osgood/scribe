@@ -1,163 +1,198 @@
 import * as CLI from '@scribe/cli';
-import { Effect, pipe } from 'src/core';
-import getStream from 'get-stream';
+import { Effect, pipe } from '@scribe/core';
 import { BaseContext } from 'clipanion/lib/advanced/Cli';
-import stripAnsi from 'strip-ansi';
+import * as fs from 'fs';
+import getStream from 'get-stream';
+import path from 'path';
 import { PassThrough, Writable } from 'stream';
+import stripAnsi from 'strip-ansi';
+import { test } from 'vitest';
+
 import { createMinimalProject } from '../../../e2e/fixtures';
 
-function createCtx(): BaseContext {
-  return {
-    stdout: new PassThrough(),
-    stdin: new PassThrough(),
-    env: process.env,
-    stderr: process.stderr,
-    colorDepth: 0,
-  };
-}
+const createCtx = (): BaseContext => ({
+  stdout: new PassThrough(),
+  stdin: new PassThrough(),
+  env: process.env,
+  stderr: process.stderr,
+  colorDepth: 0,
+});
 
-async function stringifyStdOut(stdout: Writable) {
-  return stripAnsi(await getStream(stdout));
-}
+type CliTestFixtures = {
+  cliCtx: BaseContext;
+};
+const CliTest = test.extend<CliTestFixtures>({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  cliCtx: async ({ task }, use) => {
+    const ctx = createCtx();
+    await use(ctx);
+  },
+});
+
+const parseWritable = (writeable: Writable) =>
+  Effect.tryPromise(async () => stripAnsi(await getStream(writeable)));
+
+type RunCliPromise = {
+  cliCtx: BaseContext;
+  args: string[];
+};
+const runCliPromise = ({ cliCtx, args }: RunCliPromise) =>
+  pipe(
+    Effect.gen(function* ($) {
+      yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
+      cliCtx.stdout.end();
+      return yield* $(parseWritable(cliCtx.stdout));
+    }),
+    Effect.runPromise,
+  );
 
 describe('_Cli', () => {
-  it('should warn on dirty git', async () => {
-    const projectRoot = createMinimalProject({
-      git: { init: true, dirty: true },
-    });
-    const ctx = createCtx();
+  describe('Default Command', () => {
+    CliTest('should warn on dirty git', async ({ cliCtx, expect }) => {
+      const projectRoot = createMinimalProject({
+        git: { init: true, dirty: true },
+      });
+      const args = [
+        '--template=screen',
+        '--name=Login',
+        `--config=${projectRoot}/scribe.config.ts`,
+        `--cwd=${projectRoot}`,
+      ];
 
-    return pipe(
-      Effect.gen(function* ($) {
+      const result = runCliPromise({ cliCtx, args });
+
+      expect(await result).toMatchInlineSnapshot(`
+            "We caught an error during execution, this probably isn't a bug.
+            Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
+
+            If you think this might be a bug, please report it here: https://github.com/kieran-osgood/scribe/issues/new.
+
+            You can enable verbose logging with --v, --verbose.
+
+            ⚠️ Working directory not clean"
+          `);
+    });
+
+    // TODO: fix logic so this test runs without the <rootDir>/scribe.config.ts
+    CliTest(
+      'should complete with --template --fileName and relative config path',
+      async ({ cliCtx, expect }) => {
+        const projectRoot = createMinimalProject({
+          git: { init: true, dirty: false },
+        });
+        const args = [
+          '--template=screen',
+          '--name=Login',
+          `--cwd=${projectRoot}`,
+        ];
+
+        const result = runCliPromise({ cliCtx, args });
+
+        expect(await result).toMatchInlineSnapshot(`
+            "✅  Success!
+            Output files:
+            - ${projectRoot}/examples/src/screens/Login.ts
+            - ${projectRoot}/examples/src/screens/Login.test.ts
+            "
+          `);
+      },
+    );
+
+    CliTest(
+      'should complete with --template --fileName',
+      async ({ cliCtx, expect }) => {
+        const projectRoot = createMinimalProject({
+          git: { init: true, dirty: false },
+        });
         const args = [
           '--template=screen',
           '--name=Login',
           `--config=${projectRoot}/scribe.config.ts`,
           `--cwd=${projectRoot}`,
         ];
-        yield* $(CLI.run([...process.argv.slice(0, 2), ...args], ctx));
-        ctx.stdout.end();
-      }),
-      Effect.flatMap(() =>
-        Effect.tryPromise(async () => {
-          const result = await stringifyStdOut(ctx.stdout);
 
-          expect(result).toBe('⚠️ Working directory not clean\n');
-        }),
-      ),
-      Effect.runPromise,
-    );
-  });
+        const result = runCliPromise({ cliCtx, args });
 
-  it('should complete with --template --fileName and relative config path', async () => {
-    const projectRoot = createMinimalProject({
-      git: { init: true, dirty: false },
-    });
-    const ctx = createCtx();
-
-    return pipe(
-      Effect.gen(function* ($) {
-        const args = [
-          '--template=screen',
-          '--name=Login',
-          `--cwd=${projectRoot}`,
-        ];
-        yield* $(CLI.run([...process.argv.slice(0, 2), ...args], ctx));
-        ctx.stdout.end();
-        return projectRoot;
-      }),
-      Effect.flatMap(projectRoot =>
-        Effect.tryPromise(async () => {
-          const result = await stringifyStdOut(ctx.stdout);
-
-          expect(result).toMatchInlineSnapshot(`
+        expect(await result).toMatchInlineSnapshot(`
             "✅  Success!
             Output files:
             - ${projectRoot}/examples/src/screens/Login.ts
             - ${projectRoot}/examples/src/screens/Login.test.ts
-            Complete
             "
           `);
-        }),
-      ),
-      Effect.runPromise,
+      },
     );
   });
 
-  it('should complete with --template --fileName', async () => {
-    const projectRoot = createMinimalProject({
-      git: { init: true, dirty: false },
+  describe('Init Command', () => {
+    CliTest('should write base config file', async ({ cliCtx, expect }) => {
+      const projectRoot = createMinimalProject({
+        git: { init: true, dirty: false },
+        fixtures: {
+          configFile: false,
+          templateFiles: false,
+        },
+      });
+
+      const args = ['init', `--cwd=${projectRoot}`];
+
+      const result = runCliPromise({ cliCtx, args });
+
+      expect(await result).toMatchInlineSnapshot(
+        `"Scribe config created: ${projectRoot}/scribe.config.ts"`,
+      );
+
+      const file = fs.readFileSync(path.join(projectRoot, 'scribe.config.ts'));
+      expect(String(file)).toMatchSnapshot();
     });
-    const ctx = createCtx();
 
-    return pipe(
-      Effect.gen(function* ($) {
-        const args = [
-          '--template=screen',
-          '--name=Login',
-          `--config=${projectRoot}/scribe.config.ts`,
-          `--cwd=${projectRoot}`,
-        ];
-        yield* $(CLI.run([...process.argv.slice(0, 2), ...args], ctx));
-        ctx.stdout.end();
-        return projectRoot;
-      }),
-      Effect.flatMap(projectRoot =>
-        Effect.tryPromise(async () => {
-          const result = await stringifyStdOut(ctx.stdout);
+    CliTest("should fail if file doesn't exist", async ({ cliCtx, expect }) => {
+      const projectRoot = createMinimalProject({
+        git: { init: true, dirty: false },
+        fixtures: { configFile: true, templateFiles: false },
+      });
+      const args = ['init', `--cwd=${projectRoot}`];
 
-          expect(result).toMatchInlineSnapshot(`
-            "✅  Success!
-            Output files:
-            - ${projectRoot}/examples/src/screens/Login.ts
-            - ${projectRoot}/examples/src/screens/Login.test.ts
-            Complete
-            "
-          `);
-        }),
-      ),
-      Effect.runPromise,
-    );
+      const result = runCliPromise({ cliCtx, args });
+
+      expect(await result).toMatchInlineSnapshot(`
+              "We caught an error during execution, this probably isn't a bug.
+              Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
+
+              If you think this might be a bug, please report it here: https://github.com/kieran-osgood/scribe/issues/new.
+
+              You can enable verbose logging with --v, --verbose.
+
+              Error: File ${projectRoot}/scribe.config.ts already exists."
+            `);
+
+      const file = fs.readFileSync(path.join(projectRoot, 'scribe.config.ts'));
+      expect(String(file)).toMatchSnapshot();
+    });
   });
 
-  it('should print --help', async () => {
-    const ctx = createCtx();
+  describe('Help Command', () => {
+    CliTest('should print --help', async ({ cliCtx, expect }) => {
+      const args = ['--help'];
 
-    return pipe(
-      Effect.gen(function* ($) {
-        const args = ['--help'];
-        yield* $(CLI.run([...process.argv.slice(0, 2), ...args], ctx));
-        ctx.stdout.end();
-      }),
-      Effect.flatMap(() =>
-        Effect.tryPromise(async () => {
-          const result = await stringifyStdOut(ctx.stdout);
-          expect(result).toMatchInlineSnapshot(`
-            "Scribe generates files based on mustache templates.
+      const result = runCliPromise({ cliCtx, args });
 
-            ━━━ Usage ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      expect(await result).toMatchInlineSnapshot(`
+        "━━━ scribe ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          $ scribe <command>
 
-            $ scribe
+        ━━━ General commands ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-            ━━━ Options ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          scribe [-c,--config #0] [--verbose] [-n,--name #0] [-t,--template #0]
+            Scribe generates files based on mustache templates.
 
-              -c,--config #0      Path to the config (default: scribe.config.ts)
-              --verbose           More verbose logging and error stack traces
-              -n,--name #0        The key of templates to generate.
-              -t,--template #0    Specify the name of the template to generate. Must be a key under templates in config.
+          scribe init [-c,--config #0] [--verbose]
+            Generates a scribe.config.ts file.
 
-            ━━━ Examples ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-            Interactively select template to use
-              $ scribe
-
-            Select via args
-              $ scribe --template screen --name Login
-            "
-          `);
-        }),
-      ),
-      Effect.runPromise,
-    );
+        You can also print more details about any of these commands by calling them with 
+        the \`-h,--help\` flag right after the command name.
+        "
+      `);
+    });
   });
 });

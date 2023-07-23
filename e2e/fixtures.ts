@@ -1,8 +1,8 @@
 import spawnAsync, { SpawnOptions, SpawnResult } from '@expo/spawn-async';
-import path from 'path';
-import * as fs from 'fs';
-import * as tempy from 'tempy';
 import * as child_process from 'child_process';
+import * as fs from 'fs';
+import path from 'path';
+import * as tempy from 'tempy';
 
 const cliPath = path.join(process.cwd(), 'dist', 'index.js');
 
@@ -53,31 +53,49 @@ type CreateMinimalProjectOptions = {
     init: boolean;
     dirty: boolean;
   };
+  fixtures?: {
+    configFile: boolean;
+    templateFiles: boolean;
+  };
 };
+const defaultMinimalProjectOptions = {
+  fixtures: {
+    configFile: true,
+    templateFiles: true,
+  },
+  git: { init: true, dirty: false },
+} satisfies CreateMinimalProjectOptions;
 
-export function createMinimalProject(
-  options: CreateMinimalProjectOptions = { git: { init: true, dirty: false } },
-) {
+export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
+  const options = { ...defaultMinimalProjectOptions, ..._options };
+
   const projectRoot = tempy.temporaryDirectory();
-  const testPath = path.join(projectRoot, 'test-fixtures');
+  const testPath = path.join(projectRoot, 'src', 'test-fixtures');
   fs.mkdirSync(testPath, { recursive: true });
 
-  copyFileToPath(
-    projectRoot,
-    path.join(projectRoot, 'scribe.config.ts'),
-    './test-fixtures/scribe.config.ts',
-  );
-  copyFileToPath(
-    projectRoot,
-    path.join(testPath, `screen.scribe`),
-    './test-fixtures/screen.scribe',
-  );
-  copyFileToPath(
-    projectRoot,
-    path.join(testPath, 'screen.test.scribe'),
-    // TODO: WE'RE READING THE WRONG FILE
-    './test-fixtures/screen.scribe',
-  );
+  // Allows git commit to pass even when fixtures are all off
+  fs.writeFileSync(path.join(projectRoot, 'dummyfile'), 'dummy');
+
+  if (options.fixtures?.configFile) {
+    copyFileToPath(
+      projectRoot,
+      path.join(projectRoot, 'scribe.config.ts'),
+      './src/test-fixtures/scribe.config.ts',
+    );
+  }
+  if (options.fixtures?.templateFiles) {
+    copyFileToPath(
+      projectRoot,
+      path.join(testPath, `screen.scribe`),
+      './src/test-fixtures/screen.scribe',
+    );
+    copyFileToPath(
+      projectRoot,
+      path.join(testPath, 'screen.test.scribe'),
+      // TODO: WE'RE READING THE WRONG FILE
+      './src/test-fixtures/screen.scribe',
+    );
+  }
 
   if (options?.git?.init) {
     const execOpts = {

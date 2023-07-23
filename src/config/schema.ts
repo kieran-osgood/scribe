@@ -1,4 +1,4 @@
-import { S } from 'src/core';
+import { S } from '@scribe/core';
 
 const Template = S.struct({
   templateFileKey: S.string,

@@ -1,4 +1,5 @@
-import { S } from 'src/core';
+import { S } from '@scribe/core';
+
 import { ScribeConfig } from '../schema';
 
 describe('Config', () => {

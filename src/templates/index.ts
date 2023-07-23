@@ -1,20 +1,18 @@
-import { render } from 'template-file';
-import path from 'path';
-
-import { Effect, flow, pipe, RA } from 'src/core';
-import * as FS from 'src/services/fs';
+import { TemplateFile } from '@scribe/adapters';
 import { Template } from '@scribe/config';
+import { Effect, pipe, RA } from '@scribe/core';
+import { FS, Process } from '@scribe/services';
+import path from 'path';
+import { render } from 'template-file';
 
-import { promptUserForMissingArgs } from '../context';
-import { TemplateFileError } from './error';
-import { Process } from '@scribe/services';
+import { DefaultCommand } from '../cli/commands';
 
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   return Effect.gen(function* ($) {
     const {
-      templateOutput: { templateFileKey },
+      output: { templateFileKey },
     } = ctx;
-    // should report if templatesDirectories isn't a dir?
+    // TODO: should report if templatesDirectories isn't a dir?
     const templateDirs = ctx.config.options?.templatesDirectories ?? [''];
     const cwd = (yield* $(Process.Process)).cwd();
 
@@ -25,38 +23,26 @@ function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   });
 }
 
-export type Ctx = Effect.Effect.Success<
-  ReturnType<typeof promptUserForMissingArgs>
->;
+type PromptUserForMissingArgs = InstanceType<
+  typeof DefaultCommand
+>['promptUserForMissingArgs'];
+export type Ctx = Effect.Effect.Success<ReturnType<PromptUserForMissingArgs>>;
 
-export type ConstructTemplateCtx = Ctx & { templateOutput: Template };
+export type ConstructTemplateCtx = Ctx & { output: Template };
 
 export function constructTemplate(ctx: ConstructTemplateCtx) {
   return pipe(
     createAbsFilePaths(ctx),
-    Effect.flatMap(
-      flow(
-        RA.map(_ =>
-          pipe(
-            FS.readFile(_, null), //
-            Effect.map(String),
-          ),
-        ),
+    Effect.flatMap(_ =>
+      pipe(
+        _,
+        RA.map(_ => pipe(FS.readFile(_, null), Effect.map(String))),
         Effect.all,
       ),
     ),
     Effect.map(
-      RA.map(_ =>
-        Effect.tryCatch(
-          () =>
-            // extract renderFile to effectify
-            render(_, {
-              Name: ctx.input.name,
-              //   ...ctx.input.variables
-            }),
-          cause => new TemplateFileError({ cause }),
-        ),
-      ),
+      // TODO: spread in ctx.input.variables
+      RA.map(_ => TemplateFile.render(_, { Name: ctx.input.name })),
     ),
     Effect.flatMap(Effect.all),
     Effect.map(
@@ -68,19 +54,16 @@ export function constructTemplate(ctx: ConstructTemplateCtx) {
 
 export type WriteTemplateCtx = Ctx & {
   fileContents: string;
-  templateOutput: Template;
+  output: Template;
 };
 export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
     const _process = yield* $(Process.Process);
-    const fileName = render(_.templateOutput.output.fileName, {
+    const fileName = render(_.output.output.fileName, {
       Name: _.input.name,
     });
 
-    const relativeFilePaths = path.join(
-      _.templateOutput.output.directory,
-      fileName,
-    );
+    const relativeFilePaths = path.join(_.output.output.directory, fileName);
 
     const absoluteFilePath = path.join(_process.cwd(), relativeFilePaths);
 

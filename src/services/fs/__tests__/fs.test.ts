@@ -1,11 +1,20 @@
-import { Context, Effect, pipe } from 'src/core';
-import * as memfs from 'memfs';
-import { vol } from 'memfs';
-import path from 'path';
+import { Context, Effect, pipe } from '@scribe/core';
 import * as NFS from 'fs';
-import * as FS from '../fs';
+import * as memfs from 'memfs';
+import { DirectoryJSON, vol } from 'memfs';
+import path from 'path';
+
 import { MkDirError, ReadFileError, StatError, WriteFileError } from '../error';
-import { cwdAsJson } from '../../../../configs/vite/setup-fs';
+import * as FS from '../fs';
+
+/**
+ * Provides a JSON representation of the current working directory
+ * in the in-memory file system.
+ *
+ * @return {DirectoryJSON}
+ */
+export const cwdAsJson = (): DirectoryJSON =>
+  vol.toJSON(process.cwd(), undefined, true);
 
 const fileContents = 'super secret file';
 
@@ -86,12 +95,15 @@ describe('fs', () => {
       pipe(
         Effect.gen(function* ($) {
           const filePath = './mkdir/nested/path';
-          const statError = yield* $(FS.fileOrDirExists(filePath), Effect.flip);
+          const statError = yield* $(
+            FS.isFileOrDirectory(filePath),
+            Effect.flip,
+          );
           expect(statError).toBeInstanceOf(StatError);
 
           yield* $(FS.mkdir(filePath, { recursive: true }));
 
-          const exists = yield* $(FS.fileOrDirExists(filePath));
+          const exists = yield* $(FS.isFileOrDirectory(filePath));
           expect(exists).toBe(true);
         }),
         Effect.provideContext(FSMock),
@@ -132,7 +144,7 @@ describe('writeFileWithDir', () => {
       Effect.gen(function* ($) {
         const filePath = './path/to/some/long/path/template5.txt';
 
-        const result = yield $(
+        const result = yield* $(
           FS.writeFileWithDir(filePath, fileContents, null),
         );
         expect(result).toBe(filePath);

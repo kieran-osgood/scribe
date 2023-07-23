@@ -1,4 +1,9 @@
-import { Effect, pipe, RA } from 'src/core';
+import { Effect, pipe, RA } from '@scribe/core';
+import { FS, Process } from '@scribe/services';
+import * as memfs from 'memfs';
+import { vol } from 'memfs';
+import path from 'path';
+
 import {
   constructTemplate,
   ConstructTemplateCtx,
@@ -6,11 +11,6 @@ import {
   writeTemplate,
   WriteTemplateCtx,
 } from '../index';
-import * as FS from 'src/services/fs';
-import * as memfs from 'memfs';
-import { vol } from 'memfs';
-import path from 'path';
-import { Process } from '@scribe/services';
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -24,7 +24,7 @@ const screenFileContents = `describe('{{Name}}', function() {
 
 beforeEach(() => {
   vol.mkdirSync(process.cwd(), { recursive: true });
-  vol.mkdirSync(path.join(process.cwd(), './test-fixtures'), {
+  vol.mkdirSync(path.join(process.cwd(), './src/test-fixtures'), {
     recursive: true,
   });
 });
@@ -32,7 +32,7 @@ afterEach(() => vol.reset());
 
 const mockConfig = {
   options: {
-    templatesDirectories: ['test-fixtures'],
+    templatesDirectories: ['src/test-fixtures'],
     rootOutDir: '',
   },
   templates: {
@@ -41,14 +41,14 @@ const mockConfig = {
         {
           templateFileKey: 'screen',
           output: {
-            directory: 'test-fixtures/config',
+            directory: 'src/test-fixtures/config',
             fileName: '{{Name}}.ts',
           },
         },
         {
           templateFileKey: 'screen.test',
           output: {
-            directory: 'test-fixtures/config',
+            directory: 'src/test-fixtures/config',
             fileName: '{{Name}}.test.ts',
           },
         },
@@ -65,14 +65,14 @@ const _ctx = {
     template: 'screen',
     name: 'login',
   },
-  templateKeys: ['screen'],
+  templates: ['screen'],
 } satisfies Ctx;
 
 const templateOutput = {
   templateFileKey: 'screen',
   output: {
     fileName: '{{Name}}.ts', // good-scribe
-    directory: 'test-fixtures/config',
+    directory: 'src/test-fixtures/config',
   },
 };
 
@@ -82,22 +82,23 @@ describe('writeTemplate', () => {
       Effect.gen(function* ($) {
         const ctx = {
           fileContents,
-          templateOutput,
+          output: templateOutput,
           ..._ctx,
         } satisfies WriteTemplateCtx;
-        const res = writeTemplate(ctx);
-        const result = yield* $(res);
+        const result = yield* $(writeTemplate(ctx));
+        const _process = yield* $(Process.Process);
         expect(result).toBe(
-          path.join(process.cwd(), '/test-fixtures/config/login.ts'),
+          path.join(_process.cwd(), '/src/test-fixtures/config/login.ts'),
         );
 
         const readResult = yield* $(
-          FS.readFile('test-fixtures/config/login.ts', null),
+          FS.readFile('src/test-fixtures/config/login.ts', null),
         );
         expect(String(readResult)).toBe(fileContents);
       }),
-      FS.FSMock,
-      Process.ProcessLive,
+      Effect.provideService(FS.FS, FS.FSMock),
+      // TODO: ProcessLive in use?
+      Effect.provideService(Process.Process, Process.ProcessLive),
       Effect.runPromise,
     ));
 });
@@ -107,7 +108,7 @@ describe('constructTemplate', () => {
     pipe(
       Effect.gen(function* ($) {
         const ctx = {
-          templateOutput: {
+          output: {
             templateFileKey: 'screen',
             output: {
               fileName: '{{Name}}.ts', // good-scribe
@@ -119,7 +120,7 @@ describe('constructTemplate', () => {
 
         yield* $(
           FS.writeFileWithDir(
-            path.join(process.cwd(), './test-fixtures/screen.scribe'),
+            path.join(process.cwd(), './src/test-fixtures/screen.scribe'),
             screenFileContents,
             null,
           ),
@@ -140,8 +141,8 @@ describe('constructTemplate', () => {
           ]
         `);
       }),
-      FS.FSMock,
-      Process.ProcessLive,
+      Effect.provideService(FS.FS, FS.FSMock),
+      Effect.provideService(Process.Process, Process.ProcessLive),
       Effect.runPromise,
     ));
 
@@ -150,7 +151,7 @@ describe('constructTemplate', () => {
       Effect.gen(function* ($) {
         const ctx = {
           ..._ctx,
-          templateOutput: {
+          output: {
             templateFileKey: 'screen',
             output: {
               fileName: '{{Name}}.ts',
@@ -180,8 +181,8 @@ describe('constructTemplate', () => {
           ]
         `);
       }),
-      FS.FSMock,
-      Process.ProcessLive,
+      Effect.provideService(FS.FS, FS.FSMock),
+      Effect.provideService(Process.Process, Process.ProcessLive),
       Effect.runPromise,
     ));
 
@@ -189,7 +190,7 @@ describe('constructTemplate', () => {
     pipe(
       Effect.gen(function* ($) {
         const ctx = {
-          templateOutput: {
+          output: {
             templateFileKey: 'BADKEY',
             output: {
               fileName: '', // good-scribe
@@ -203,8 +204,8 @@ describe('constructTemplate', () => {
 
         expect(result).toBeInstanceOf(FS.ReadFileError);
       }),
-      FS.FSMock,
-      Process.ProcessMock,
+      Effect.provideService(FS.FS, FS.FSMock),
+      Effect.provideService(Process.Process, Process.ProcessLive),
       Effect.runPromise,
     ));
 });

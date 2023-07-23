@@ -1,9 +1,11 @@
-import * as NFS from 'fs';
-import path from 'path';
-import { MkDirError, ReadFileError, StatError, WriteFileError } from './error';
 import { Abortable } from 'node:events';
-import { Context, Effect, pipe } from 'src/core';
+
+import { Context, Effect, pipe } from '@scribe/core';
+import * as NFS from 'fs';
 import * as memfs from 'memfs';
+import path from 'path';
+
+import { MkDirError, ReadFileError, StatError, WriteFileError } from './error';
 
 export interface FS {
   writeFile: typeof NFS.writeFile;
@@ -15,11 +17,12 @@ export interface FS {
 }
 
 export const FS = Context.Tag<FS>();
-export const FSLive = Effect.provideService(FS, NFS);
-export const FSMock = Effect.provideService(
-  FS,
-  memfs.fs as unknown as typeof NFS,
-);
+export const FSLive = NFS;
+export const FSMock = memfs.fs as unknown as typeof NFS;
+
+export const getFS = (test: boolean) => {
+  return test ? FSMock : FSLive;
+};
 
 export const writeFile = (
   file: NFS.PathOrFileDescriptor,
@@ -112,12 +115,28 @@ export const stat = (path: string) =>
     ),
   );
 
-export const fileOrDirExists = (
+export const isFileOrDirectory = (
   pathLike: string,
 ): Effect.Effect<FS, StatError, boolean> =>
   pipe(
     stat(pathLike),
     Effect.map(_ => _.isFile() || _.isDirectory()),
+  );
+
+export const isFile = (
+  pathLike: string,
+): Effect.Effect<FS, StatError, boolean> =>
+  pipe(
+    stat(pathLike),
+    Effect.map(_ => _.isFile()),
+  );
+
+export const isDirectory = (
+  pathLike: string,
+): Effect.Effect<FS, StatError, boolean> =>
+  pipe(
+    stat(pathLike),
+    Effect.map(_ => _.isDirectory()),
   );
 
 // export const open = (
