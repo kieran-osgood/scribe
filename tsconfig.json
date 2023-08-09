@@ -6,6 +6,7 @@
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
     "outDir": "dist",
+    "declaration": true,
     "noImplicitOverride": true,
     "resolveJsonModule": true,
     "paths": {
@@ -27,6 +28,7 @@
     "esModuleInterop": true,
     // Eases ESM support
     "types": ["node", "vitest/globals"],
+
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "plugins": [
@@ -44,7 +46,7 @@
     ".eslintrc.js",
     "."
   ],
-  "exclude": ["examples"],
+  "exclude": ["examples", "public/base.ts", "dist"],
   "ts-node": {
     "swc": true,
     "require": ["tsconfig-paths/register"]
