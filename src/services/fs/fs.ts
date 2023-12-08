@@ -81,11 +81,9 @@ export const readFile = (
 export const mkdir = (
   file: NFS.PathLike,
   options: NFS.MakeDirectoryOptions & {
-    recursive: true;
+    recursive: boolean;
   } = {
-    // TODO!!!! Check mode
-    mode: 0,
-    recursive: true,
+    recursive: false,
   },
 ): Effect.Effect<FS, MkDirError, string | undefined> =>
   pipe(
@@ -107,15 +105,15 @@ export const stat = (path: string) =>
   pipe(
     FS,
     Effect.flatMap(fs =>
-      Effect.async<FS, StatError, NFS.Stats>(resume =>
-        { fs.stat(path, (error, stats) => {
+      Effect.async<FS, StatError, NFS.Stats>(resume => {
+        fs.stat(path, (error, stats) => {
           if (error) {
             resume(Effect.fail(new StatError({ path, error })));
           } else {
             resume(Effect.succeed(stats));
           }
-        }); },
-      ),
+        });
+      }),
     ),
   );
 

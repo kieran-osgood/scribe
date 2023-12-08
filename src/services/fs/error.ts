@@ -48,7 +48,7 @@ export class MkDirError extends FSError('MkDirError')<{
   readonly error: NodeJS.ErrnoException;
   readonly file: NFS.PathLike;
   readonly options?: NFS.MakeDirectoryOptions & {
-    recursive: true;
+    recursive: boolean;
   };
 }> {}
 

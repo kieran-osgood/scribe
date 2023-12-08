@@ -1,4 +1,5 @@
 import { Schema as S } from '@effect/schema';
+import { Effect, pipe } from 'effect';
 
 import { ScribeConfig } from '../schema';
 
@@ -21,7 +22,7 @@ describe('Config', () => {
       },
     };
 
-    const result = S.parse(ScribeConfig)(config);
+    const result = Effect.runSync(S.parse(ScribeConfig)(config));
     expect(result).toMatchInlineSnapshot(`
         {
           "options": {
@@ -48,7 +49,9 @@ describe('Config', () => {
   });
 
   it('throws with invalid config', () => {
-    expect(() => S.parse(ScribeConfig)({})).toThrowErrorMatchingInlineSnapshot(`
+    const result = Effect.runSync(pipe(S.parse(ScribeConfig)({}), Effect.flip));
+
+    expect(String(result)).toMatchInlineSnapshot(`
         "error(s) found
         └─ [\\"templates\\"]
            └─ is missing"
