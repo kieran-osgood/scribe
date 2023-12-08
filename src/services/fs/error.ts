@@ -1,6 +1,6 @@
 import { Abortable } from 'node:events';
 
-import { Data } from '@scribe/core';
+import { Data } from 'effect';
 import * as fs from 'fs';
 import NFS from 'fs';
 

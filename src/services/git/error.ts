@@ -1,4 +1,4 @@
-import { Data } from '@scribe/core';
+import { Data } from 'effect';
 import { GitConstructError, GitError, StatusResult } from 'simple-git';
 
 export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
@@ -7,7 +7,7 @@ export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
 }> {
   override toString(): string {
     switch (true) {
-      case this.status?.isClean() === false:
+      case !(this.status.isClean()):
         return '⚠️ Working directory not clean';
       case this.error instanceof GitError:
         if (this.error?.message.includes('not a git repository')) {

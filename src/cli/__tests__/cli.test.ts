@@ -1,6 +1,6 @@
 import * as CLI from '@scribe/cli';
-import { Effect, pipe } from '@scribe/core';
 import { BaseContext } from 'clipanion/lib/advanced/Cli';
+import { Effect, pipe } from 'effect';
 import * as fs from 'fs';
 import getStream from 'get-stream';
 import path from 'path';
@@ -36,7 +36,7 @@ type RunCliPromise = {
   cliCtx: BaseContext;
   args: string[];
 };
-const runCliPromise = ({ cliCtx, args }: RunCliPromise) =>
+const runCliPromise = async ({ cliCtx, args }: RunCliPromise) =>
   pipe(
     Effect.gen(function* ($) {
       yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));

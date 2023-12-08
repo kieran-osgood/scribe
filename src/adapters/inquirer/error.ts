@@ -1,6 +1,6 @@
-import { TaggedClass } from '@scribe/core';
+import { Data } from 'effect';
 
-export class PromptError extends TaggedClass('PromptError')<{
+export class PromptError extends Data.TaggedClass('PromptError')<{
   readonly message: string;
   readonly cause?: unknown;
 }> {

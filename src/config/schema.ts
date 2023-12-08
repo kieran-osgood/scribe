@@ -1,4 +1,4 @@
-import { S } from '@scribe/core';
+import * as S from '@effect/schema/Schema';
 
 const Template = S.struct({
   templateFileKey: S.string,
@@ -8,7 +8,7 @@ const Template = S.struct({
   }),
 });
 
-export type Template = S.To<typeof Template>;
+export type Template = S.Schema.To<typeof Template>;
 
 const TemplateSettings = S.struct({
   output: S.optional(
@@ -19,7 +19,7 @@ const TemplateSettings = S.struct({
   outputs: S.array(Template),
 });
 
-export type TemplateSettings = S.To<typeof TemplateSettings>;
+export type TemplateSettings = S.Schema.To<typeof TemplateSettings>;
 
 export const ScribeConfig = S.struct({
   /**
@@ -43,4 +43,4 @@ export const ScribeConfig = S.struct({
    */
   templates: S.record(S.string, TemplateSettings),
 });
-export type ScribeConfig = S.To<typeof ScribeConfig>;
+export type ScribeConfig = S.Schema.To<typeof ScribeConfig>;

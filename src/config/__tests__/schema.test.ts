@@ -1,4 +1,4 @@
-import { S } from '@scribe/core';
+import { Schema as S } from '@effect/schema';
 
 import { ScribeConfig } from '../schema';
 

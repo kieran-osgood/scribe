@@ -1,5 +1,5 @@
-import { TaggedClass } from '@scribe/core';
+import { Data } from 'effect';
 
-export class CliError extends TaggedClass('CliError')<{
+export class CliError extends Data.TaggedClass('CliError')<{
   readonly cause?: unknown;
 }> {}
