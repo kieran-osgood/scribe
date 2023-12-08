@@ -84,6 +84,7 @@ describe('_Cli', () => {
           '--template=screen',
           '--name=Login',
           `--cwd=${projectRoot}`,
+          '--verbose',
         ];
 
         const result = runCliPromise({ cliCtx, args });

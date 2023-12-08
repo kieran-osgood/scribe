@@ -5,7 +5,14 @@ import * as Config from '@scribe/config';
 import { FS, Git, Process } from '@scribe/services';
 import { Command, Option } from 'clipanion';
 import { green } from 'colorette';
-import { Effect, pipe, ReadonlyArray, ReadonlyRecord } from 'effect';
+import {
+  Data,
+  Effect,
+  Option as O,
+  pipe,
+  ReadonlyArray,
+  ReadonlyRecord,
+} from 'effect';
 import { PathOrFileDescriptor } from 'fs';
 import { QuestionCollection } from 'inquirer';
 import path from 'path';
@@ -57,7 +64,7 @@ export class DefaultCommand extends BaseCommand {
           launchPrompt({ templates, flags: { name, template } }),
         );
 
-        const config = yield* $(Config.readConfig(configPath));
+        const config = yield* $(Config.readConfig(_configPath));
         return { config, input, templates } as const;
       }),
       Effect.tap(_ =>
@@ -103,16 +110,13 @@ export class DefaultCommand extends BaseCommand {
       message: 'Pick your template',
       choices: options.templates,
       when: () =>
-        !options.flags.template ||
-        typeof options.flags.template !== 'string',
+        !options.flags.template || typeof options.flags.template !== 'string',
     },
     {
       name: 'name',
       type: 'input',
       message: 'File name:',
-      when: () =>
-        !options.flags.name ||
-        typeof options.flags.name !== 'string',
+      when: () => !options.flags.name || typeof options.flags.name !== 'string',
       validate: (s: string) => {
         if (/^([A-Za-z\-_\d])+$/.test(s)) return true;
         return 'File name may only include letters, numbers & underscores.';
@@ -134,11 +138,8 @@ export class DefaultCommand extends BaseCommand {
     pipe(
       // TODO: add ignore git
       Git.checkWorkingTreeClean(),
-      id => id,
       Effect.flatMap(() => this.promptUserForMissingArgs()),
-      id => id,
       Effect.flatMap(writeAllTemplates),
-      id => id,
       Effect.map(this.print),
     );
 }
@@ -149,20 +150,23 @@ export class DefaultCommand extends BaseCommand {
 export const writeAllTemplates = (ctx: Ctx) =>
   pipe(
     ReadonlyRecord.get(ctx.input.template)(ctx.config.templates),
-    Effect.flatMap(_ =>
-      pipe(
-        _.outputs,
-        ReadonlyArray.map(output =>
-          pipe(
-            constructTemplate({ output, ...ctx }),
-            Effect.map(ReadonlyArray.map(writeTemplate)),
-            Effect.flatMap(Effect.all),
-          ),
-        ),
-        Effect.all,
-        Effect.map(ReadonlyArray.flatten),
+    O.getOrThrowWith(() =>
+      Effect.fail(
+        new GetTemplateError({
+          cause: `Template Missing: ${ctx.input.template}`,
+        }),
       ),
     ),
+    _ => _.outputs,
+    ReadonlyArray.map(output =>
+      pipe(
+        constructTemplate({ output, ...ctx }),
+        Effect.map(ReadonlyArray.map(writeTemplate)),
+        Effect.flatMap(Effect.all),
+      ),
+    ),
+    Effect.all,
+    Effect.map(ReadonlyArray.flatten),
   );
 
 export const createConfigPathAbsolute = (filePath: string) =>
@@ -182,3 +186,7 @@ export const createConfigPathAbsolute = (filePath: string) =>
       }),
     ),
   );
+
+export class GetTemplateError extends Data.TaggedClass('GetTemplateError')<{
+  readonly cause?: string;
+}> {}

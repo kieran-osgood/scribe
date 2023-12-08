@@ -1,6 +1,14 @@
 import { FS, Process } from '@scribe/services';
 import { Command, Option } from 'clipanion';
-import { Cause, Context, Effect, pipe, Runtime } from 'effect';
+import {
+  Cause,
+  Context,
+  Effect,
+  Logger,
+  LogLevel,
+  pipe,
+  Runtime,
+} from 'effect';
 import { Writable } from 'stream';
 import * as t from 'typanion';
 
@@ -14,21 +22,6 @@ export abstract class BaseCommand extends Command {
   verbose = Option.Boolean('--verbose', false, {
     description: 'More verbose logging and error stack traces',
   });
-
-  // eslint-disable-next-line @typescript-eslint/no-useless-constructor
-  constructor() {
-    super();
-
-    // if (process.env.NODE_ENV === 'production') {
-    //   runtimeDebug.minumumLogLevel = 'Info';
-    //   runtimeDebug.tracingEnabled = false;
-    // }
-    //
-    // if (this.verbose) {
-    //   runtimeDebug.minumumLogLevel = 'All';
-    //   runtimeDebug.tracingEnabled = true;
-    // }
-  }
 
   abstract executeSafe: () => Effect.Effect<
     Process.Process | FS.FS,
@@ -78,18 +71,18 @@ If you think this might be a bug, please report it here: ${githubIssueUri}.\n\n`
             );
           }
 
-          // if (
-          //   !verbose &&
-          //   Cause.isAnnotatedType(result.cause) &&
-          //   Cause.isFailType(result.cause.cause)
-          // ) {
-          //   stdout.write(
-          //     extractNestedError(result.cause.cause) ||
-          //       'Unable to extract error.',
-          //   );
-          // } else {
-          //   stdout.write(Cause.pretty(result.cause));
-          // }
+          if (
+            !verbose &&
+            Cause.isFailType(result.cause)
+            // Cause.isFailType(result.cause.cause)
+          ) {
+            stdout.write(
+              extractNestedError(result.cause.error) ||
+                'Unable to extract error.',
+            );
+          } else {
+            stdout.write(Cause.pretty(result.cause));
+          }
 
           yield* $(
             // TODO: add exit to Process.Process
@@ -108,28 +101,41 @@ If you think this might be a bug, please report it here: ${githubIssueUri}.\n\n`
         return result.value;
       });
 
+  private setLogLevel = () => {
+    if (process.env.NODE_ENV === 'production') {
+      return Logger.withMinimumLogLevel(LogLevel.Info);
+    }
+    if (this.verbose) {
+      return Logger.withMinimumLogLevel(LogLevel.All);
+    }
+
+    return Logger.withMinimumLogLevel(LogLevel.Debug);
+  };
+
   execute = async (): Promise<void> => {
     return pipe(
       this.executeSafe(),
+      this.setLogLevel(),
       this.handleExecutionResult({
         stdout: this.context.stdout,
         verbose: this.verbose,
       }),
       Effect.provide(this.createContext()),
+
       Effect.runPromise,
     );
   };
 }
 
-// const hasErrorProperty = (object: unknown): object is { error: Error } =>
-//   Boolean(object) &&
-//   typeof object === 'object' &&
-//   Boolean((object as Record<string, unknown>)['error']);
+const hasErrorProperty = (object: unknown): object is { error: Error } =>
+  Boolean(object) &&
+  typeof object === 'object' &&
+  Boolean((object as Record<string, unknown>).error);
 
-// const extractNestedError = (object: Cause.Fail<unknown> | Error): string => {
-//   if (hasErrorProperty(object)) {
-//     return extractNestedError(object.error);
-//   }
-//
-//   return object?.toString?.() ?? 'Error extraction failed';
-// };
+const extractNestedError = (object: unknown): string => {
+  if (hasErrorProperty(object)) {
+    return extractNestedError(object.error);
+  }
+
+  return object?.toString() ?? 'Error extraction failed';
+};
