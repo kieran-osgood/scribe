@@ -22,7 +22,9 @@ export const readConfig = (path: string) =>
         // TODO: if path - load, !path - search
         async () => getCosmicExplorer().load(path),
       catch: _ =>
-        new CosmicConfigError({ error: `[read config failed] ${String(_)}` }),
+        new CosmicConfigError({
+          error: `[read config failed] ${path} - ${String(_)}`,
+        }),
     }),
     Effect.flatMap(extractConfig),
     Effect.flatMap(Schema.parse(ScribeConfig)),

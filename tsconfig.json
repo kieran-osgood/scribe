@@ -16,7 +16,7 @@
       "bun-types"
     ],
     "lib": ["ESNext"],
-    "target": "ES2022",
+    "target": "ESNext",
 //    "target": "ES2022",
     "paths": {
       "@scribe/adapters": [

@@ -3,8 +3,6 @@ import { Effect } from 'effect';
 
 import { DefaultCommand, InitCommand } from './commands';
 
-// import { DefaultCommand, InitCommand } from './commands';
-
 export async function _Cli(
   args: string[],
   contextOverrides?: Partial<unknown>,
