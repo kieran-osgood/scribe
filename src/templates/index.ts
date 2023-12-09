@@ -3,9 +3,9 @@ import { Template } from '@scribe/config';
 import { FS, Process } from '@scribe/services';
 import { Effect, pipe, ReadonlyArray } from 'effect';
 import path from 'path';
-import { render } from 'template-file';
 
 import { DefaultCommand } from '../cli/commands';
+import { render } from '../services/tf';
 
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   return Effect.gen(function* ($) {

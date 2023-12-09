@@ -3,6 +3,7 @@ import { Effect, pipe, ReadonlyArray as RA } from 'effect';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import path from 'path';
+import { afterEach, beforeEach, describe, it, vi } from 'vitest';
 
 import {
   constructTemplate,
@@ -28,7 +29,9 @@ beforeEach(() => {
     recursive: true,
   });
 });
-afterEach(() => { vol.reset(); });
+afterEach(() => {
+  vol.reset();
+});
 
 const mockConfig = {
   options: {

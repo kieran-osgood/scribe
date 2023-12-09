@@ -1,6 +1,6 @@
 import { pipe, String } from 'effect';
 import * as fc from 'fast-check';
-import { describe } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { fmtError } from '../error';
 

@@ -1,7 +1,7 @@
 import { FS, Process } from '@scribe/services';
 import { Effect, pipe } from 'effect';
 import * as memfs from 'memfs';
-import { test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import { createConfigPathAbsolute } from '../commands';
 

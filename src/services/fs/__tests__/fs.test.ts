@@ -3,6 +3,7 @@ import * as NFS from 'fs';
 import * as memfs from 'memfs';
 import { DirectoryJSON, vol } from 'memfs';
 import path from 'path';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MkDirError, ReadFileError, StatError, WriteFileError } from '../error';
 import * as FS from '../fs';
@@ -25,7 +26,9 @@ beforeEach(() => {
 beforeEach(() => {
   vol.mkdirSync(process.cwd(), { recursive: true });
 });
-afterEach(() => { vol.reset(); });
+afterEach(() => {
+  vol.reset();
+});
 
 export const FSMock = Context.make(FS.FS, memfs.fs as unknown as typeof NFS);
 

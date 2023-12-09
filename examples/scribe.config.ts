@@ -6,6 +6,42 @@ const config = {
     templatesDirectories: ['./examples'],
   },
   templates: {
+    model: {
+      outputs: [
+        {
+          templateFileKey: 'screen',
+          output: {
+            directory: 'examples/src/screens',
+            fileName: '{{Name}}.ts',
+          },
+        },
+        {
+          templateFileKey: 'screen.test',
+          output: {
+            directory: 'examples/src/screens',
+            fileName: '{{Name}}.test.ts',
+          },
+        },
+      ],
+    },
+    component: {
+      outputs: [
+        {
+          templateFileKey: 'screen',
+          output: {
+            directory: 'examples/src/screens',
+            fileName: '{{Name}}.ts',
+          },
+        },
+        {
+          templateFileKey: 'screen.test',
+          output: {
+            directory: 'examples/src/screens',
+            fileName: '{{Name}}.test.ts',
+          },
+        },
+      ],
+    },
     screen: {
       outputs: [
         {

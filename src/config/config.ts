@@ -11,7 +11,7 @@ import { ScribeConfig } from './schema';
 export const getCosmicExplorer = () =>
   cosmiconfig(PackageJson.name, {
     loaders: {
-      '.ts': TypeScriptLoader({ transpileOnly: true }),
+      '.ts': TypeScriptLoader(),
     },
   });
 
@@ -21,8 +21,8 @@ export const readConfig = (path: string) =>
       try:
         // TODO: if path - load, !path - search
         async () => getCosmicExplorer().load(path),
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      catch: _ => new CosmicConfigError({ error: `[read config failed] ${_}` }),
+      catch: _ =>
+        new CosmicConfigError({ error: `[read config failed] ${String(_)}` }),
     }),
     Effect.flatMap(extractConfig),
     Effect.flatMap(Schema.parse(ScribeConfig)),
@@ -34,6 +34,7 @@ export const readConfig = (path: string) =>
 export const checkForTemplates = (_: string[]) =>
   Effect.if({
     onTrue: Effect.succeed(_),
+    // TODO: improve error logging here - print out the config and point to the issue
     onFalse: Effect.fail(
       new CosmicConfigError({ error: 'No template options found' }),
     ),
