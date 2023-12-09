@@ -47,15 +47,16 @@ describe('Scribe Cli', () => {
 
       const cli = processPromise.child;
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (cli === null) {
         throw new Error('spawned process is null');
       }
       // cli.stderr?.pipe(process.stderr);
 
       cli.stdout?.on('data', (data: { toString(): string }) => {
-        if (/Pick your template/.test(data.toString())) {
+        if (data.toString().includes('Pick your template')) {
           cli.stdin?.write(`${arrowKey.down}\n`);
-        } else if (/File name/.test(data.toString())) {
+        } else if (data.toString().includes('File name')) {
           cli.stdin?.write('Login\n');
         } else {
           // console.log(data.toString());

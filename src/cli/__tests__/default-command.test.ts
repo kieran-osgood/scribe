@@ -1,11 +1,11 @@
-import { Effect, pipe } from '@scribe/core';
 import { FS, Process } from '@scribe/services';
+import { Effect, pipe } from 'effect';
 import * as memfs from 'memfs';
-import { test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import { createConfigPathAbsolute } from '../commands';
 
-const runEffect = ({
+const runEffect = async ({
   effect,
   dir,
 }: {

@@ -1,8 +1,9 @@
-import { Effect, pipe, RA } from '@scribe/core';
 import { FS, Process } from '@scribe/services';
+import { Effect, pipe, ReadonlyArray as RA } from 'effect';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import path from 'path';
+import { afterEach, beforeEach, describe, it, vi } from 'vitest';
 
 import {
   constructTemplate,
@@ -28,7 +29,9 @@ beforeEach(() => {
     recursive: true,
   });
 });
-afterEach(() => vol.reset());
+afterEach(() => {
+  vol.reset();
+});
 
 const mockConfig = {
   options: {
@@ -77,7 +80,7 @@ const templateOutput = {
 };
 
 describe('writeTemplate', () => {
-  it('should write file', () =>
+  it('should write file', async () =>
     pipe(
       Effect.gen(function* ($) {
         const ctx = {
@@ -104,7 +107,7 @@ describe('writeTemplate', () => {
 });
 
 describe('constructTemplate', () => {
-  it('should return fileContents formatted with variables', () =>
+  it('should return fileContents formatted with variables', async () =>
     pipe(
       Effect.gen(function* ($) {
         const ctx = {
@@ -146,7 +149,7 @@ describe('constructTemplate', () => {
       Effect.runPromise,
     ));
 
-  it('should check process root dir for templates', () =>
+  it('should check process root dir for templates', async () =>
     pipe(
       Effect.gen(function* ($) {
         const ctx = {
@@ -186,7 +189,7 @@ describe('constructTemplate', () => {
       Effect.runPromise,
     ));
 
-  it("should throw if scribe file isn't readable", () =>
+  it("should throw if scribe file isn't readable", async () =>
     pipe(
       Effect.gen(function* ($) {
         const ctx = {

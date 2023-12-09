@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
       - uses: pnpm/action-setup@v2
         with:
           version: 8.6.3
@@ -20,10 +21,10 @@ jobs:
           node-version: 19.7.0
           cache: "pnpm"
 
-      - run: pnpm install --frozen-lockfile
+      - run: bun i
 
       - name: Lint
-        run: pnpm run ci
+        run: bun ci
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3

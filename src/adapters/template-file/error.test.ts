@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { TemplateFileError } from './error';
 
 describe('error', () => {

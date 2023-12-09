@@ -1,9 +1,18 @@
+import { TreeFormatter } from '@effect/schema';
+import * as Schema from '@effect/schema/Schema';
 import { Inquirer, PromptError } from '@scribe/adapters';
 import * as Config from '@scribe/config';
-import { Effect, pipe, R, RA, S, TF } from '@scribe/core';
 import { FS, Git, Process } from '@scribe/services';
 import { Command, Option } from 'clipanion';
 import { green } from 'colorette';
+import {
+  Data,
+  Effect,
+  Option as O,
+  pipe,
+  ReadonlyArray,
+  ReadonlyRecord,
+} from 'effect';
 import { PathOrFileDescriptor } from 'fs';
 import { QuestionCollection } from 'inquirer';
 import path from 'path';
@@ -12,12 +21,12 @@ import * as t from 'typanion';
 import { constructTemplate, Ctx, writeTemplate } from '../../templates';
 import { BaseCommand } from './base-command';
 
-const Prompt = S.struct({
-  template: S.string,
-  name: S.string,
+const Prompt = Schema.struct({
+  template: Schema.string,
+  name: Schema.string,
 });
 
-export type Prompt = S.To<typeof Prompt>;
+export type Prompt = Schema.Schema.To<typeof Prompt>;
 type Flags = { template: string | undefined; name: string | undefined };
 
 export class DefaultCommand extends BaseCommand {
@@ -55,7 +64,7 @@ export class DefaultCommand extends BaseCommand {
           launchPrompt({ templates, flags: { name, template } }),
         );
 
-        const config = yield* $(Config.readConfig(configPath));
+        const config = yield* $(Config.readConfig(_configPath));
         return { config, input, templates } as const;
       }),
       Effect.tap(_ =>
@@ -79,10 +88,12 @@ export class DefaultCommand extends BaseCommand {
       })),
       Effect.flatMap(_ =>
         pipe(
-          S.parseEffect(Prompt)(_),
+          Schema.parse(Prompt)(_),
           Effect.catchTag('ParseError', error =>
             Effect.fail(
-              new PromptError({ message: TF.formatErrors(error.errors) }),
+              new PromptError({
+                message: TreeFormatter.formatErrors(error.errors),
+              }),
             ),
           ),
         ),
@@ -99,16 +110,13 @@ export class DefaultCommand extends BaseCommand {
       message: 'Pick your template',
       choices: options.templates,
       when: () =>
-        Boolean(options.flags.template) === false ||
-        typeof options.flags.template !== 'string',
+        !options.flags.template || typeof options.flags.template !== 'string',
     },
     {
       name: 'name',
       type: 'input',
       message: 'File name:',
-      when: () =>
-        Boolean(options.flags.name) === false ||
-        typeof options.flags.name !== 'string',
+      when: () => !options.flags.name || typeof options.flags.name !== 'string',
       validate: (s: string) => {
         if (/^([A-Za-z\-_\d])+$/.test(s)) return true;
         return 'File name may only include letters, numbers & underscores.';
@@ -119,8 +127,8 @@ export class DefaultCommand extends BaseCommand {
   print = (_: PathOrFileDescriptor[]) => {
     const results = pipe(
       _,
-      RA.map(s => `- ${String(s)}`),
-      RA.join('\n'),
+      ReadonlyArray.map(s => `- ${String(s)}`),
+      ReadonlyArray.join('\n'),
     );
     this.context.stdout.write(green(`✅  Success!\n`));
     this.context.stdout.write(`Output files:\n${results}\n`);
@@ -141,37 +149,44 @@ export class DefaultCommand extends BaseCommand {
  */
 export const writeAllTemplates = (ctx: Ctx) =>
   pipe(
-    R.get(ctx.input.template)(ctx.config.templates),
-    Effect.flatMap(_ =>
-      pipe(
-        _.outputs,
-        RA.map(output =>
-          pipe(
-            constructTemplate({ output, ...ctx }),
-            Effect.map(RA.map(writeTemplate)),
-            Effect.flatMap(Effect.all),
-          ),
-        ),
-        Effect.all,
-        Effect.map(RA.flatten),
+    ReadonlyRecord.get(ctx.input.template)(ctx.config.templates),
+    O.getOrThrowWith(() =>
+      Effect.fail(
+        new GetTemplateError({
+          cause: `Template Missing: ${ctx.input.template}`,
+        }),
       ),
     ),
+    _ => _.outputs,
+    ReadonlyArray.map(output =>
+      pipe(
+        constructTemplate({ output, ...ctx }),
+        Effect.map(ReadonlyArray.map(writeTemplate)),
+        Effect.flatMap(Effect.all),
+      ),
+    ),
+    Effect.all,
+    Effect.map(ReadonlyArray.flatten),
   );
 
 export const createConfigPathAbsolute = (filePath: string) =>
   pipe(
     Process.Process,
     Effect.flatMap(_process =>
-      Effect.if(
-        path.isAbsolute(filePath),
-        Effect.ifEffect(
-          FS.isFile(filePath),
-          Effect.succeed(filePath),
+      Effect.if(path.isAbsolute(filePath), {
+        onTrue: Effect.if(FS.isFile(filePath), {
+          onTrue: Effect.succeed(filePath),
           // absolute directory, so set the filePath to default location
           // TODO: use search from cosmic config to handle this
-          Effect.succeed(path.join(_process.cwd(), 'scribe.config.ts')),
-        ),
-        Effect.succeed(path.join(_process.cwd(), filePath)),
-      ),
+          onFalse: Effect.succeed(
+            path.join(_process.cwd(), 'scribe.config.ts'),
+          ),
+        }),
+        onFalse: Effect.succeed(path.join(_process.cwd(), filePath)),
+      }),
     ),
   );
+
+export class GetTemplateError extends Data.TaggedClass('GetTemplateError')<{
+  readonly cause?: string;
+}> {}

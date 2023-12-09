@@ -4,8 +4,8 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     globals: true,
-    outputFile: process.env.CI ? '.github/tests/run.xml' : undefined,
-    reporters: process.env.CI ? 'junit' : undefined,
+    outputFile: process.env.CI ? '.github/tests/run.xml' : '',
+    reporters: [process.env.CI ? 'junit' : 'default'],
     watch: false,
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache', 'examples'],
     coverage: {

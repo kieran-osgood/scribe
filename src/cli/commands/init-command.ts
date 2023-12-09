@@ -1,6 +1,6 @@
-import { Effect, pipe } from '@scribe/core';
 import { FS, Git, Process } from '@scribe/services';
 import { Command } from 'clipanion';
+import { Effect, pipe } from 'effect';
 import path from 'path';
 
 import { BaseCommand } from './base-command';
@@ -13,12 +13,11 @@ export class InitCommand extends BaseCommand {
     examples: [],
   });
 
-  private createConfigPath = (_process: Process.Process) => {
-    return path.join(_process.cwd(), 'scribe.config.ts');
-  };
+  private createConfigPath = (_process: Process.Process) =>
+    path.join(_process.cwd(), 'scribe.config.ts');
 
-  private createFileExistsError = (_process: Process.Process) => {
-    return new FS.FileExistsError({
+  private createFileExistsError = (_process: Process.Process) =>
+    new FS.FileExistsError({
       error: new FS.AccessError({
         error: new Error(
           `File ${this.createConfigPath(_process)} already exists.`,
@@ -27,43 +26,59 @@ export class InitCommand extends BaseCommand {
         mode: 0,
       }),
     });
-  };
 
   executeSafe = () =>
     pipe(
       // TODO: add ignore git
       Git.checkWorkingTreeClean(),
-      Effect.flatMap(() =>
+
+      Effect.flatMap(() => Process.Process),
+
+      Effect.flatMap(_process =>
+        pipe(
+          FS.isFileOrDirectory(this.createConfigPath(_process)),
+          Effect.flatMap(configPathAlreadyExists =>
+            configPathAlreadyExists
+              ? Effect.fail(this.createFileExistsError(_process))
+              : Effect.unit,
+          ),
+
+          // Effect.catchTag('@scribe/core/fs/FileExistsError', () =>
+          //   pipe(
+          //     Effect.succeed(true),
+          //     Effect.tap(() => Effect.sync(() => console.log('File exists'))),
+          //   ),
+          // ),
+
+          Effect.catchTag('@scribe/core/fs/StatError', e => {
+            /**
+             * ENOENT indicates the path is clear, and we can safely write there
+             */
+            if (e.error.code === 'ENOENT') {
+              return Effect.succeed(true);
+            }
+
+            // TODO: add ignore file exists
+            return Effect.fail(e);
+          }),
+        ),
+      ),
+
+      Effect.flatMap(() => FS.readFile('public/base.ts', null)),
+
+      Effect.flatMap(_ =>
         pipe(
           Process.Process,
           Effect.flatMap(_process =>
-            pipe(
-              FS.isFileOrDirectory(this.createConfigPath(_process)),
-              // TODO: add ignore file exists
-              Effect.flatMap(_ =>
-                _
-                  ? Effect.fail(this.createFileExistsError(_process))
-                  : Effect.unit(),
-              ),
-              Effect.catchTag('@scribe/core/fs/StatError', () => {
-                // If file doesn't exist we can create it
-                return Effect.succeed(true);
-              }),
-            ),
-          ),
-          Effect.flatMap(() => FS.readFile('src/config/base.ts', null)),
-          Effect.flatMap(_ =>
-            pipe(
-              Process.Process,
-              Effect.flatMap(_process =>
-                FS.writeFile(this.createConfigPath(_process), String(_), null),
-              ),
-            ),
+            FS.writeFile(this.createConfigPath(_process), String(_), null),
           ),
         ),
       ),
-      Effect.map(_ => {
-        this.context.stdout.write(`Scribe config created: ${String(_)}`);
-      }),
+
+      Effect.flatMap(_ =>
+        Effect.sync(() =>
+          this.context.stdout.write(`Scribe config created: ${String(_)}`),
+        ),
+      ),
     );
 }

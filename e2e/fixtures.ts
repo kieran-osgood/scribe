@@ -76,14 +76,14 @@ export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
   // Allows git commit to pass even when fixtures are all off
   fs.writeFileSync(path.join(projectRoot, 'dummyfile'), 'dummy');
 
-  if (options.fixtures?.configFile) {
+  if (options.fixtures.configFile) {
     copyFileToPath(
       projectRoot,
       path.join(projectRoot, 'scribe.config.ts'),
       './src/test-fixtures/scribe.config.ts',
     );
   }
-  if (options.fixtures?.templateFiles) {
+  if (options.fixtures.templateFiles) {
     copyFileToPath(
       projectRoot,
       path.join(testPath, `screen.scribe`),
@@ -97,7 +97,7 @@ export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
     );
   }
 
-  if (options?.git?.init) {
+  if (options.git.init) {
     const execOpts = {
       cwd: projectRoot,
     } satisfies child_process.ExecSyncOptionsWithBufferEncoding;
@@ -105,7 +105,7 @@ export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
     child_process.execSync('git init', execOpts);
     child_process.execSync('git config user.name "kieran"', execOpts);
     child_process.execSync('git config user.email "ko@gmail.com"', execOpts);
-    if (options.git.dirty === false) {
+    if (!options.git.dirty) {
       child_process.execSync('git add .', execOpts);
       child_process.execSync(
         'git commit -m "non empty commit message"',

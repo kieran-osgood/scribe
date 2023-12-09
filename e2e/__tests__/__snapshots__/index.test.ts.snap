@@ -1,0 +1,18 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Scribe Cli --help should print help text 1`] = `
+"━━━ scribe ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  $ scribe <command>
+
+━━━ General commands ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  scribe [-c,--config #0] [--verbose] [-n,--name #0] [-t,--template #0]
+    Scribe generates files based on mustache templates.
+
+  scribe init [-c,--config #0] [--verbose]
+    Generates a scribe.config.ts file.
+
+You can also print more details about any of these commands by calling them with 
+the \`-h,--help\` flag right after the command name.
+"
+`;

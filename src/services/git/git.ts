@@ -1,6 +1,5 @@
-import * as Effect from '@effect/io/Effect';
-import { pipe } from '@scribe/core';
 import { Process } from '@scribe/services';
+import { Effect, pipe } from 'effect';
 import simpleGit, {
   GitConstructError,
   SimpleGitOptions,
@@ -11,11 +10,11 @@ import simpleGit, {
 import GitStatusError, { SimpleGitError } from './error';
 
 export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
-  Effect.tryCatch(
-    () => simpleGit(options),
+  Effect.try({
+    try: () => simpleGit(options),
     // TODO: remove assertion
-    error => new SimpleGitError({ error: error as GitConstructError }),
-  );
+    catch: error => new SimpleGitError({ error: error as GitConstructError }),
+  });
 
 export const checkWorkingTreeClean = (options?: TaskOptions) =>
   pipe(
@@ -31,7 +30,7 @@ export const checkWorkingTreeClean = (options?: TaskOptions) =>
 
           if (error) {
             resume(Effect.fail(new GitStatusError({ status, error })));
-          } else if (status?.isClean()) {
+          } else if (status.isClean()) {
             resume(Effect.succeed(status));
           } else {
             resume(Effect.fail(new GitStatusError({ status })));

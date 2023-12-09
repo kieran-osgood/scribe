@@ -1,10 +1,9 @@
-import { NonEmptyReadonlyArray } from '@effect/data/ReadonlyArray';
-import { ParseErrors } from '@effect/schema/src/ParseResult';
-import { TaggedClass } from '@scribe/core';
+import { TreeFormatter } from '@effect/schema';
+import { ParseErrors } from '@effect/schema/ParseResult';
+import { Data } from 'effect';
+import { NonEmptyReadonlyArray } from 'effect/ReadonlyArray';
 
-import { TF } from '../core';
-
-export class CosmicConfigError extends TaggedClass('CosmicConfigError')<{
+export class CosmicConfigError extends Data.TaggedClass('CosmicConfigError')<{
   readonly error:
     | `[read config failed] ${string}`
     | 'invalid config'
@@ -16,12 +15,12 @@ export class CosmicConfigError extends TaggedClass('CosmicConfigError')<{
   }
 }
 
-export class ConfigParseError extends TaggedClass('ParseError')<{
+export class ConfigParseError extends Data.TaggedClass('ParseError')<{
   readonly errors: NonEmptyReadonlyArray<ParseErrors>;
   readonly path: string;
 }> {
   override toString() {
     return `⚠️ Config parsing error: '${this.path}' 
- ${TF.formatErrors(this.errors)}`;
+ ${TreeFormatter.formatErrors(this.errors)}`;
   }
 }

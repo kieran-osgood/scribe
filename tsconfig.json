@@ -5,33 +5,53 @@
     "strict": true,
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
     "outDir": "dist",
     "declaration": true,
     "noImplicitOverride": true,
     "resolveJsonModule": true,
-    "paths": {
-      "@scribe/adapters": ["src/adapters/index"],
-      "@scribe/core": ["src/core/index"],
-      "@scribe/config": ["src/config/index"],
-      "@scribe/reader": ["src/reader/index"],
-      "@scribe/git": ["src/git/index"],
-      "@scribe/commands": ["src/commands/index"],
-      "@scribe/fs": ["src/common/fs/index"],
-      "@scribe/cli": ["src/cli/index"],
-      "@scribe/services": ["src/services/index"]
-    },
+    // "bun-types" is the important part
+    "types": [
+      "vitest/globals",
+      "bun-types"
+    ],
     "lib": ["ESNext"],
+    "target": "ESNext",
+//    "target": "ES2022",
+    "paths": {
+      "@scribe/adapters": [
+        "src/adapters/index"
+      ],
+      "@scribe/config": [
+        "src/config/index"
+      ],
+      "@scribe/reader": [
+        "src/reader/index"
+      ],
+      "@scribe/git": [
+        "src/git/index"
+      ],
+      "@scribe/commands": [
+        "src/commands/index"
+      ],
+      "@scribe/fs": [
+        "src/common/fs/index"
+      ],
+      "@scribe/cli": [
+        "src/cli/index"
+      ],
+      "@scribe/services": [
+        "src/services/index"
+      ]
+    },
     "baseUrl": ".",
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "Node",
     "esModuleInterop": true,
-    // Eases ESM support
-    "types": ["node", "vitest/globals"],
-
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "plugins": [
+      {
+        "name": "@effect/language-service"
+      },
       {
         "name": "@unsplash/ts-namespace-import-plugin",
         "namespaces": {
@@ -46,9 +66,9 @@
     ".eslintrc.js",
     "."
   ],
-  "exclude": ["examples", "public/base.ts", "dist"],
-  "ts-node": {
-    "swc": true,
-    "require": ["tsconfig-paths/register"]
-  }
+  "exclude": [
+    "examples",
+    "public/base.ts",
+    "dist"
+  ]
 }
