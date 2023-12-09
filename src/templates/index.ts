@@ -1,11 +1,11 @@
-import { TemplateFile } from '@scribe/adapters';
 import { Template } from '@scribe/config';
 import { FS, Process } from '@scribe/services';
 import { Effect, pipe, ReadonlyArray } from 'effect';
 import path from 'path';
+import * as TF from 'template-file';
 
+import { render } from '../adapters/template-file/template-file';
 import { DefaultCommand } from '../cli/commands';
-import { render } from '../services/tf';
 
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   return Effect.gen(function* ($) {
@@ -46,7 +46,7 @@ export function constructTemplate(ctx: ConstructTemplateCtx) {
     Effect.flatMap(Effect.all),
     Effect.map(
       // TODO: spread in ctx.input.variables
-      ReadonlyArray.map(_ => TemplateFile.render(_, { Name: ctx.input.name })),
+      ReadonlyArray.map(_ => render(_, { Name: ctx.input.name })),
     ),
     Effect.flatMap(Effect.all),
     Effect.map(
@@ -65,7 +65,7 @@ export type WriteTemplateCtx = Ctx & {
 export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
     const _process = yield* $(Process.Process);
-    const fileName = render(_.output.output.fileName, {
+    const fileName = TF.render(_.output.output.fileName, {
       Name: _.input.name,
     });
 

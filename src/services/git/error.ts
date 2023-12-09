@@ -7,9 +7,10 @@ export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
 }> {
   override toString(): string {
     switch (true) {
-      case !(this.status.isClean()):
+      case !this.status.isClean():
         return '⚠️ Working directory not clean';
       case this.error instanceof GitError:
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (this.error?.message.includes('not a git repository')) {
           return "You're not running within a git repository, continue?";
         }
