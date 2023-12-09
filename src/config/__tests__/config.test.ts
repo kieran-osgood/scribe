@@ -1,4 +1,4 @@
-import { Effect, pipe } from '@scribe/core';
+import { Effect, pipe } from 'effect';
 
 import {
   checkForTemplates,
@@ -17,7 +17,7 @@ describe('config', function () {
   // });
 
   describe('readConfig', () => {
-    it('should return valid config', () =>
+    it('should return valid config', async () =>
       pipe(
         Effect.gen(function* ($) {
           const result = yield* $(
@@ -28,7 +28,7 @@ describe('config', function () {
         Effect.runPromise,
       ));
     describe('should return ConfigParseError ', () => {
-      it('when reads config with invalid syntax', () =>
+      it('when reads config with invalid syntax', async () =>
         pipe(
           Effect.gen(function* ($) {
             const result = yield* $(
@@ -42,7 +42,7 @@ describe('config', function () {
           Effect.runPromise,
         ));
 
-      it('when reads config with missing export', () =>
+      it('when reads config with missing export', async () =>
         pipe(
           Effect.gen(function* ($) {
             const result = yield* $(
@@ -57,7 +57,7 @@ describe('config', function () {
         ));
     });
 
-    it('should return CosmicConfigError if getCosmicExplorer.load() throws', () =>
+    it('should return CosmicConfigError if getCosmicExplorer.load() throws', async () =>
       pipe(
         Effect.gen(function* ($) {
           const result = yield* $(readConfig('bad-path'), Effect.flip);
@@ -68,7 +68,7 @@ describe('config', function () {
   });
 
   describe('checkForTemplates', () => {
-    it('should return input if non empty array', () =>
+    it('should return input if non empty array', async () =>
       pipe(
         Effect.gen(function* ($) {
           const input = [''];
@@ -78,7 +78,7 @@ describe('config', function () {
         Effect.runPromise,
       ));
 
-    it('should return CosmicConfigError if empty array', () =>
+    it('should return CosmicConfigError if empty array', async () =>
       pipe(
         Effect.gen(function* ($) {
           const result = yield* $(checkForTemplates([]), Effect.flip);
@@ -89,7 +89,7 @@ describe('config', function () {
   });
 
   describe('readUserTemplateOptions', () => {
-    it('should return the keys from config.template', () =>
+    it('should return the keys from config.template', async () =>
       pipe(
         Effect.gen(function* ($) {
           const result = yield* $(
@@ -106,7 +106,7 @@ describe('config', function () {
   });
 
   describe('extractConfig', () => {
-    it('should return config if isEmpty false', () =>
+    it('should return config if isEmpty false', async () =>
       pipe(
         Effect.gen(function* ($) {
           const result = yield* $(
@@ -121,7 +121,7 @@ describe('config', function () {
         Effect.runPromise,
       ));
 
-    it('should return CosmicConfigError if isEmpty true', () =>
+    it('should return CosmicConfigError if isEmpty true', async () =>
       pipe(
         Effect.gen(function* ($) {
           const result = yield* $(
@@ -137,7 +137,7 @@ describe('config', function () {
         Effect.runPromise,
       ));
 
-    it('should return CosmicConfigError if CosmicConfigResult was null', () =>
+    it('should return CosmicConfigError if CosmicConfigResult was null', async () =>
       pipe(
         Effect.gen(function* ($) {
           const result = yield* $(extractConfig(null), Effect.flip);

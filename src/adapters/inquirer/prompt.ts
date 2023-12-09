@@ -1,4 +1,4 @@
-import { Effect } from '@scribe/core';
+import { Effect } from 'effect';
 import inquirer, { Answers, QuestionCollection } from 'inquirer';
 
 import { fmtError } from '../../error';
@@ -8,8 +8,8 @@ export const prompt = (
   questions: QuestionCollection,
   initialAnswers?: Partial<Answers>,
 ) =>
-  Effect.tryCatchPromise(
-    () => inquirer.prompt(questions, initialAnswers),
-    cause =>
+  Effect.tryPromise({
+    try: async () => inquirer.prompt(questions, initialAnswers),
+    catch: cause =>
       new PromptError({ message: `Prompt failed: ${fmtError(cause)}`, cause }),
-  );
+  });

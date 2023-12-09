@@ -1,4 +1,4 @@
-import { Context, Effect, pipe } from '@scribe/core';
+import { Context, Effect, pipe } from 'effect';
 import * as NFS from 'fs';
 import * as memfs from 'memfs';
 import { DirectoryJSON, vol } from 'memfs';
@@ -25,13 +25,13 @@ beforeEach(() => {
 beforeEach(() => {
   vol.mkdirSync(process.cwd(), { recursive: true });
 });
-afterEach(() => vol.reset());
+afterEach(() => { vol.reset(); });
 
 export const FSMock = Context.make(FS.FS, memfs.fs as unknown as typeof NFS);
 
 describe('fs', () => {
   describe('readFile', () => {
-    it('should read file to path', () =>
+    it('should read file to path', async () =>
       pipe(
         Effect.gen(function* ($) {
           const filePath = 'template1.txt';
@@ -41,11 +41,11 @@ describe('fs', () => {
 
           expect(String(result)).toBe(fileContents);
         }),
-        Effect.provideContext(FSMock),
+        Effect.provide(FSMock),
         Effect.runPromise,
       ));
 
-    it('throw error if file doesnt exist', () =>
+    it('throw error if file doesnt exist', async () =>
       pipe(
         Effect.gen(function* ($) {
           const filePath = path.join(process.cwd(), './template2.txt');
@@ -53,13 +53,13 @@ describe('fs', () => {
 
           expect(result).toBeInstanceOf(ReadFileError);
         }),
-        Effect.provideContext(FSMock),
+        Effect.provide(FSMock),
         Effect.runPromise,
       ));
   });
 
   describe('writeFile', () => {
-    it('should write file to path and read it back', () =>
+    it('should write file to path and read it back', async () =>
       pipe(
         Effect.gen(function* ($) {
           const filePath = './template3.txt';
@@ -71,11 +71,11 @@ describe('fs', () => {
             yield* $(FS.readFile(filePath, { encoding: 'utf8' })), //
           ).toEqual(fileContents);
         }),
-        Effect.provideContext(FSMock),
+        Effect.provide(FSMock),
         Effect.runPromise,
       ));
 
-    it('should write file to path and read it back', () =>
+    it('should write file to path and read it back', async () =>
       pipe(
         Effect.gen(function* ($) {
           const filePath = '/some/nonexistent/path/template4.txt';
@@ -85,13 +85,13 @@ describe('fs', () => {
           );
           expect(result).toBeInstanceOf(WriteFileError);
         }),
-        Effect.provideContext(FSMock),
+        Effect.provide(FSMock),
         Effect.runPromise,
       ));
   });
 
   describe('mkdir', () => {
-    it('creates recursively ', () =>
+    it('creates recursively ', async () =>
       pipe(
         Effect.gen(function* ($) {
           const filePath = './mkdir/nested/path';
@@ -106,11 +106,11 @@ describe('fs', () => {
           const exists = yield* $(FS.isFileOrDirectory(filePath));
           expect(exists).toBe(true);
         }),
-        Effect.provideContext(FSMock),
+        Effect.provide(FSMock),
         Effect.runPromise,
       ));
 
-    it('returns undefined if dir already exists', () =>
+    it('returns undefined if dir already exists', async () =>
       pipe(
         Effect.gen(function* ($) {
           const filePath = './some/path';
@@ -121,25 +121,25 @@ describe('fs', () => {
           expect(result).toBe(undefined);
           expect(cwdAsJson()).toEqual(previousDirStructure);
         }),
-        Effect.provideContext(FSMock),
+        Effect.provide(FSMock),
         Effect.runPromise,
       ));
 
-    it('fails with error if mkdir cb has error', () =>
+    it('fails with error if mkdir cb has error', async () =>
       pipe(
         Effect.gen(function* ($) {
           const filePath = './some/path';
           const result = yield* $(FS.mkdir(filePath), Effect.flip);
           expect(result).toBeInstanceOf(MkDirError);
         }),
-        Effect.provideContext(FSMock),
+        Effect.provide(FSMock),
         Effect.runPromise,
       ));
   });
 });
 
 describe('writeFileWithDir', () => {
-  it('should write file to path and read it back', () =>
+  it('should write file to path and read it back', async () =>
     pipe(
       Effect.gen(function* ($) {
         const filePath = './path/to/some/long/path/template5.txt';
@@ -154,7 +154,7 @@ describe('writeFileWithDir', () => {
         );
         expect(String(readResult)).toEqual(fileContents);
       }),
-      Effect.provideContext(FSMock),
+      Effect.provide(FSMock),
       Effect.runPromise,
     ));
 });

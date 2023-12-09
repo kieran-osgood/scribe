@@ -5,13 +5,13 @@
     "strict": true,
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
     "outDir": "dist",
     "declaration": true,
     "noImplicitOverride": true,
     "resolveJsonModule": true,
     "paths": {
       "@scribe/adapters": ["src/adapters/index"],
-      "@scribe/core": ["src/core/index"],
       "@scribe/config": ["src/config/index"],
       "@scribe/reader": ["src/reader/index"],
       "@scribe/git": ["src/git/index"],
@@ -23,8 +23,6 @@
     "lib": ["ESNext"],
     "baseUrl": ".",
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "Node",
     "esModuleInterop": true,
     // Eases ESM support
     "types": ["node", "vitest/globals"],
@@ -32,6 +30,7 @@
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "plugins": [
+      { "name": "@effect/language-service" },
       {
         "name": "@unsplash/ts-namespace-import-plugin",
         "namespaces": {

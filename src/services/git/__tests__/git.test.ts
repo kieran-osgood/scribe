@@ -1,5 +1,5 @@
-import { Effect, pipe } from '@scribe/core';
 import { Process } from '@scribe/services';
+import { Effect, pipe } from 'effect';
 import * as resp from 'simple-git/dist/typings/response';
 import * as types from 'simple-git/dist/typings/types';
 import { beforeEach, vi } from 'vitest';
@@ -55,7 +55,7 @@ describe('Git', async () => {
 
           mockStatusImplementation.mockImplementation(
             (_options: StatusOptions, cb: StatusCallback) => {
-              return cb(new GitError(), { isClean: () => true });
+              cb(new GitError(), { isClean: () => true });
             },
           );
           const result = yield* $(checkWorkingTreeClean());
@@ -66,12 +66,12 @@ describe('Git', async () => {
       ));
 
     // TODO: handle accepting or rejecting continue on dirty
-    it.skip('The callback has an error', () =>
+    it.skip('The callback has an error', async () =>
       pipe(
         Effect.gen(function* ($) {
           mockStatusImplementation.mockImplementation(
             (_options: StatusOptions, cb: StatusCallback) => {
-              return cb(new GitError(), { isClean: () => true });
+              cb(new GitError(), { isClean: () => true });
             },
           );
           const result = yield* $(checkWorkingTreeClean(), Effect.flip);
@@ -87,7 +87,7 @@ describe('Git', async () => {
       ));
 
     describe('The callback has no error', () => {
-      it('The status.isClean() is true', () =>
+      it('The status.isClean() is true', async () =>
         pipe(
           Effect.gen(function* ($) {
             mockStatusImplementation.mockImplementation(
@@ -103,7 +103,7 @@ describe('Git', async () => {
         ));
 
       // TODO: handle accepting or rejecting continue on dirty
-      it.skip('The status.isClean is false', () =>
+      it.skip('The status.isClean is false', async () =>
         pipe(
           Effect.gen(function* ($) {
             mockStatusImplementation.mockImplementation(
@@ -127,12 +127,12 @@ describe('Git', async () => {
     });
 
     // Not sure how to test abort signal?
-    it.skip('The AbortController.abort() is called', () =>
+    it.skip('The AbortController.abort() is called', async () =>
       pipe(
         Effect.gen(function* ($) {
           mockStatusImplementation.mockImplementation(
             (_options: StatusOptions, cb: StatusCallback) => {
-              return cb(null, { isClean: () => true });
+              cb(null, { isClean: () => true });
             },
           );
           const abortController = new AbortController();

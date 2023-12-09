@@ -4,6 +4,7 @@ export function fmtError(error: unknown) {
   }
 
   return typeof error?.toString === 'function'
+    // eslint-disable-next-line
     ? error?.toString()
     : 'Unknown Error';
 }

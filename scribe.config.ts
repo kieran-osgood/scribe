@@ -1,41 +1,11 @@
-import type { ScribeConfig } from '@scribe/config';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+import { ScribeConfig } from '@kieran-osgood/scribe';
 
-const config = {
+export default {
   options: {
     rootOutDir: '.',
-    templatesDirectories: ['./src/test-fixtures'],
+    templatesDirectories: ['.'],
   },
-  templates: {
-    component: {
-      outputs: [
-        {
-          templateFileKey: 'component',
-          output: {
-            directory: 'examples/src/components',
-            fileName: '{{Name}}.ts',
-          },
-        },
-      ],
-    },
-    screen: {
-      outputs: [
-        {
-          templateFileKey: 'screen',
-          output: {
-            directory: 'examples/src/screens',
-            fileName: '{{Name}}.ts',
-          },
-        },
-        {
-          templateFileKey: 'screen.test',
-          output: {
-            directory: 'examples/src/screens',
-            fileName: '{{Name}}.test.ts',
-          },
-        },
-      ],
-    },
-  },
+  templates: {},
 } satisfies ScribeConfig;
-
-export default config;
