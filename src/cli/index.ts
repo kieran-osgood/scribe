@@ -2,13 +2,18 @@ import { Builtins, Cli } from 'clipanion';
 import { BaseContext } from 'clipanion/lib/advanced/Cli';
 import { Effect } from 'effect';
 
+import packageJson from '../../package.json';
 import { DefaultCommand, InitCommand } from './commands';
 
-export async function _Cli(args: string[], contextOverrides?: Partial<BaseContext>) {
+export async function _Cli(
+  args: string[],
+  contextOverrides?: Partial<BaseContext>,
+) {
   const cli = new Cli({
     binaryLabel: `scribe`,
     binaryName: 'scribe',
     enableCapture: true,
+    binaryVersion: packageJson.version,
   });
 
   cli.register(DefaultCommand);
