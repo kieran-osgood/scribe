@@ -19,6 +19,7 @@ export async function _Cli(
   cli.register(DefaultCommand);
   cli.register(InitCommand);
 
+  cli.register(Builtins.DefinitionsCommand);
   cli.register(Builtins.HelpCommand);
   cli.register(Builtins.VersionCommand);
 

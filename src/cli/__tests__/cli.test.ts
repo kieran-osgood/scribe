@@ -9,6 +9,7 @@ import stripAnsi from 'strip-ansi';
 import { test } from 'vitest';
 
 import { createMinimalProject } from '../../../e2e/fixtures';
+import packageJson from '../../../package.json';
 
 const createCtx = (): BaseContext => ({
   stdout: new PassThrough(),
@@ -179,7 +180,8 @@ describe('_Cli', () => {
       const result = runCliPromise({ cliCtx, args });
 
       expect(await result).toMatchInlineSnapshot(`
-        "━━━ scribe ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        "━━━ scribe - ${packageJson.version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
           $ scribe <command>
 
         ━━━ General commands ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

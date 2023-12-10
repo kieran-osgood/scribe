@@ -3,7 +3,7 @@ import { Effect, pipe } from 'effect';
 import * as memfs from 'memfs';
 import { test } from 'vitest';
 
-import { createConfigPathAbsolute } from '../commands';
+import { createConfigPathAbsolute } from '../index';
 
 const runEffect = async ({
   effect,
