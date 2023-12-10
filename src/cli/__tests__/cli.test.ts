@@ -158,15 +158,15 @@ describe('_Cli', () => {
       const result = runCliPromise({ cliCtx, args });
 
       expect(await result).toMatchInlineSnapshot(`
-              "We caught an error during execution, this probably isn't a bug.
-              Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
+        "We caught an error during execution, this probably isn't a bug.
+        Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
 
-              If you think this might be a bug, please report it here: https://github.com/kieran-osgood/scribe/issues/new.
+        If you think this might be a bug, please report it here: https://github.com/kieran-osgood/scribe/issues/new.
 
-              You can enable verbose logging with --v, --verbose.
+        You can enable verbose logging with --v, --verbose.
 
-              Error: File ${projectRoot}/scribe.config.ts already exists."
-            `);
+        Error: ${projectRoot}/scribe.config.ts already exists."
+      `);
 
       const file = fs.readFileSync(path.join(projectRoot, 'scribe.config.ts'));
       expect(String(file)).toMatchSnapshot();

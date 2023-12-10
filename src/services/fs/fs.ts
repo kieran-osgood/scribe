@@ -58,7 +58,7 @@ export const writeFileWithDir = (
 
 export const readFile = (
   path: NFS.PathOrFileDescriptor,
-  options:
+  options?:
     | ({ encoding?: BufferEncoding; flag?: string } & Abortable)
     | undefined
     | null,

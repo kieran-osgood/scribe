@@ -125,7 +125,7 @@ describe('InitCommand', () => {
 
         You can enable verbose logging with --v, --verbose.
 
-        Error: File ${cwd}/scribe.config.ts already exists."
+        Error: ${cwd}/scribe.config.ts already exists."
       `);
     });
   });
@@ -214,7 +214,6 @@ describe('DefinitionsCommand', () => {
           \\"path\\": \\"scribe init\\",
           \\"usage\\": \\"scribe init\\",
           \\"description\\": \\"Generates a scribe.config.ts file.\\\\n\\",
-          \\"examples\\": [],
           \\"options\\": [
             {
               \\"definition\\": \\"-c,--config #0\\",
