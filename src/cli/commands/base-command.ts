@@ -12,6 +12,8 @@ import {
 import { Writable } from 'stream';
 import * as t from 'typanion';
 
+import { URLS } from '../../constants';
+
 export abstract class BaseCommand extends Command {
   configPath = Option.String('-c,--config', 'scribe.config.ts', {
     description: 'Path to the config (default: scribe.config.ts)',
@@ -41,9 +43,6 @@ export abstract class BaseCommand extends Command {
     ({ stdout, verbose }: { stdout: Writable; verbose: boolean }) =>
     (commandEffect: Effect.Effect<Process.Process | FS.FS, unknown, void>) =>
       Effect.gen(function* ($) {
-        const githubIssueUri =
-          'https://github.com/kieran-osgood/scribe/issues/new';
-
         const result = yield* $(commandEffect, Effect.exit);
 
         if (result._tag === 'Failure') {
@@ -54,14 +53,14 @@ export abstract class BaseCommand extends Command {
           if (!isDie) {
             stdout.write(
               `Unexpected Error
-Please report this with the attached error: ${githubIssueUri}.\n\n`,
+Please report this with the attached error: ${URLS.github.newIssue}.\n\n`,
             );
           } else {
             stdout.write(
               `We caught an error during execution, this probably isn't a bug.
 Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
 
-If you think this might be a bug, please report it here: ${githubIssueUri}.\n\n`,
+If you think this might be a bug, please report it here: ${URLS.github.newIssue}.\n\n`,
             );
           }
 
