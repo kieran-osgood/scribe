@@ -10,6 +10,7 @@
     "declaration": true,
     "noImplicitOverride": true,
     "resolveJsonModule": true,
+    "noEmit": true,
     "paths": {
       "@scribe/adapters": ["src/adapters/index"],
       "@scribe/config": ["src/config/index"],
@@ -45,7 +46,7 @@
     ".eslintrc.js",
     "."
   ],
-  "exclude": ["examples", "public/base.ts", "dist"],
+  "exclude": ["examples", "public/base.ts", "dist/*"],
   "ts-node": {
     "swc": true,
     "require": ["tsconfig-paths/register"]
