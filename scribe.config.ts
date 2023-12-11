@@ -5,5 +5,20 @@ export default {
     rootOutDir: '.',
     templatesDirectories: ['.'],
   },
-  templates: {},
+  templates: {
+    Model: {
+      output: {
+        directory: './',
+      },
+      outputs: [
+        {
+          templateFileKey: 'Model',
+          output: {
+            directory: '.',
+            fileName: 'abc',
+          },
+        },
+      ],
+    },
+  },
 } satisfies ScribeConfig;
