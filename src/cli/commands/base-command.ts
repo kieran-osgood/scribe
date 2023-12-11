@@ -4,6 +4,7 @@ import {
   Cause,
   Context,
   Effect,
+  Exit,
   Logger,
   LogLevel,
   pipe,
@@ -39,67 +40,6 @@ export abstract class BaseCommand extends Command {
       Context.add(FS.FS, FS.getFS(this.test)),
     );
 
-  private handleExecutionResult =
-    ({ stdout, verbose }: { stdout: Writable; verbose: boolean }) =>
-    (commandEffect: Effect.Effect<Process.Process | FS.FS, unknown, void>) =>
-      Effect.gen(function* ($) {
-        const result = yield* $(commandEffect, Effect.exit);
-
-        if (result._tag === 'Failure') {
-          const failOrCause = Cause.failureOrCause(result.cause);
-          const isDie =
-            failOrCause._tag === 'Left' || Runtime.isFiberFailure(failOrCause);
-
-          if (!isDie) {
-            stdout.write(
-              `Unexpected Error
-Please report this with the attached error: ${URLS.github.newIssue}.\n\n`,
-            );
-          } else {
-            stdout.write(
-              `We caught an error during execution, this probably isn't a bug.
-Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
-
-If you think this might be a bug, please report it here: ${URLS.github.newIssue}.\n\n`,
-            );
-          }
-
-          if (!verbose) {
-            stdout.write(
-              'You can enable verbose logging with --v, --verbose.\n\n',
-            );
-          }
-
-          if (
-            !verbose &&
-            Cause.isFailType(result.cause)
-            // Cause.isFailType(result.cause.cause)
-          ) {
-            stdout.write(
-              extractNestedError(result.cause.error) ||
-                'Unable to extract error.',
-            );
-          } else {
-            stdout.write(Cause.pretty(result.cause));
-          }
-
-          yield* $(
-            // TODO: add exit to Process.Process
-            pipe(
-              Process.Process,
-              Effect.flatMap(_ =>
-                Effect.sync(() => {
-                  if (process.env.NODE_ENV !== 'test') return _.exit(1);
-                }),
-              ),
-            ),
-          );
-          return undefined;
-        }
-
-        return result.value;
-      });
-
   private setLogLevel = () => {
     if (process.env.NODE_ENV === 'production') {
       return Logger.withMinimumLogLevel(LogLevel.Info);
@@ -110,6 +50,19 @@ If you think this might be a bug, please report it here: ${URLS.github.newIssue}
 
     return Logger.withMinimumLogLevel(LogLevel.Debug);
   };
+
+  private handleExecutionResult =
+    ({ stdout, verbose }: { stdout: Writable; verbose: boolean }) =>
+    (commandEffect: Effect.Effect<Process.Process | FS.FS, unknown, void>) =>
+      Effect.gen(function* ($) {
+        const result = yield* $(commandEffect, Effect.exit);
+
+        if (result._tag === 'Failure') {
+          return yield* $(printFailure({ stdout, verbose, result }));
+        }
+
+        return result.value;
+      });
 
   execute = async (): Promise<void> => {
     return pipe(
@@ -138,3 +91,60 @@ const extractNestedError = (object: unknown): string => {
 
   return object?.toString() ?? 'Error extraction failed';
 };
+
+const printFailure = ({
+  result,
+  verbose,
+  stdout,
+}: {
+  result: Exit.Failure<unknown, void>;
+  verbose: boolean;
+  stdout: Writable;
+}) =>
+  Effect.gen(function* ($) {
+    const failOrCause = Cause.failureOrCause(result.cause);
+    const isDie =
+      failOrCause._tag === 'Left' || Runtime.isFiberFailure(failOrCause);
+
+    if (!isDie) {
+      stdout.write(
+        `Unexpected Error
+Please report this with the attached error: ${URLS.github.newIssue}.\n\n`,
+      );
+    } else {
+      stdout.write(
+        `We caught an error during execution, this probably isn't a bug.
+Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
+
+If you think this might be a bug, please report it here: ${URLS.github.newIssue}.\n\n`,
+      );
+    }
+
+    if (!verbose) {
+      stdout.write('You can enable verbose logging with --v, --verbose.\n\n');
+    }
+
+    if (
+      !verbose &&
+      Cause.isFailType(result.cause)
+      // Cause.isFailType(result.cause.cause)
+    ) {
+      stdout.write(
+        extractNestedError(result.cause.error) || 'Unable to extract error.',
+      );
+    } else {
+      stdout.write(Cause.pretty(result.cause));
+    }
+
+    yield* $(
+      // TODO: add exit to Process.Process
+      Process.Process,
+      Effect.flatMap(_ =>
+        Effect.sync(() => {
+          if (process.env.NODE_ENV !== 'test') return _.exit(1);
+        }),
+      ),
+    );
+
+    return undefined;
+  });
