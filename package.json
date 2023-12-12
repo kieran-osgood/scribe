@@ -118,7 +118,8 @@
       "dist",
       "node_modules",
       "html",
-      "scribe.config.ts"
+      "scribe.config.ts",
+      "public"
     ],
     "root": true,
     "overrides": [],
