@@ -1,5 +1,15 @@
 # @kieran-osgood/scribe
 
+## 0.3.1
+
+### Patch Changes
+
+- b6f9b1a: Fix issues with ScribeConfig type being inaccessible
+- b6f9b1a: Migrate to effect core package
+  Includes new TS-eslint rules to raise strictness
+  Bumps TS to 5.2.2
+- b6f9b1a: (internal) Add definitions command
+
 ## 0.3.0
 
 ### Minor Changes
