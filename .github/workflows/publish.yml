@@ -20,6 +20,10 @@ jobs:
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
+
+      - name: Link @kieran-osgood/scribe -> scribe
+        run: pnpm link .
+
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
