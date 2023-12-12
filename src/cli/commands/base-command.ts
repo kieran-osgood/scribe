@@ -73,7 +73,7 @@ export abstract class BaseCommand extends Command {
         verbose: this.verbose,
       }),
       Effect.tap(() => {
-        process.exit(0);
+        process.exitCode = 0;
         return Effect.unit;
       }),
       Effect.provide(this.createContext()),
