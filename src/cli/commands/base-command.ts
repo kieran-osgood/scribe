@@ -13,7 +13,7 @@ import {
 import { Writable } from 'stream';
 import * as t from 'typanion';
 
-import { URLS } from '../../constants';
+import { URLS } from '../../common/constants';
 
 export abstract class BaseCommand extends Command {
   configPath = Option.String('-c,--config', 'scribe.config.ts', {

@@ -1,7 +1,7 @@
 import { Effect } from 'effect';
 import inquirer, { Answers, QuestionCollection } from 'inquirer';
 
-import { fmtError } from '../../error';
+import { fmtError } from '../../common/error';
 import { PromptError } from './error';
 
 export const prompt = (
