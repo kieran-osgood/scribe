@@ -73,7 +73,7 @@
   ],
   "exclude": [
     "examples",
-    "public/base.ts",
+    "public",
     "dist",
     "scribe.config.ts"
   ],
