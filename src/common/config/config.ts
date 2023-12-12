@@ -4,7 +4,7 @@ import { CosmiconfigResult } from 'cosmiconfig/dist/types';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
 import { Effect, flow, pipe, ReadonlyArray, Tuple } from 'effect';
 
-import PackageJson from '../../package.json';
+import PackageJson from '../../../package.json';
 import { ConfigParseError, CosmicConfigError } from './error';
 import { ScribeConfig } from './schema';
 

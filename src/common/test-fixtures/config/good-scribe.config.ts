@@ -1,9 +1,9 @@
-import type { ScribeConfig } from '@scribe/config';
+import type { ScribeConfig } from '../../config';
 
 const config = {
   options: {
     rootOutDir: '.',
-    templatesDirectories: ['./src/test-fixtures'],
+    templatesDirectories: ['./src/common/test-fixtures'],
   },
   templates: {
     component: {

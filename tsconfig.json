@@ -15,7 +15,7 @@
         "src/adapters/index"
       ],
       "@scribe/config": [
-        "src/config/index"
+        "src/common/config/index"
       ],
       "@scribe/reader": [
         "src/reader/index"
@@ -30,7 +30,7 @@
         "src/common/fs/index"
       ],
       "@scribe/cli": [
-        "src/cli/index"
+        "src/cli/cli"
       ],
       "@scribe/services": [
         "src/services/index"

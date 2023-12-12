@@ -1,7 +1,6 @@
 import { TreeFormatter } from '@effect/schema';
 import * as Schema from '@effect/schema/Schema';
 import { Inquirer, PromptError } from '@scribe/adapters';
-import * as Config from '@scribe/config';
 import { FS, Git, Process } from '@scribe/services';
 import { Command, Option } from 'clipanion';
 import { green } from 'colorette';
@@ -16,9 +15,10 @@ import {
 import { PathOrFileDescriptor } from 'fs';
 import { QuestionCollection } from 'inquirer';
 import path from 'path';
+import * as Config from 'src/common/config';
 import * as t from 'typanion';
 
-import { constructTemplate, Ctx, writeTemplate } from '../../templates';
+import { constructTemplate, Ctx, writeTemplate } from '../../common/templates';
 import { BaseCommand } from './base-command';
 
 const Prompt = Schema.struct({

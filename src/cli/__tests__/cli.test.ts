@@ -1,4 +1,3 @@
-import * as CLI from '@scribe/cli';
 import { BaseContext } from 'clipanion/lib/advanced/Cli';
 import { Effect, pipe } from 'effect';
 import * as fs from 'fs';
@@ -10,6 +9,7 @@ import { test } from 'vitest';
 
 import { createMinimalProject } from '../../../e2e/fixtures';
 import packageJson from '../../../package.json';
+import * as CLI from '../cli';
 
 const createCtx = (): BaseContext => ({
   stdout: new PassThrough(),

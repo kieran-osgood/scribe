@@ -68,38 +68,37 @@ const defaultMinimalProjectOptions = {
 
 export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
   const options = { ...defaultMinimalProjectOptions, ..._options };
+  const fixturesPathParts = ['src', 'common', 'test-fixtures'];
+  const realFixtures = path.join(process.cwd(), ...fixturesPathParts);
 
-  const projectRoot = tempy.temporaryDirectory();
-  const testPath = path.join(projectRoot, 'src', 'test-fixtures');
-  fs.mkdirSync(testPath, { recursive: true });
+  const tmp = tempy.temporaryDirectory();
+  const tmpFixtures = path.join(tmp, 'src', 'common', 'test-fixtures');
+  fs.mkdirSync(tmpFixtures, { recursive: true });
 
   // Allows git commit to pass even when fixtures are all off
-  fs.writeFileSync(path.join(projectRoot, 'dummyfile'), 'dummy');
+  fs.writeFileSync(path.join(tmp, 'dummyfile'), 'dummy');
 
   if (options.fixtures.configFile) {
-    copyFileToPath(
-      projectRoot,
-      path.join(projectRoot, 'scribe.config.ts'),
-      './src/test-fixtures/scribe.config.ts',
-    );
+    copyFileToPath({
+      readPath: path.join(realFixtures, 'scribe.config.ts'),
+      writePath: path.join(tmp, 'scribe.config.ts'),
+    });
   }
   if (options.fixtures.templateFiles) {
-    copyFileToPath(
-      projectRoot,
-      path.join(testPath, `screen.scribe`),
-      './src/test-fixtures/screen.scribe',
-    );
-    copyFileToPath(
-      projectRoot,
-      path.join(testPath, 'screen.test.scribe'),
+    copyFileToPath({
+      readPath: path.join(realFixtures, 'screen.scribe'),
+      writePath: path.join(tmpFixtures, `screen.scribe`),
+    });
+    copyFileToPath({
       // TODO: WE'RE READING THE WRONG FILE
-      './src/test-fixtures/screen.scribe',
-    );
+      readPath: path.join(realFixtures, 'screen.scribe'),
+      writePath: path.join(tmpFixtures, 'screen.test.scribe'),
+    });
   }
 
   if (options.git.init) {
     const execOpts = {
-      cwd: projectRoot,
+      cwd: tmp,
     } satisfies child_process.ExecSyncOptionsWithBufferEncoding;
 
     child_process.execSync('git init', execOpts);
@@ -114,14 +113,14 @@ export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
     }
   }
 
-  return projectRoot;
+  return tmp;
 }
 
-const copyFileToPath = (
-  projectRoot: string,
-  writePath: string,
-  readPath: string,
-) => {
+type CopyFileOptions = {
+  writePath: string;
+  readPath: string;
+};
+const copyFileToPath = ({ writePath, readPath }: CopyFileOptions) => {
   fs.writeFileSync(writePath, fs.readFileSync(readPath));
 };
 

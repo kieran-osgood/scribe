@@ -1,7 +1,7 @@
 import { Schema as S } from '@effect/schema';
 import { Effect } from 'effect';
 
-import BaseConfig from '../../../public/base';
+import BaseConfig from '../../../../public/base';
 import { ScribeConfig } from '../schema';
 
 describe('Base Config', () => {

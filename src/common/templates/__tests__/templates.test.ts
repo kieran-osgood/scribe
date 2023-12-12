@@ -24,15 +24,17 @@ const screenFileContents = `describe('{{Name}}', function() {
 
 beforeEach(() => {
   vol.mkdirSync(process.cwd(), { recursive: true });
-  vol.mkdirSync(path.join(process.cwd(), './src/test-fixtures'), {
+  vol.mkdirSync(path.join(process.cwd(), './src/common/test-fixtures'), {
     recursive: true,
   });
 });
-afterEach(() => { vol.reset(); });
+afterEach(() => {
+  vol.reset();
+});
 
 const mockConfig = {
   options: {
-    templatesDirectories: ['src/test-fixtures'],
+    templatesDirectories: ['src/common/test-fixtures'],
     rootOutDir: '',
   },
   templates: {
@@ -41,14 +43,14 @@ const mockConfig = {
         {
           templateFileKey: 'screen',
           output: {
-            directory: 'src/test-fixtures/config',
+            directory: 'src/common/test-fixtures/config',
             fileName: '{{Name}}.ts',
           },
         },
         {
           templateFileKey: 'screen.test',
           output: {
-            directory: 'src/test-fixtures/config',
+            directory: 'src/common/test-fixtures/config',
             fileName: '{{Name}}.test.ts',
           },
         },
@@ -72,7 +74,7 @@ const templateOutput = {
   templateFileKey: 'screen',
   output: {
     fileName: '{{Name}}.ts', // good-scribe
-    directory: 'src/test-fixtures/config',
+    directory: 'src/common/test-fixtures/config',
   },
 };
 
@@ -88,11 +90,14 @@ describe('writeTemplate', () => {
         const result = yield* $(writeTemplate(ctx));
         const _process = yield* $(Process.Process);
         expect(result).toBe(
-          path.join(_process.cwd(), '/src/test-fixtures/config/login.ts'),
+          path.join(
+            _process.cwd(),
+            '/src/common/test-fixtures/config/login.ts',
+          ),
         );
 
         const readResult = yield* $(
-          FS.readFile('src/test-fixtures/config/login.ts', null),
+          FS.readFile('src/common/test-fixtures/config/login.ts', null),
         );
         expect(String(readResult)).toBe(fileContents);
       }),
@@ -120,7 +125,10 @@ describe('constructTemplate', () => {
 
         yield* $(
           FS.writeFileWithDir(
-            path.join(process.cwd(), './src/test-fixtures/screen.scribe'),
+            path.join(
+              process.cwd(),
+              './src/common/test-fixtures/screen.scribe',
+            ),
             screenFileContents,
             null,
           ),
