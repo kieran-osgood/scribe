@@ -13,4 +13,6 @@ export default defineConfig({
   minify: 'terser', // ~171kb -> ~70kb
   publicDir: 'public',
   entry: ['index.ts'],
+  tsconfig: './tsconfig.json',
+  outDir: './dist',
 });

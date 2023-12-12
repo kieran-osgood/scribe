@@ -117,7 +117,8 @@
       "examples",
       "dist",
       "node_modules",
-      "html"
+      "html",
+      "scribe.config.ts"
     ],
     "root": true,
     "overrides": [],
