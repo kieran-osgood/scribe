@@ -6,7 +6,7 @@ exports[`_Cli > Init Command > should fail if file doesn't exist 2`] = `
 const config = {
   options: {
     rootOutDir: '.',
-    templatesDirectories: ['./src/test-fixtures'],
+    templatesDirectories: ['./src/common/test-fixtures'],
   },
   templates: {
     component: {
@@ -46,16 +46,14 @@ export default config;
 `;
 
 exports[`_Cli > Init Command > should write base config file 2`] = `
-"import { ScribeConfig } from './index.js';
+"import { ScribeConfig } from '@kieran-osgood/scribe';
 
-const BaseConfig = {
+export default {
   options: {
     rootOutDir: '.',
     templatesDirectories: ['.'],
   },
   templates: {},
 } satisfies ScribeConfig;
-
-export default BaseConfig;
 "
 `;

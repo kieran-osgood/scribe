@@ -1,6 +1,6 @@
 import { Abortable } from 'node:events';
 
-import { Data } from '@scribe/core';
+import { Data } from 'effect';
 import * as fs from 'fs';
 import NFS from 'fs';
 
@@ -48,7 +48,7 @@ export class MkDirError extends FSError('MkDirError')<{
   readonly error: NodeJS.ErrnoException;
   readonly file: NFS.PathLike;
   readonly options?: NFS.MakeDirectoryOptions & {
-    recursive: true;
+    recursive: boolean;
   };
 }> {}
 

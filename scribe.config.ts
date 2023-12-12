@@ -1,41 +1,24 @@
-import type { ScribeConfig } from '@scribe/config';
+import { ScribeConfig } from '@kieran-osgood/scribe';
 
-const config = {
+export default {
   options: {
     rootOutDir: '.',
-    templatesDirectories: ['./src/test-fixtures'],
+    templatesDirectories: ['.'],
   },
   templates: {
-    component: {
+    Model: {
+      output: {
+        directory: './',
+      },
       outputs: [
         {
-          templateFileKey: 'component',
+          templateFileKey: 'Model',
           output: {
-            directory: 'examples/src/components',
-            fileName: '{{Name}}.ts',
-          },
-        },
-      ],
-    },
-    screen: {
-      outputs: [
-        {
-          templateFileKey: 'screen',
-          output: {
-            directory: 'examples/src/screens',
-            fileName: '{{Name}}.ts',
-          },
-        },
-        {
-          templateFileKey: 'screen.test',
-          output: {
-            directory: 'examples/src/screens',
-            fileName: '{{Name}}.test.ts',
+            directory: '.',
+            fileName: 'abc',
           },
         },
       ],
     },
   },
 } satisfies ScribeConfig;
-
-export default config;

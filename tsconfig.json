@@ -5,31 +5,54 @@
     "strict": true,
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
-    "outDir": "dist",
+    "exactOptionalPropertyTypes": true,
+    "declaration": true,
     "noImplicitOverride": true,
     "resolveJsonModule": true,
+    "noEmit": true,
     "paths": {
-      "@scribe/adapters": ["src/adapters/index"],
-      "@scribe/core": ["src/core/index"],
-      "@scribe/config": ["src/config/index"],
-      "@scribe/reader": ["src/reader/index"],
-      "@scribe/git": ["src/git/index"],
-      "@scribe/commands": ["src/commands/index"],
-      "@scribe/fs": ["src/common/fs/index"],
-      "@scribe/cli": ["src/cli/index"],
-      "@scribe/services": ["src/services/index"]
+      "@scribe/adapters": [
+        "src/adapters/index"
+      ],
+      "@scribe/config": [
+        "src/common/config/index"
+      ],
+      "@scribe/reader": [
+        "src/reader/index"
+      ],
+      "@scribe/git": [
+        "src/git/index"
+      ],
+      "@scribe/commands": [
+        "src/commands/index"
+      ],
+      "@scribe/fs": [
+        "src/common/fs/index"
+      ],
+      "@scribe/cli": [
+        "src/cli/cli"
+      ],
+      "@scribe/services": [
+        "src/services/index"
+      ]
     },
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "baseUrl": ".",
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "Node",
     "esModuleInterop": true,
     // Eases ESM support
-    "types": ["node", "vitest/globals"],
+    "types": [
+      "node",
+      "vitest/globals"
+    ],
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "plugins": [
+      {
+        "name": "@effect/language-service"
+      },
       {
         "name": "@unsplash/ts-namespace-import-plugin",
         "namespaces": {
@@ -42,11 +65,22 @@
   },
   "include": [
     ".eslintrc.js",
-    "."
+    "src",
+    "e2e",
+    "vite.config.ts",
+    "index.ts",
+    "tsup.config.ts"
   ],
-  "exclude": ["examples"],
+  "exclude": [
+    "examples",
+    "public",
+    "dist",
+    "scribe.config.ts"
+  ],
   "ts-node": {
     "swc": true,
-    "require": ["tsconfig-paths/register"]
+    "require": [
+      "tsconfig-paths/register"
+    ]
   }
 }

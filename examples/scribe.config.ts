@@ -1,4 +1,4 @@
-import type { ScribeConfig } from '@scribe/config';
+import type { ScribeConfig } from 'src/common/config';
 
 const config = {
   options: {

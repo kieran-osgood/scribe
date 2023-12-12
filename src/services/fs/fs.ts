@@ -1,6 +1,6 @@
 import { Abortable } from 'node:events';
 
-import { Context, Effect, pipe } from '@scribe/core';
+import { Context, Effect, pipe } from 'effect';
 import * as NFS from 'fs';
 import * as memfs from 'memfs';
 import path from 'path';
@@ -58,7 +58,7 @@ export const writeFileWithDir = (
 
 export const readFile = (
   path: NFS.PathOrFileDescriptor,
-  options:
+  options?:
     | ({ encoding?: BufferEncoding; flag?: string } & Abortable)
     | undefined
     | null,
@@ -80,8 +80,10 @@ export const readFile = (
 
 export const mkdir = (
   file: NFS.PathLike,
-  options?: NFS.MakeDirectoryOptions & {
-    recursive: true;
+  options: NFS.MakeDirectoryOptions & {
+    recursive: boolean;
+  } = {
+    recursive: false,
   },
 ): Effect.Effect<FS, MkDirError, string | undefined> =>
   pipe(
@@ -103,15 +105,15 @@ export const stat = (path: string) =>
   pipe(
     FS,
     Effect.flatMap(fs =>
-      Effect.async<FS, StatError, NFS.Stats>(resume =>
+      Effect.async<FS, StatError, NFS.Stats>(resume => {
         fs.stat(path, (error, stats) => {
           if (error) {
             resume(Effect.fail(new StatError({ path, error })));
           } else {
             resume(Effect.succeed(stats));
           }
-        }),
-      ),
+        });
+      }),
     ),
   );
 

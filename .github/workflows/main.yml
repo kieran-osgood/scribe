@@ -22,7 +22,10 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Lint
+      - name: Link @kieran-osgood/scribe -> scribe
+        run: pnpm link .
+
+      - name: Lint / TSC / Test
         run: pnpm run ci
 
       - name: Publish Test Report

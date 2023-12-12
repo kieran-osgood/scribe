@@ -1,6 +1,5 @@
-import * as CLI from '@scribe/cli';
-import { Effect, pipe } from '@scribe/core';
 import { BaseContext } from 'clipanion/lib/advanced/Cli';
+import { Effect, pipe } from 'effect';
 import * as fs from 'fs';
 import getStream from 'get-stream';
 import path from 'path';
@@ -9,6 +8,8 @@ import stripAnsi from 'strip-ansi';
 import { test } from 'vitest';
 
 import { createMinimalProject } from '../../../e2e/fixtures';
+import packageJson from '../../../package.json';
+import * as CLI from '../cli';
 
 const createCtx = (): BaseContext => ({
   stdout: new PassThrough(),
@@ -36,7 +37,7 @@ type RunCliPromise = {
   cliCtx: BaseContext;
   args: string[];
 };
-const runCliPromise = ({ cliCtx, args }: RunCliPromise) =>
+const runCliPromise = async ({ cliCtx, args }: RunCliPromise) =>
   pipe(
     Effect.gen(function* ($) {
       yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
@@ -84,6 +85,7 @@ describe('_Cli', () => {
           '--template=screen',
           '--name=Login',
           `--cwd=${projectRoot}`,
+          '--verbose',
         ];
 
         const result = runCliPromise({ cliCtx, args });
@@ -156,15 +158,15 @@ describe('_Cli', () => {
       const result = runCliPromise({ cliCtx, args });
 
       expect(await result).toMatchInlineSnapshot(`
-              "We caught an error during execution, this probably isn't a bug.
-              Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
+        "We caught an error during execution, this probably isn't a bug.
+        Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
 
-              If you think this might be a bug, please report it here: https://github.com/kieran-osgood/scribe/issues/new.
+        If you think this might be a bug, please report it here: https://github.com/kieran-osgood/scribe/issues/new.
 
-              You can enable verbose logging with --v, --verbose.
+        You can enable verbose logging with --v, --verbose.
 
-              Error: File ${projectRoot}/scribe.config.ts already exists."
-            `);
+        Error: ${projectRoot}/scribe.config.ts already exists."
+      `);
 
       const file = fs.readFileSync(path.join(projectRoot, 'scribe.config.ts'));
       expect(String(file)).toMatchSnapshot();
@@ -178,7 +180,8 @@ describe('_Cli', () => {
       const result = runCliPromise({ cliCtx, args });
 
       expect(await result).toMatchInlineSnapshot(`
-        "━━━ scribe ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        "━━━ scribe - ${packageJson.version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
           $ scribe <command>
 
         ━━━ General commands ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

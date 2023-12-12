@@ -1,6 +1,6 @@
 # scribe
 
-Standardise bootstrapping your files with [Mustache](https://github.com/mustache/mustache.github.com) templates.
+Bootstrap your common files with [Mustache](https://github.com/mustache/mustache.github.com) templates.
 
 <div align='center'>
   <img src="docs/usage.png" alt="scribe usage example" style='margin-bottom: 25px; margin-top: 20px; height: 450px;'>
@@ -32,27 +32,69 @@ Standardise bootstrapping your files with [Mustache](https://github.com/mustache
 
 ---
 
-## Installation
+## Quick Start
+We can handle setup via built in commands to bootstrap out the initial config, you'll need to edit it to add in some of your domains file requirements before your first run (see below, or [examples](https://github.com/kieran-osgood/scribe/tree/main/examples))
 
+### Install
 ```shell
-npm i -D scribe
-pnpm i -D scribe
-yarn add -D scribe
+npm i -D @kieran-osgood/scribe
+pnpm i -D @kieran-osgood/scribe
+yarn add -D @kieran-osgood/scribe
+bun i -D @kieran-osgood/scribe
 ```
-## Usage
 
-A simple use-case is a single file to output, but you can bootstrap multiple files, e.g. test files, related components,
+### Initialise Config file
+```shell
+scribe init
+# or
+cat 'node_modules/@kieran-osgood/scribe/base.ts' > scribe.config.ts
+```
+
+## Getting Started
+
+A simple use-case is a creating a single file from a template, but each CLI run can be configured to output multiple files.
+
+As an example, if you're creating a React Component, you can output test files, sub-component barrel files, storybook files
 etc.
 
-Given an appropriate config file, when running:
+Given a config and scribe files **all in the root of the repository**:
+```ts
+// scribe.config.ts -- this is the config file we'll read the settings from
+import type { ScribeConfig } from '@scribe/config';
 
-```sh
-$ scribe --template screen --name Login
-```
+const config = {
+  options: {
+    rootOutDir: '.',
+    templatesDirectories: ['./examples'],
+  },
+  templates: {
+    // Keys within the templates object correspond to what interactive mode will display, or --template flag will accept 
+    screen: {
+      outputs: [
+        {
+          // the templateFileKey screen corresponds to the template `screen.scribe` shown below 
+          templateFileKey: 'screen',
+          output: {
+            directory: 'examples/src/screens',
+            fileName: '{{Name}}.ts',
+          },
+        },
+        {
+          // the templateFileKey screen corresponds to the template `screen.test.scribe` shown below 
+          templateFileKey: 'screen.test',
+          output: {
+            directory: 'examples/src/screens',
+            fileName: '{{Name}}.test.ts',
+          },
+        },
+      ],
+    },
+  },
+} satisfies ScribeConfig;
 
-with an input template like the following:
+export default config;
 
-```mustache
+// ./screen.scribe -- This is the template file that we will generate from
 import * as React from 'react';
 
 type {{Name}}Props = {}
@@ -62,11 +104,36 @@ function {{Name}}Screen() {
     <></>
   )
 }
+
+// ./screen.test.scribe -- This is the template file that we will generate from
+describe('{{Name}}', function() {
+  it('should ', function() {
+
+  });
+});
 ```
 
-Would output:
+When you run the following command
+
+```sh
+# Interactive mode!
+scribe
+
+# Non-Interactive mode
+scribe --template screen --name Login
+
+# Partially Interactive mode - will prompt for additional args!
+scribe --template screen 
+# or
+scribe --name Login
+```
+
+> Note: you can either run in interactive mode, or pass the flags in directly, each of these commands allow you to get to the same end result
+
+Given the above CLI run with the files and paths all setup appropriately, you should see the output of two files in the following directories
 
 ```tsx
+// ✅ File Created: `examples/src/screens/Login.ts`
 import * as React from 'react';
 
 type LoginProps = {}
@@ -74,6 +141,13 @@ type LoginProps = {}
 function LoginScreen() {
   return (
     <></>
-  )
+  );
 }
+
+// ✅ File Created: `examples/src/screens/Login.test.ts`
+describe('Login', function() {
+  it('should ', function() {
+
+  });
+});
 ```
