@@ -3,10 +3,8 @@ import { Command } from 'clipanion';
 import { Effect, pipe } from 'effect';
 import { PathOrFileDescriptor } from 'fs';
 import path from 'path';
-import { StatusResult } from 'simple-git';
 import { Writable } from 'stream';
 
-import GitStatusError, { SimpleGitError } from '../../services/git/error';
 import { BaseCommand } from './base-command';
 
 export class InitCommand extends BaseCommand {
@@ -16,26 +14,29 @@ export class InitCommand extends BaseCommand {
     description: 'Generates a scribe.config.ts file.',
   });
 
+  // TODO: add flag to continue
+
   executeSafe = () =>
     pipe(
-      // TODO: add ignore git
       Git.checkWorkingTreeClean(),
-      checkConfigWritePathEmpty,
-      Effect.flatMap(copyBaseScribeConfigToPath),
-      Effect.flatMap(logSuccess(this.context.stdout)),
+      Effect.flatMap(continueOnDirty =>
+        Effect.if(continueOnDirty, {
+          onTrue: pipe(
+            Effect.succeed(continueOnDirty),
+            checkConfigWritePathEmpty,
+            Effect.flatMap(copyBaseScribeConfigToPath),
+            Effect.flatMap(logSuccess(this.context.stdout)),
+          ),
+          onFalse: Effect.unit,
+        }),
+      ),
     );
 }
 
 const createConfigPath = (_process: Process.Process) =>
   path.join(_process.cwd(), 'scribe.config.ts');
 
-const checkConfigWritePathEmpty = (
-  _: Effect.Effect<
-    Process.Process,
-    SimpleGitError | GitStatusError,
-    StatusResult
-  >,
-) => {
+const checkConfigWritePathEmpty = (_: Effect.Effect<never, never, boolean>) => {
   return pipe(
     _,
     Effect.flatMap(() =>
@@ -68,8 +69,8 @@ const checkConfigWritePathEmpty = (
   );
 };
 
-const copyBaseScribeConfigToPath = () => {
-  return pipe(
+const copyBaseScribeConfigToPath = () =>
+  pipe(
     FS.readFile('public/base.ts'),
     Effect.flatMap(configTxt =>
       Process.Process.pipe(
@@ -81,7 +82,6 @@ const copyBaseScribeConfigToPath = () => {
       ),
     ),
   );
-};
 
 const createFileExistsError = () =>
   Process.Process.pipe(

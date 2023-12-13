@@ -136,6 +136,7 @@
       "simple-import-sort"
     ],
     "rules": {
+      "@typescript-eslint/no-unnecessary-boolean-literal-compare": "off",
       "@typescript-eslint/no-misused-promises": "error",
       "@typescript-eslint/promise-function-async": "error",
       "@typescript-eslint/no-floating-promises": "error",
