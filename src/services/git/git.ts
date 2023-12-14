@@ -1,5 +1,3 @@
-import * as Schema from '@effect/schema/Schema';
-import { Inquirer } from '@scribe/adapters';
 import { Process } from '@scribe/services';
 import { Effect, pipe } from 'effect';
 import simpleGit, {
@@ -11,9 +9,6 @@ import simpleGit, {
 
 import GitStatusError, { SimpleGitError } from './error';
 
-const ContinueSchema = Schema.struct({
-  continue: Schema.boolean,
-});
 export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
   Effect.try({
     try: () => simpleGit(options),
@@ -21,8 +16,8 @@ export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
     catch: error => new SimpleGitError({ error: error as GitConstructError }),
   });
 
-export const checkWorkingTreeClean = (options?: TaskOptions) =>
-  pipe(
+export const status = (options?: TaskOptions) => {
+  return pipe(
     Process.Process,
     Effect.flatMap(_ => createSimpleGit({ baseDir: _.cwd() })),
     Effect.flatMap(_ =>
@@ -36,28 +31,11 @@ export const checkWorkingTreeClean = (options?: TaskOptions) =>
         });
       }),
     ),
+  );
+};
 
-    Effect.flatMap(status =>
-      Effect.if(status.isClean(), {
-        onTrue: Effect.succeed(true),
-        onFalse: pipe(
-          // status,
-          // Effect.tap(Effect.sync(() => {})),
-          Inquirer.prompt([
-            {
-              name: 'continue',
-              type: 'confirm',
-              message: 'Continue',
-            },
-          ]),
-          Effect.flatMap(Schema.parse(ContinueSchema)),
-          Effect.flatMap(_ =>
-            Effect.if(_.continue, {
-              onTrue: Effect.succeed(true),
-              onFalse: Effect.succeed(false),
-            }),
-          ),
-        ),
-      }),
-    ),
+export const isWorkingTreeClean = (options?: TaskOptions) =>
+  pipe(
+    status(options),
+    Effect.map(_ => _.isClean()),
   );

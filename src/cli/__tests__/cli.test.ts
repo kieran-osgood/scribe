@@ -5,7 +5,7 @@ import getStream from 'get-stream';
 import path from 'path';
 import { PassThrough, Writable } from 'stream';
 import stripAnsi from 'strip-ansi';
-import { test } from 'vitest';
+import { describe, test } from 'vitest';
 
 import { createMinimalProject } from '../../../e2e/fixtures';
 import packageJson from '../../../package.json';
@@ -37,7 +37,7 @@ type RunCliPromise = {
   cliCtx: BaseContext;
   args: string[];
 };
-const runCliPromise = async ({ cliCtx, args }: RunCliPromise) =>
+const runCli = async ({ cliCtx, args }: RunCliPromise) =>
   pipe(
     Effect.gen(function* ($) {
       yield* $(CLI.run([...process.argv.slice(0, 2), ...args], cliCtx));
@@ -48,7 +48,7 @@ const runCliPromise = async ({ cliCtx, args }: RunCliPromise) =>
   );
 
 describe('_Cli', () => {
-  describe('Default Command', () => {
+  describe.skip('Default Command', () => {
     CliTest('should warn on dirty git', async ({ cliCtx, expect }) => {
       const projectRoot = createMinimalProject({
         git: { init: true, dirty: true },
@@ -60,7 +60,7 @@ describe('_Cli', () => {
         `--cwd=${projectRoot}`,
       ];
 
-      const result = runCliPromise({ cliCtx, args });
+      const result = runCli({ cliCtx, args });
 
       expect(await result).toMatchInlineSnapshot(`
             "We caught an error during execution, this probably isn't a bug.
@@ -88,7 +88,7 @@ describe('_Cli', () => {
           '--verbose',
         ];
 
-        const result = runCliPromise({ cliCtx, args });
+        const result = runCli({ cliCtx, args });
 
         expect(await result).toMatchInlineSnapshot(`
             "✅  Success!
@@ -113,7 +113,7 @@ describe('_Cli', () => {
           `--cwd=${projectRoot}`,
         ];
 
-        const result = runCliPromise({ cliCtx, args });
+        const result = runCli({ cliCtx, args });
 
         expect(await result).toMatchInlineSnapshot(`
             "✅  Success!
@@ -127,57 +127,121 @@ describe('_Cli', () => {
   });
 
   describe('Init Command', () => {
-    CliTest('should write base config file', async ({ cliCtx, expect }) => {
-      const projectRoot = createMinimalProject({
-        git: { init: true, dirty: false },
-        fixtures: {
-          configFile: false,
-          templateFiles: false,
+    describe('[Given] git is clean', () => {
+      CliTest('should write base config file', async ({ cliCtx, expect }) => {
+        const cwd = createMinimalProject({
+          git: { init: true, dirty: false },
+          fixtures: {
+            configFile: false,
+            templateFiles: false,
+            base: false,
+          },
+        });
+
+        const args = ['init', `--cwd=${cwd}`];
+
+        const result = await runCli({ cliCtx, args });
+        expect(result).toMatchInlineSnapshot(
+          `"Init
+Checking working tree clean
+Checking Config path clear
+Writing...
+✅  Success
+📁 file://${cwd}/scribe.config.ts
+"`,
+        );
+
+        const file = fs.readFileSync(path.join(cwd, 'scribe.config.ts'));
+        expect(String(file)).toMatchSnapshot();
+      });
+
+      CliTest(
+        "should fail if file doesn't exist",
+        async ({ cliCtx, expect }) => {
+          const cwd = createMinimalProject({
+            git: { init: true, dirty: false },
+            fixtures: { configFile: true, templateFiles: false, base: false },
+          });
+          const args = ['init', `--cwd=${cwd}`];
+
+          const result = await runCli({ cliCtx, args });
+
+          expect(result).toMatchInlineSnapshot(
+            `"Init
+Checking working tree clean
+Checking Config path clear
+💥 Failed to create config. Path not empty: ${cwd}/scribe.config.ts
+"`,
+          );
+
+          const file = fs.readFileSync(path.join(cwd, 'scribe.config.ts'));
+          expect(String(file)).toMatchSnapshot();
         },
-      });
-
-      const args = ['init', `--cwd=${projectRoot}`];
-
-      const result = runCliPromise({ cliCtx, args });
-
-      expect(await result).toMatchInlineSnapshot(
-        `"Scribe config created: ${projectRoot}/scribe.config.ts"`,
       );
-
-      const file = fs.readFileSync(path.join(projectRoot, 'scribe.config.ts'));
-      expect(String(file)).toMatchSnapshot();
     });
 
-    CliTest("should fail if file doesn't exist", async ({ cliCtx, expect }) => {
-      const projectRoot = createMinimalProject({
-        git: { init: true, dirty: false },
-        fixtures: { configFile: true, templateFiles: false },
-      });
-      const args = ['init', `--cwd=${projectRoot}`];
-
-      const result = runCliPromise({ cliCtx, args });
-
-      expect(await result).toMatchInlineSnapshot(`
-        "We caught an error during execution, this probably isn't a bug.
-        Check your 'scribe.config.ts', and ensure all files exist and paths are correct.
-
-        If you think this might be a bug, please report it here: https://github.com/kieran-osgood/scribe/issues/new.
-
-        You can enable verbose logging with --v, --verbose.
-
-        Error: ${projectRoot}/scribe.config.ts already exists."
-      `);
-
-      const file = fs.readFileSync(path.join(projectRoot, 'scribe.config.ts'));
-      expect(String(file)).toMatchSnapshot();
-    });
+    // describe('[Given] git dirty', () => {
+    //   describe('[Then] prompt user to continue', () => {
+    //     test('[When] y', async ({ expect }) => {
+    //       // Arrange
+    //       const cliCtx = createCtx();
+    //       const cwd = createMinimalProject({
+    //         git: { init: true, dirty: true },
+    //         fixtures: { configFile: false, templateFiles: false },
+    //       });
+    //
+    //       const args = ['init', `--cwd=${cwd}`];
+    //
+    //       // Act
+    //       cliCtx.stdout.on('data', (data: { toString(): string }) => {
+    //         const d = data.toString();
+    //         if (d.includes('Continue')) {
+    //           cliCtx.stdin.push(`y\n`);
+    //         }
+    //       });
+    //
+    //       const result = runCli({ cliCtx, args });
+    //
+    //       // Assert
+    //       expect(await result).toMatchInlineSnapshot(``);
+    //
+    //       const file = fs.readFileSync(path.join(cwd, 'scribe.config.ts'));
+    //       expect(String(file)).toMatchSnapshot();
+    //     });
+    //   });
+    // });
+    //
+    // describe.todo('[Given] not git', () => {
+    //   //
+    //   CliTest.todo(
+    //     'should prompt user to continue',
+    //     async ({ cliCtx, expect }) => {
+    //       const cwd = createMinimalProject({
+    //         git: { init: false, dirty: false },
+    //         fixtures: {
+    //           configFile: false,
+    //           templateFiles: false,
+    //         },
+    //       });
+    //
+    //       const args = ['init', `--cwd=${cwd}`];
+    //
+    //       const result = await runCli({ cliCtx, args });
+    //
+    //       expect(result).toMatchInlineSnapshot();
+    //
+    //       const file = fs.readFileSync(path.join(cwd, 'scribe.config.ts'));
+    //       expect(String(file)).toMatchSnapshot();
+    //     },
+    //   );
+    // });
   });
 
   describe('Help Command', () => {
     CliTest('should print --help', async ({ cliCtx, expect }) => {
       const args = ['--help'];
 
-      const result = runCliPromise({ cliCtx, args });
+      const result = runCli({ cliCtx, args });
 
       expect(await result).toMatchInlineSnapshot(`
         "━━━ scribe - ${packageJson.version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

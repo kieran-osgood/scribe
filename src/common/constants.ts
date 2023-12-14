@@ -6,3 +6,15 @@ export const URLS = {
     newIssue: `${github}/issues/new`,
   },
 } as const;
+
+export const WARNINGS = {
+  gitWorkingDirectoryDirty: `Git working tree dirty - proceed with caution.
+Recommendation: commit all changes before proceeding.`,
+};
+
+export const SYMBOLS = {
+  success: '✅',
+  warning: '⚠️',
+  error: '💥',
+  directory: '📁',
+};

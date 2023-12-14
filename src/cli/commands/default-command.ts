@@ -136,8 +136,14 @@ export class DefaultCommand extends BaseCommand {
 
   executeSafe = () =>
     pipe(
+      Git.isWorkingTreeClean(),
       // TODO: add ignore git
-      Git.checkWorkingTreeClean(),
+      Effect.flatMap(
+        Effect.if({
+          onFalse: Effect.fail(''),
+          onTrue: Effect.unit,
+        }),
+      ),
       Effect.flatMap(() => this.promptUserForMissingArgs()),
       Effect.flatMap(writeAllTemplates),
       Effect.map(this.print),

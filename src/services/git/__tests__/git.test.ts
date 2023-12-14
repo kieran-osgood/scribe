@@ -5,7 +5,7 @@ import * as types from 'simple-git/dist/typings/types';
 import { beforeEach, vi } from 'vitest';
 
 import GitStatusError from '../error';
-import { checkWorkingTreeClean } from '../git';
+import { isWorkingTreeClean } from '../git';
 
 const mockConsoleLog = vi.fn();
 vi.stubGlobal('console', {
@@ -48,23 +48,6 @@ describe('Git', async () => {
     //
     // });
 
-    it("The process.env.NODE_ENV is 'development'", async () =>
-      pipe(
-        Effect.gen(function* ($) {
-          vi.stubEnv('NODE_ENV', 'development');
-
-          mockStatusImplementation.mockImplementation(
-            (_options: StatusOptions, cb: StatusCallback) => {
-              cb(new GitError(), { isClean: () => true });
-            },
-          );
-          const result = yield* $(checkWorkingTreeClean());
-          expect(result.isClean()).toBe(true);
-        }),
-        Effect.provideService(Process.Process, Process.ProcessMock),
-        Effect.runPromise,
-      ));
-
     // TODO: handle accepting or rejecting continue on dirty
     it.skip('The callback has an error', async () =>
       pipe(
@@ -74,7 +57,7 @@ describe('Git', async () => {
               cb(new GitError(), { isClean: () => true });
             },
           );
-          const result = yield* $(checkWorkingTreeClean(), Effect.flip);
+          const result = yield* $(isWorkingTreeClean(), Effect.flip);
           expect(result).toBeInstanceOf(GitStatusError);
           // expect(mockConsoleLog).toBeCalledTimes(1);
           // expect(mockConsoleLog).toBeCalledWith('unknown cause');
@@ -95,8 +78,8 @@ describe('Git', async () => {
                 cb(null, { isClean: () => true });
               },
             );
-            const result = yield* $(checkWorkingTreeClean());
-            expect(result.isClean()).toBe(true);
+            const result = yield* $(isWorkingTreeClean());
+            expect(result).toBe(true);
           }),
           Effect.provideService(Process.Process, Process.ProcessMock),
           Effect.runPromise,
@@ -111,7 +94,7 @@ describe('Git', async () => {
                 cb(null, { isClean: () => false });
               },
             );
-            const result = yield* $(checkWorkingTreeClean(), Effect.flip);
+            const result = yield* $(isWorkingTreeClean(), Effect.flip);
             expect(result).toBeInstanceOf(GitStatusError);
             // expect(mockConsoleLog).toBeCalledTimes(1);
             // expect(mockConsoleLog).toBeCalledWith(
@@ -137,8 +120,8 @@ describe('Git', async () => {
           );
           const abortController = new AbortController();
           abortController.abort();
-          const result = yield* $(checkWorkingTreeClean([]));
-          expect(result.isClean()).toBe(true);
+          const result = yield* $(isWorkingTreeClean([]));
+          expect(result).toBe(true);
         }),
         Effect.provideService(Process.Process, Process.ProcessMock),
         Effect.runPromise,
