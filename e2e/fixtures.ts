@@ -101,8 +101,7 @@ export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
       writePath: path.join(tmpFixtures, `screen.scribe`),
     });
     copyFileToPath({
-      // TODO: WE'RE READING THE WRONG FILE
-      readPath: path.join(realFixtures, 'screen.scribe'),
+      readPath: path.join(realFixtures, 'screen.test.scribe'),
       writePath: path.join(tmpFixtures, 'screen.test.scribe'),
     });
   }

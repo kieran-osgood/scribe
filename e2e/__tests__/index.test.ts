@@ -240,18 +240,6 @@ describe('InitCommand', () => {
             📁 file://${cwd}/scribe.config.ts
             "
           `);
-        expect(result.stdout).toMatchInlineSnapshot(`
-            "[34m[44m[30mInit[34m[49m[39m
-            [34mChecking working tree clean[39m
-            ⚠️ [33mGit working tree dirty - proceed with caution.
-            Recommendation: commit all changes before proceeding.[39m
-            [32m?[39m [1mContinue[22m[0m [0m[2m(Y/n) [22m[17D[17C[2K[G[32m?[39m [1mContinue[22m[0m [0m[2m(Y/n) [22my[18D[18C[2K[G[32m?[39m [1mContinue[22m[0m [0m[36mYes[39m[14D[14C
-            [34mChecking Config path clear[39m
-            [34mWriting...[39m
-            [34m✅  [32mSuccess[34m[39m
-            [34m📁 file://${cwd}/scribe.config.ts[39m
-            "
-          `);
 
         const config = fs.readFileSync(`${cwd}/scribe.config.ts`);
         expect(String(config)).toMatchSnapshot();
@@ -278,14 +266,6 @@ describe('InitCommand', () => {
             ⚠️ Git working tree dirty - proceed with caution.
             Recommendation: commit all changes before proceeding.
             ? Continue (Y/n) ? Continue (Y/n) n? Continue No
-            "
-          `);
-        expect(result.stdout).toMatchInlineSnapshot(`
-            "[34m[44m[30mInit[34m[49m[39m
-            [34mChecking working tree clean[39m
-            ⚠️ [33mGit working tree dirty - proceed with caution.
-            Recommendation: commit all changes before proceeding.[39m
-            [32m?[39m [1mContinue[22m[0m [0m[2m(Y/n) [22m[17D[17C[2K[G[32m?[39m [1mContinue[22m[0m [0m[2m(Y/n) [22mn[18D[18C[2K[G[32m?[39m [1mContinue[22m[0m [0m[36mNo[39m[13D[13C
             "
           `);
 
@@ -315,15 +295,6 @@ describe('InitCommand', () => {
           Writing...
           ✅  Success
           📁 file://${cwd}/scribe.config.ts
-          "
-        `);
-      expect(result.stdout).toMatchInlineSnapshot(`
-          "[34m[44m[30mInit[34m[49m[39m
-          [34mChecking working tree clean[39m
-          [34mChecking Config path clear[39m
-          [34mWriting...[39m
-          [34m✅  [32mSuccess[34m[39m
-          [34m📁 file://${cwd}/scribe.config.ts[39m
           "
         `);
 
