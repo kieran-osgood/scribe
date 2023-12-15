@@ -57,6 +57,8 @@ A simple use-case is a creating a single file from a template, but each CLI run 
 As an example, if you're creating a React Component, you can output test files, sub-component barrel files, storybook files
 etc.
 
+### Example
+
 Given a config and scribe files **all in the root of the repository**:
 ```ts
 // scribe.config.ts -- this is the config file we'll read the settings from
