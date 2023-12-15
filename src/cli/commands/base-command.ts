@@ -37,7 +37,7 @@ export abstract class BaseCommand extends Command {
   private createContext = () =>
     pipe(
       Context.empty(),
-      Context.add(Process.Process, Process.getProcess(this.cwd)),
+      Context.add(Process.Process, Process.make(this.cwd)),
       Context.add(FS.FS, FS.getFS(this.test)),
     );
 

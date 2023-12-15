@@ -1,6 +1,6 @@
 import { TreeFormatter } from '@effect/schema';
 import * as Schema from '@effect/schema/Schema';
-import { Console, Inquirer, PromptError } from '@scribe/adapters';
+import { Console, Inquirer } from '@scribe/adapters';
 import { FS, Git, Process } from '@scribe/services';
 import { Command, Option } from 'clipanion';
 import { green } from 'colorette';
@@ -92,7 +92,7 @@ export class DefaultCommand extends BaseCommand {
           Schema.parse(Prompt)(_),
           Effect.catchTag('ParseError', error =>
             Effect.fail(
-              new PromptError({
+              new Inquirer.PromptError({
                 message: TreeFormatter.formatErrors(error.errors),
               }),
             ),
