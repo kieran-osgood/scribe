@@ -7,8 +7,8 @@ import path from 'path';
 import stripAnsi from 'strip-ansi';
 import { describe } from 'vitest';
 
-import packageJson from '../../package.json';
-import { arrowKey, createMinimalProject } from '../fixtures';
+import packageJson from '../../../package.json';
+import { arrowKey, createMinimalProject } from './fixtures';
 
 const cliPath = path.join(process.cwd(), 'dist', 'index.js');
 const configFlag = path.join('scribe.config.ts');
