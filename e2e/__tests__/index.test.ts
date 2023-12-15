@@ -62,150 +62,308 @@ const getCliFromSpawn = (
 };
 
 describe('DefaultCommand', () => {
-  describe('[Given] Flag passed in: --config & fully interactive session', () => {
-    it('[Then] creates two files', async () => {
-      const cwd = createMinimalProject();
+  describe('[Given] Git clean', () => {
+    describe('[When] `--config` passed in & fully interactive session', () => {
+      it('[Then] creates two files', async () => {
+        const cwd = createMinimalProject();
 
-      const processPromise = spawnAsync(cliPath, [`--config=${configFlag}`], {
-        cwd,
-      });
-
-      const cli = getCliFromSpawn(processPromise);
-
-      registerInteractiveListeners(cli)({
-        templatePicker: arrowKey.down,
-        fileName: 'Login',
-      });
-
-      const result = await processPromise;
-
-      expect(result.status).toBe(0);
-      expect(stripAnsi(result.stdout)).toMatch(
-        '✅  Success!\n' +
-          'Output files:\n' +
-          `- ${cwd}/examples/src/screens/Login.ts\n` +
-          `- ${cwd}/examples/src/screens/Login.test.ts\n`,
-      );
-
-      const loginscreen = fs.readFileSync(
-        `${cwd}/examples/src/screens/Login.ts`,
-      );
-      expect(String(loginscreen)).toMatchSnapshot();
-
-      const loginscreentest = fs.readFileSync(
-        `${cwd}/examples/src/screens/Login.test.ts`,
-      );
-      expect(String(loginscreentest)).toMatchSnapshot();
-    });
-  });
-
-  describe('[Given] only --name passed in', () => {
-    it('[Then] creates two files', async () => {
-      const cwd = createMinimalProject();
-
-      const processPromise = spawnAsync(
-        cliPath,
-        [`--config=${configFlag}`, '--name=Login'],
-        {
+        const processPromise = spawnAsync(cliPath, [`--config=${configFlag}`], {
           cwd,
-        },
-      );
+        });
 
-      const cli = getCliFromSpawn(processPromise);
+        const cli = getCliFromSpawn(processPromise);
 
-      registerInteractiveListeners(cli)({
-        templatePicker: arrowKey.down,
+        registerInteractiveListeners(cli)({
+          templatePicker: arrowKey.down,
+          fileName: 'Login',
+        });
+
+        const result = await processPromise;
+
+        expect(result.status).toBe(0);
+        expect(stripAnsi(result.stdout)).toMatch(
+          '✅  Success!\n' +
+            'Output files:\n' +
+            `- ${cwd}/examples/src/screens/Login.ts\n` +
+            `- ${cwd}/examples/src/screens/Login.test.ts\n`,
+        );
+
+        const loginscreen = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.ts`,
+        );
+        expect(String(loginscreen)).toMatchSnapshot();
+
+        const loginscreentest = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.test.ts`,
+        );
+        expect(String(loginscreentest)).toMatchSnapshot();
       });
+    });
 
-      const result = await processPromise;
+    describe('[When] `--name` passed in', () => {
+      it('[Then] creates two files', async () => {
+        const cwd = createMinimalProject();
 
-      expect(result.status).toBe(0);
-      expect(stripAnsi(result.stdout)).toMatch(
-        '✅  Success!\n' +
-          'Output files:\n' +
-          `- ${cwd}/examples/src/screens/Login.ts\n` +
-          `- ${cwd}/examples/src/screens/Login.test.ts\n`,
-      );
+        const processPromise = spawnAsync(
+          cliPath,
+          [`--config=${configFlag}`, '--name=Login'],
+          {
+            cwd,
+          },
+        );
 
-      const loginscreen = fs.readFileSync(
-        `${cwd}/examples/src/screens/Login.ts`,
-      );
-      expect(String(loginscreen)).toMatchSnapshot();
+        const cli = getCliFromSpawn(processPromise);
 
-      const loginscreentest = fs.readFileSync(
-        `${cwd}/examples/src/screens/Login.test.ts`,
-      );
-      expect(String(loginscreentest)).toMatchSnapshot();
+        registerInteractiveListeners(cli)({
+          templatePicker: arrowKey.down,
+        });
+
+        const result = await processPromise;
+
+        expect(result.status).toBe(0);
+        expect(stripAnsi(result.stdout)).toMatch(
+          '✅  Success!\n' +
+            'Output files:\n' +
+            `- ${cwd}/examples/src/screens/Login.ts\n` +
+            `- ${cwd}/examples/src/screens/Login.test.ts\n`,
+        );
+
+        const loginscreen = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.ts`,
+        );
+        expect(String(loginscreen)).toMatchSnapshot();
+
+        const loginscreentest = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.test.ts`,
+        );
+        expect(String(loginscreentest)).toMatchSnapshot();
+      });
+    });
+
+    describe('[When] `--template` passed in', () => {
+      it('[Then] creates two files', async () => {
+        const cwd = createMinimalProject();
+
+        const processPromise = spawnAsync(
+          cliPath,
+          [`--config=${configFlag}`, '--template=screen'],
+          {
+            cwd,
+          },
+        );
+
+        const cli = getCliFromSpawn(processPromise);
+
+        registerInteractiveListeners(cli)({
+          fileName: 'Login',
+        });
+
+        const result = await processPromise;
+
+        expect(result.status).toBe(0);
+        expect(stripAnsi(result.stdout)).toMatch(
+          '✅  Success!\n' +
+            'Output files:\n' +
+            `- ${cwd}/examples/src/screens/Login.ts\n` +
+            `- ${cwd}/examples/src/screens/Login.test.ts\n`,
+        );
+
+        const loginscreen = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.ts`,
+        );
+        expect(String(loginscreen)).toMatchSnapshot();
+
+        const loginscreentest = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.test.ts`,
+        );
+        expect(String(loginscreentest)).toMatchSnapshot();
+      });
+    });
+
+    describe('[Given] `--config --template --name passed` in', () => {
+      it('[Then] creates two files', async () => {
+        const cwd = createMinimalProject();
+
+        const result = await spawnAsync(
+          cliPath,
+          [`--config=${configFlag}`, '--template=screen', '--name=Login'],
+          { cwd },
+        );
+
+        expect(result.status).toBe(0);
+        expect(stripAnsi(result.stdout)).toMatch(
+          '✅  Success!\n' +
+            'Output files:\n' +
+            `- ${cwd}/examples/src/screens/Login.ts\n` +
+            `- ${cwd}/examples/src/screens/Login.test.ts\n`,
+        );
+
+        const loginscreen = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.ts`,
+        );
+        expect(String(loginscreen)).toMatchSnapshot();
+
+        const loginscreentest = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.test.ts`,
+        );
+        expect(String(loginscreentest)).toMatchSnapshot();
+      });
     });
   });
 
-  describe('[Given] only --template passed in', () => {
-    it('[Then] creates two files', async () => {
-      const cwd = createMinimalProject();
+  describe('[Given] Git Dirty', function () {
+    describe('[Given] prompts to continue', () => {
+      it('[Then] user answers `y`, creates two files', async () => {
+        const cwd = createMinimalProject({
+          git: { init: true, dirty: true },
+          fixtures: { configFile: true, base: true, templateFiles: true },
+        });
 
-      const processPromise = spawnAsync(
-        cliPath,
-        [`--config=${configFlag}`, '--template=screen'],
-        {
-          cwd,
-        },
-      );
+        const processPromise = spawnAsync(
+          cliPath,
+          [`--config=${configFlag}`, '--template=screen', '--name=Login'],
+          { cwd },
+        );
 
-      const cli = getCliFromSpawn(processPromise);
+        const cli = getCliFromSpawn(processPromise);
 
-      registerInteractiveListeners(cli)({
-        fileName: 'Login',
+        registerInteractiveListeners(cli)({
+          continue: 'y',
+        });
+
+        const result = await processPromise;
+
+        expect(result.status).toBe(0);
+        expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+          "⚠️ Git working tree dirty - proceed with caution.
+          Recommendation: commit all changes before proceeding.
+          ? Continue (Y/n) ? Continue (Y/n) y? Continue Yes
+          ✅  Success!
+          Output files:
+          - ${cwd}/examples/src/screens/Login.ts
+          - ${cwd}/examples/src/screens/Login.test.ts
+          "
+        `);
+
+        const loginscreen = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.ts`,
+        );
+        expect(String(loginscreen)).toMatchSnapshot();
+
+        const loginscreentest = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.test.ts`,
+        );
+        expect(String(loginscreentest)).toMatchSnapshot();
       });
 
-      const result = await processPromise;
+      it('[Then] user answers `n`, cli aborts without writing file', async () => {
+        const cwd = createMinimalProject({
+          git: { init: true, dirty: true },
+          fixtures: { configFile: true, base: true, templateFiles: true },
+        });
 
-      expect(result.status).toBe(0);
-      expect(stripAnsi(result.stdout)).toMatch(
-        '✅  Success!\n' +
-          'Output files:\n' +
-          `- ${cwd}/examples/src/screens/Login.ts\n` +
-          `- ${cwd}/examples/src/screens/Login.test.ts\n`,
-      );
+        const processPromise = spawnAsync(
+          cliPath,
+          [`--config=${configFlag}`, '--template=screen', '--name=Login'],
+          { cwd },
+        );
 
-      const loginscreen = fs.readFileSync(
-        `${cwd}/examples/src/screens/Login.ts`,
-      );
-      expect(String(loginscreen)).toMatchSnapshot();
+        const cli = getCliFromSpawn(processPromise);
 
-      const loginscreentest = fs.readFileSync(
-        `${cwd}/examples/src/screens/Login.test.ts`,
-      );
-      expect(String(loginscreentest)).toMatchSnapshot();
+        registerInteractiveListeners(cli)({
+          continue: 'n',
+        });
+
+        const result = await processPromise;
+
+        expect(result.status).toBe(0);
+        expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+          "⚠️ Git working tree dirty - proceed with caution.
+          Recommendation: commit all changes before proceeding.
+          ? Continue (Y/n) ? Continue (Y/n) n? Continue No
+          "
+        `);
+
+        await expect(async () =>
+          fs.promises.readFile(`${cwd}/examples/src/screens/Login.ts`),
+        ).rejects.toMatchInlineSnapshot(
+          `[Error: ENOENT: no such file or directory, open '${cwd}/examples/src/screens/Login.ts']`,
+        );
+      });
     });
   });
 
-  describe('[Given] all flags used: --config --template --name', () => {
-    it('[Then] creates two files', async () => {
-      const cwd = createMinimalProject();
+  describe.skip('[Given] Not in Git', function () {
+    describe('[Given] prompts to continue', () => {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      it('[Then] user answers y, creates two files', async () => {
+        const cwd = createMinimalProject({
+          git: { init: false, dirty: true },
+          fixtures: { configFile: true, base: true, templateFiles: true },
+        });
 
-      const result = await spawnAsync(
-        cliPath,
-        [`--config=${configFlag}`, '--template=screen', '--name=Login'],
-        { cwd },
-      );
+        const processPromise = spawnAsync(
+          cliPath,
+          [`--config=${configFlag}`, '--template=screen', '--name=Login'],
+          { cwd },
+        );
 
-      expect(result.status).toBe(0);
-      expect(stripAnsi(result.stdout)).toMatch(
-        '✅  Success!\n' +
-          'Output files:\n' +
-          `- ${cwd}/examples/src/screens/Login.ts\n` +
-          `- ${cwd}/examples/src/screens/Login.test.ts\n`,
-      );
+        const cli = getCliFromSpawn(processPromise);
 
-      const loginscreen = fs.readFileSync(
-        `${cwd}/examples/src/screens/Login.ts`,
-      );
-      expect(String(loginscreen)).toMatchSnapshot();
+        registerInteractiveListeners(cli)({
+          continue: 'n',
+        });
 
-      const loginscreentest = fs.readFileSync(
-        `${cwd}/examples/src/screens/Login.test.ts`,
-      );
-      expect(String(loginscreentest)).toMatchSnapshot();
+        const result = await processPromise;
+
+        expect(result.status).toBe(0);
+        expect(stripAnsi(result.stdout)).toMatchInlineSnapshot();
+
+        const loginscreen = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.ts`,
+        );
+        expect(String(loginscreen)).toMatchSnapshot();
+
+        const loginscreentest = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.test.ts`,
+        );
+        expect(String(loginscreentest)).toMatchSnapshot();
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      it('[Then] user answers `n`, cli aborts without writing file', async () => {
+        const cwd = createMinimalProject({
+          git: { init: false, dirty: true },
+          fixtures: { configFile: true, base: true, templateFiles: true },
+        });
+
+        const processPromise = spawnAsync(
+          cliPath,
+          [`--config=${configFlag}`, '--template=screen', '--name=Login'],
+          { cwd },
+        );
+
+        const cli = getCliFromSpawn(processPromise);
+
+        registerInteractiveListeners(cli)({
+          continue: 'n',
+        });
+
+        const result = await processPromise;
+
+        expect(result.status).toBe(0);
+        expect(stripAnsi(result.stdout)).toMatchInlineSnapshot();
+
+        const loginscreen = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.ts`,
+        );
+        expect(String(loginscreen)).toMatchSnapshot();
+
+        const loginscreentest = fs.readFileSync(
+          `${cwd}/examples/src/screens/Login.test.ts`,
+        );
+        expect(String(loginscreentest)).toMatchSnapshot();
+      });
     });
   });
 });

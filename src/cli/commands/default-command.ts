@@ -1,6 +1,6 @@
 import { TreeFormatter } from '@effect/schema';
 import * as Schema from '@effect/schema/Schema';
-import { Inquirer, PromptError } from '@scribe/adapters';
+import { Console, Inquirer, PromptError } from '@scribe/adapters';
 import { FS, Git, Process } from '@scribe/services';
 import { Command, Option } from 'clipanion';
 import { green } from 'colorette';
@@ -18,6 +18,7 @@ import path from 'path';
 import * as Config from 'src/common/config';
 import * as t from 'typanion';
 
+import { WARNINGS } from '../../common/constants';
 import { constructTemplate, Ctx, writeTemplate } from '../../common/templates';
 import { BaseCommand } from './base-command';
 
@@ -138,15 +139,29 @@ export class DefaultCommand extends BaseCommand {
     pipe(
       Git.isWorkingTreeClean(),
       // TODO: add ignore git
+
       Effect.flatMap(
         Effect.if({
-          onFalse: Effect.fail(''),
-          onTrue: Effect.unit,
+          onTrue: Effect.succeed(true),
+          onFalse: Effect.gen(function* ($) {
+            yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
+            return yield* $(Inquirer.continuePrompt());
+          }),
         }),
       ),
-      Effect.flatMap(() => this.promptUserForMissingArgs()),
-      Effect.flatMap(writeAllTemplates),
-      Effect.map(this.print),
+
+      Effect.catchTag('SimpleGitError', () => Inquirer.continuePrompt()),
+
+      Effect.flatMap(
+        Effect.if({
+          onTrue: pipe(
+            this.promptUserForMissingArgs(),
+            Effect.flatMap(writeAllTemplates),
+            Effect.map(this.print),
+          ),
+          onFalse: Effect.unit,
+        }),
+      ),
     );
 }
 

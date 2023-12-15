@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`DefaultCommand > [Given] Flag passed in: --config & fully interactive session > [Then] creates two files 1`] = `
+exports[`DefaultCommand > [Given] Git Dirty > [Given] prompts to continue > [Then] user answers \`y\`, creates two files 2`] = `
 "// @ts-ignore
 import * as React from 'react';
 
@@ -11,7 +11,7 @@ function LoginScreen() {
 "
 `;
 
-exports[`DefaultCommand > [Given] Flag passed in: --config & fully interactive session > [Then] creates two files 2`] = `
+exports[`DefaultCommand > [Given] Git Dirty > [Given] prompts to continue > [Then] user answers \`y\`, creates two files 3`] = `
 "describe('Login', function() {
   it('should ', function() {
 
@@ -20,7 +20,7 @@ exports[`DefaultCommand > [Given] Flag passed in: --config & fully interactive s
 "
 `;
 
-exports[`DefaultCommand > [Given] all flags used: --config --template --name > [Then] creates two files 1`] = `
+exports[`DefaultCommand > [Given] Git clean > [Given] \`--config --template --name passed\` in > [Then] creates two files 1`] = `
 "// @ts-ignore
 import * as React from 'react';
 
@@ -31,7 +31,7 @@ function LoginScreen() {
 "
 `;
 
-exports[`DefaultCommand > [Given] all flags used: --config --template --name > [Then] creates two files 2`] = `
+exports[`DefaultCommand > [Given] Git clean > [Given] \`--config --template --name passed\` in > [Then] creates two files 2`] = `
 "describe('Login', function() {
   it('should ', function() {
 
@@ -40,7 +40,7 @@ exports[`DefaultCommand > [Given] all flags used: --config --template --name > [
 "
 `;
 
-exports[`DefaultCommand > [Given] only --name passed in > [Then] creates two files 1`] = `
+exports[`DefaultCommand > [Given] Git clean > [When] \`--config\` passed in & fully interactive session > [Then] creates two files 1`] = `
 "// @ts-ignore
 import * as React from 'react';
 
@@ -51,7 +51,7 @@ function LoginScreen() {
 "
 `;
 
-exports[`DefaultCommand > [Given] only --name passed in > [Then] creates two files 2`] = `
+exports[`DefaultCommand > [Given] Git clean > [When] \`--config\` passed in & fully interactive session > [Then] creates two files 2`] = `
 "describe('Login', function() {
   it('should ', function() {
 
@@ -60,7 +60,7 @@ exports[`DefaultCommand > [Given] only --name passed in > [Then] creates two fil
 "
 `;
 
-exports[`DefaultCommand > [Given] only --template passed in > [Then] creates two files 1`] = `
+exports[`DefaultCommand > [Given] Git clean > [When] \`--name\` passed in > [Then] creates two files 1`] = `
 "// @ts-ignore
 import * as React from 'react';
 
@@ -71,7 +71,27 @@ function LoginScreen() {
 "
 `;
 
-exports[`DefaultCommand > [Given] only --template passed in > [Then] creates two files 2`] = `
+exports[`DefaultCommand > [Given] Git clean > [When] \`--name\` passed in > [Then] creates two files 2`] = `
+"describe('Login', function() {
+  it('should ', function() {
+
+  });
+});
+"
+`;
+
+exports[`DefaultCommand > [Given] Git clean > [When] \`--template\` passed in > [Then] creates two files 1`] = `
+"// @ts-ignore
+import * as React from 'react';
+
+type LoginProps = {}
+function LoginScreen() {
+
+}
+"
+`;
+
+exports[`DefaultCommand > [Given] Git clean > [When] \`--template\` passed in > [Then] creates two files 2`] = `
 "describe('Login', function() {
   it('should ', function() {
 
@@ -81,19 +101,6 @@ exports[`DefaultCommand > [Given] only --template passed in > [Then] creates two
 `;
 
 exports[`InitCommand > [Given] Git Clean > [When] filepath clear [Then] create file 2`] = `
-"import { ScribeConfig } from '@kieran-osgood/scribe';
-
-export default {
-  options: {
-    rootOutDir: '.',
-    templatesDirectories: ['.'],
-  },
-  templates: {},
-} satisfies ScribeConfig;
-"
-`;
-
-exports[`InitCommand > [Given] Git Clean > [When] filepath clear [Then] create file 3`] = `
 "import { ScribeConfig } from '@kieran-osgood/scribe';
 
 export default {
@@ -152,19 +159,6 @@ export default config;
 `;
 
 exports[`InitCommand > [Given] Git dirty > [Then] prompt user to continue > [When] user accepts [Then] create file 2`] = `
-"import { ScribeConfig } from '@kieran-osgood/scribe';
-
-export default {
-  options: {
-    rootOutDir: '.',
-    templatesDirectories: ['.'],
-  },
-  templates: {},
-} satisfies ScribeConfig;
-"
-`;
-
-exports[`InitCommand > [Given] Git dirty > [Then] prompt user to continue > [When] user accepts [Then] create file 3`] = `
 "import { ScribeConfig } from '@kieran-osgood/scribe';
 
 export default {

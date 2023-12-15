@@ -36,6 +36,7 @@ export class InitCommand extends BaseCommand {
 
       //  Print: Not in git repository?
       // prompt: Continue?
+      // TODO: test this
       Effect.catchTag('SimpleGitError', () => Inquirer.continuePrompt()),
 
       Effect.flatMap(
