@@ -59,7 +59,9 @@ etc.
 
 ### Example
 
-Given a config and scribe files **all in the root of the repository**:
+
+Given a config and scribe files in the root of the repository (See [examples](https://github.com/kieran-osgood/scribe/tree/main/examples) for this setup)
+
 ```ts
 // scribe.config.ts -- this is the config file we'll read the settings from
 import type { ScribeConfig } from '@scribe/config';
