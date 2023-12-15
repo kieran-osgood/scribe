@@ -31,17 +31,4 @@ describe('createConfigPathAbsolute', () => {
     });
     expect(result).toBe(`${dir}/scribe.config.ts`);
   });
-
-  // test('Should 1', async () => {
-  //   // const dir =
-  //   //   '/private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/6babf399372540f63efac66bb6968305';
-  //   // memfs.vol.mkdirSync(dir, { recursive: true });
-  //
-  //   const dir = process.cwd();
-  //   const result = await runEffect({
-  //     effect: createConfigPathAbsolute('scribe.config.ts'),
-  //     dir,
-  //   });
-  //   expect(result).toBe(`${dir}/scribe.config.ts`);
-  // });
 });

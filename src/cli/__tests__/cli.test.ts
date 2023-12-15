@@ -143,10 +143,13 @@ describe('_Cli', () => {
         const result = await runCli({ cliCtx, args });
         expect(result).toMatchInlineSnapshot(
           `"Init
+ Git 
 Checking working tree clean
-Checking Config path clear
+ Config 
+Checking write path clear
 Writing...
-✅  Success
+ Success 
+✅  Scribe init complete. Edit the config to begin templating.
 📁 file://${cwd}/scribe.config.ts
 "`,
         );
@@ -168,9 +171,12 @@ Writing...
 
           expect(result).toMatchInlineSnapshot(
             `"Init
+ Git 
 Checking working tree clean
-Checking Config path clear
-💥 Failed to create config. Path not empty: ${cwd}/scribe.config.ts
+ Config 
+Checking write path clear
+💥 Failed to create config. Path not empty.
+📁 file://${cwd}/scribe.config.ts
 "`,
           );
 
@@ -179,62 +185,6 @@ Checking Config path clear
         },
       );
     });
-
-    // describe('[Given] git dirty', () => {
-    //   describe('[Then] prompt user to continue', () => {
-    //     test('[When] y', async ({ expect }) => {
-    //       // Arrange
-    //       const cliCtx = createCtx();
-    //       const cwd = createMinimalProject({
-    //         git: { init: true, dirty: true },
-    //         fixtures: { configFile: false, templateFiles: false },
-    //       });
-    //
-    //       const args = ['init', `--cwd=${cwd}`];
-    //
-    //       // Act
-    //       cliCtx.stdout.on('data', (data: { toString(): string }) => {
-    //         const d = data.toString();
-    //         if (d.includes('Continue')) {
-    //           cliCtx.stdin.push(`y\n`);
-    //         }
-    //       });
-    //
-    //       const result = runCli({ cliCtx, args });
-    //
-    //       // Assert
-    //       expect(await result).toMatchInlineSnapshot(``);
-    //
-    //       const file = fs.readFileSync(path.join(cwd, 'scribe.config.ts'));
-    //       expect(String(file)).toMatchSnapshot();
-    //     });
-    //   });
-    // });
-    //
-    // describe.todo('[Given] not git', () => {
-    //   //
-    //   CliTest.todo(
-    //     'should prompt user to continue',
-    //     async ({ cliCtx, expect }) => {
-    //       const cwd = createMinimalProject({
-    //         git: { init: false, dirty: false },
-    //         fixtures: {
-    //           configFile: false,
-    //           templateFiles: false,
-    //         },
-    //       });
-    //
-    //       const args = ['init', `--cwd=${cwd}`];
-    //
-    //       const result = await runCli({ cliCtx, args });
-    //
-    //       expect(result).toMatchInlineSnapshot();
-    //
-    //       const file = fs.readFileSync(path.join(cwd, 'scribe.config.ts'));
-    //       expect(String(file)).toMatchSnapshot();
-    //     },
-    //   );
-    // });
   });
 
   describe('Help Command', () => {

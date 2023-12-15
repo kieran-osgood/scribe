@@ -229,17 +229,20 @@ describe('InitCommand', () => {
 
         expect(result.status).toBe(0);
         expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
-            "Init
-            Checking working tree clean
-            ⚠️ Git working tree dirty - proceed with caution.
-            Recommendation: commit all changes before proceeding.
-            ? Continue (Y/n) ? Continue (Y/n) y? Continue Yes
-            Checking Config path clear
-            Writing...
-            ✅  Success
-            📁 file://${cwd}/scribe.config.ts
-            "
-          `);
+          "Init
+           Git 
+          Checking working tree clean
+          ⚠️ Git working tree dirty - proceed with caution.
+          Recommendation: commit all changes before proceeding.
+          ? Continue (Y/n) ? Continue (Y/n) y? Continue Yes
+           Config 
+          Checking write path clear
+          Writing...
+           Success 
+          ✅  Scribe init complete. Edit the config to begin templating.
+          📁 file://${cwd}/scribe.config.ts
+          "
+        `);
 
         const config = fs.readFileSync(`${cwd}/scribe.config.ts`);
         expect(String(config)).toMatchSnapshot();
@@ -262,6 +265,7 @@ describe('InitCommand', () => {
         expect(result.status).toBe(0);
         expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
             "Init
+             Git 
             Checking working tree clean
             ⚠️ Git working tree dirty - proceed with caution.
             Recommendation: commit all changes before proceeding.
@@ -289,14 +293,17 @@ describe('InitCommand', () => {
 
       expect(result.status).toBe(0);
       expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
-          "Init
-          Checking working tree clean
-          Checking Config path clear
-          Writing...
-          ✅  Success
-          📁 file://${cwd}/scribe.config.ts
-          "
-        `);
+        "Init
+         Git 
+        Checking working tree clean
+         Config 
+        Checking write path clear
+        Writing...
+         Success 
+        ✅  Scribe init complete. Edit the config to begin templating.
+        📁 file://${cwd}/scribe.config.ts
+        "
+      `);
 
       const config = fs.readFileSync(`${cwd}/scribe.config.ts`);
       expect(String(config)).toMatchSnapshot();
@@ -313,9 +320,12 @@ describe('InitCommand', () => {
       expect(t.status).toBe(0);
       expect(stripAnsi(t.stdout)).toMatchInlineSnapshot(`
         "Init
+         Git 
         Checking working tree clean
-        Checking Config path clear
-        💥 Failed to create config. Path not empty: ${cwd}/scribe.config.ts
+         Config 
+        Checking write path clear
+        💥 Failed to create config. Path not empty.
+        📁 file://${cwd}/scribe.config.ts
         "
       `);
 

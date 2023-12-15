@@ -19,7 +19,9 @@ export class InitCommand extends BaseCommand {
   executeSafe = () => {
     return pipe(
       Console.logHeader('Init'),
-      Effect.tap(() => Console.logInfo('Checking working tree clean')),
+      Effect.tap(() =>
+        Console.logGroup('info', 'Git')('Checking working tree clean'),
+      ),
       Effect.flatMap(() => Git.isWorkingTreeClean()),
 
       Effect.flatMap(
@@ -39,7 +41,7 @@ export class InitCommand extends BaseCommand {
       Effect.flatMap(
         Effect.if({
           onTrue: pipe(
-            Console.logInfo('Checking Config path clear'),
+            Console.logGroup('info', 'Config')('Checking write path clear'),
             Effect.flatMap(() => checkConfigWritePathEmpty()),
             Effect.tap(() => Console.logInfo('Writing...')),
             Effect.flatMap(copyBaseScribeConfigToPath),
@@ -49,17 +51,21 @@ export class InitCommand extends BaseCommand {
       ),
 
       Effect.catchTag('@scribe/core/fs/FileExistsError', error =>
-        Console.logError(
-          `Failed to create config. Path not empty: ${error.error.path.toString()}`,
+        pipe(
+          Console.logError(`Failed to create config. Path not empty.`),
+          Effect.tap(() => Console.logFile(error.error.path.toString())),
         ),
       ),
 
       Effect.flatMap(fileDescriptor => {
         if (fileDescriptor) {
-          return Console.logSuccess(`Success`).pipe(
-            Effect.flatMap(() =>
-              Console.logFile(`${fileDescriptor.toString()}`),
+          return Console.logGroup(`success`, 'Success')().pipe(
+            Effect.tap(() =>
+              Console.logSuccess(
+                'Scribe init complete. Edit the config to begin templating.',
+              ),
             ),
+            Effect.tap(() => Console.logFile(`${fileDescriptor.toString()}`)),
           );
         }
 
