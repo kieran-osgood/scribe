@@ -68,12 +68,12 @@ export class DefaultCommand extends BaseCommand {
         const config = yield* $(Config.readConfig(_configPath));
         return { config, input, templates } as const;
       }),
-      Effect.tap(_ =>
-        Effect.sync(() => {
-          this.name = _.input.name;
-          this.template = _.input.template;
-        }),
-      ),
+      // Effect.tap(_ =>
+      //   Effect.sync(() => {
+      //     this.name = _.input.name;
+      //     this.template = _.input.template;
+      //   }),
+      // ),
     );
   };
 
@@ -81,15 +81,9 @@ export class DefaultCommand extends BaseCommand {
     pipe(
       this.createQuestionCollection(options),
       Inquirer.prompt,
-      Effect.map(_ => ({
-        // TODO: need to validate this in test
-        name: options.flags.name,
-        template: options.flags.template,
-        ..._,
-      })),
+      Effect.map(_ => ({ ...options.flags, ..._ })),
       Effect.flatMap(_ =>
-        pipe(
-          Schema.parse(Prompt)(_),
+        Schema.parse(Prompt)(_).pipe(
           Effect.catchTag('ParseError', error =>
             Effect.fail(
               new Inquirer.PromptError({
@@ -156,6 +150,7 @@ export class DefaultCommand extends BaseCommand {
         Effect.if({
           onTrue: pipe(
             this.promptUserForMissingArgs(),
+            // TODO: add error handling for overwriting files
             Effect.flatMap(writeAllTemplates),
             Effect.map(this.print),
           ),
@@ -165,9 +160,6 @@ export class DefaultCommand extends BaseCommand {
     );
 }
 
-/**
- * Constructs and writes templates to files persistently
- */
 export const writeAllTemplates = (ctx: Ctx) =>
   pipe(
     ReadonlyRecord.get(ctx.input.template)(ctx.config.templates),
@@ -180,8 +172,7 @@ export const writeAllTemplates = (ctx: Ctx) =>
     ),
     _ => _.outputs,
     ReadonlyArray.map(output =>
-      pipe(
-        constructTemplate({ output, ...ctx }),
+      constructTemplate({ output, ...ctx }).pipe(
         Effect.map(ReadonlyArray.map(writeTemplate)),
         Effect.flatMap(Effect.all),
       ),
@@ -191,22 +182,25 @@ export const writeAllTemplates = (ctx: Ctx) =>
   );
 
 export const createConfigPathAbsolute = (filePath: string) =>
-  pipe(
-    Process.Process,
-    Effect.flatMap(_process =>
-      Effect.if(path.isAbsolute(filePath), {
-        onTrue: Effect.if(FS.isFile(filePath), {
-          onTrue: Effect.succeed(filePath),
-          // absolute directory, so set the filePath to default location
-          // TODO: use search from cosmic config to handle this
-          onFalse: Effect.succeed(
-            path.join(_process.cwd(), 'scribe.config.ts'),
-          ),
-        }),
-        onFalse: Effect.succeed(path.join(_process.cwd(), filePath)),
+  Effect.gen(function* ($) {
+    const process = yield* $(Process.Process);
+
+    const onAbsolutePath = () =>
+      Effect.if(FS.isFile(filePath), {
+        onTrue: Effect.succeed(filePath),
+        // absolute directory, so set the filePath to default location
+        // TODO: use search from cosmic config to handle this
+        onFalse: Effect.succeed(path.join(process.cwd(), 'scribe.config.ts')),
+      });
+
+    return yield* $(
+      path.isAbsolute(filePath),
+      Effect.if({
+        onTrue: onAbsolutePath(),
+        onFalse: Effect.succeed(path.join(process.cwd(), filePath)),
       }),
-    ),
-  );
+    );
+  });
 
 export class GetTemplateError extends Data.TaggedClass('GetTemplateError')<{
   readonly cause?: string;
