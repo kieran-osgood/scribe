@@ -1,3 +1,5 @@
+import { parseError } from '@effect/schema/ParseResult';
+
 import { ConfigParseError, CosmicConfigError } from '../error';
 
 describe('error', () => {
@@ -12,13 +14,11 @@ describe('error', () => {
 
   describe(ConfigParseError.name, () => {
     it('tree format ', () => {
-      const errors = [
-        { _tag: 'Key', key: 'templates', errors: [{ _tag: 'Missing' }] },
-      ] as const;
-
       const result = new ConfigParseError({
         path: 'config.ts',
-        errors,
+        parseError: parseError([
+          { _tag: 'Key', key: 'templates', errors: [{ _tag: 'Missing' }] },
+        ]),
       }).toString();
 
       expect(result).toMatchInlineSnapshot(`

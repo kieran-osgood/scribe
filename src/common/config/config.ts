@@ -26,8 +26,8 @@ export const readConfig = (path: string) =>
     }),
     Effect.flatMap(extractConfig),
     Effect.flatMap(Schema.parse(ScribeConfig)),
-    Effect.catchTag('ParseError', ({ errors }) =>
-      Effect.fail(new ConfigParseError({ errors, path })),
+    Effect.catchTag('ParseError', parseError =>
+      Effect.fail(new ConfigParseError({ parseError, path })),
     ),
   );
 

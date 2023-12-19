@@ -38,13 +38,15 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@effect/schema": "^0.48.4",
+    "@effect/cli": "^0.26.0",
+    "@effect/platform-node": "^0.38.0",
+    "@effect/schema": "^0.54.0",
     "case-anything": "^2.1.13",
     "clipanion": "^3.2.1",
     "colorette": "^2.0.20",
     "cosmiconfig": "^8.2.0",
     "cosmiconfig-typescript-loader": "^4.3.0",
-    "effect": "2.0.0-next.55",
+    "effect": "2.0.0-next.61",
     "inquirer": "8.0.0",
     "simple-git": "^3.19.1",
     "strip-ansi": "^7.1.0",
