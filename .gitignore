@@ -137,3 +137,5 @@ tsconfig.vitest-temp.json
 
 # Vite
 html
+
+scribe.config.ts

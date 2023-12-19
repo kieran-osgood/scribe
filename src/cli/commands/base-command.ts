@@ -13,6 +13,7 @@ import {
 import { Writable } from 'stream';
 import * as t from 'typanion';
 
+import { provideLoggerLayer } from '../../adapters/console';
 import { URLS } from '../../common/constants';
 
 export abstract class BaseCommand extends Command {
@@ -36,7 +37,7 @@ export abstract class BaseCommand extends Command {
   private createContext = () =>
     pipe(
       Context.empty(),
-      Context.add(Process.Process, Process.getProcess(this.cwd)),
+      Context.add(Process.Process, Process.make(this.cwd)),
       Context.add(FS.FS, FS.getFS(this.test)),
     );
 
@@ -72,11 +73,9 @@ export abstract class BaseCommand extends Command {
         stdout: this.context.stdout,
         verbose: this.verbose,
       }),
-      Effect.tap(() => {
-        process.exitCode = 0;
-        return Effect.unit;
-      }),
+
       Effect.provide(this.createContext()),
+      Effect.provide(provideLoggerLayer(this.context.stdout)),
 
       Effect.runPromise,
     );
@@ -106,6 +105,7 @@ const printFailure = ({
   stdout: Writable;
 }) =>
   Effect.gen(function* ($) {
+    // TODO: format with chalk
     const failOrCause = Cause.failureOrCause(result.cause);
     const isDie =
       failOrCause._tag === 'Left' || Runtime.isFiberFailure(failOrCause);

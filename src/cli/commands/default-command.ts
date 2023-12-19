@@ -1,6 +1,6 @@
 import { TreeFormatter } from '@effect/schema';
 import * as Schema from '@effect/schema/Schema';
-import { Inquirer, PromptError } from '@scribe/adapters';
+import { Console, Inquirer } from '@scribe/adapters';
 import { FS, Git, Process } from '@scribe/services';
 import { Command, Option } from 'clipanion';
 import { green } from 'colorette';
@@ -18,6 +18,7 @@ import path from 'path';
 import * as Config from 'src/common/config';
 import * as t from 'typanion';
 
+import { WARNINGS } from '../../common/constants';
 import { constructTemplate, Ctx, writeTemplate } from '../../common/templates';
 import { BaseCommand } from './base-command';
 
@@ -67,12 +68,12 @@ export class DefaultCommand extends BaseCommand {
         const config = yield* $(Config.readConfig(_configPath));
         return { config, input, templates } as const;
       }),
-      Effect.tap(_ =>
-        Effect.sync(() => {
-          this.name = _.input.name;
-          this.template = _.input.template;
-        }),
-      ),
+      // Effect.tap(_ =>
+      //   Effect.sync(() => {
+      //     this.name = _.input.name;
+      //     this.template = _.input.template;
+      //   }),
+      // ),
     );
   };
 
@@ -80,18 +81,12 @@ export class DefaultCommand extends BaseCommand {
     pipe(
       this.createQuestionCollection(options),
       Inquirer.prompt,
-      Effect.map(_ => ({
-        // TODO: need to validate this in test
-        name: options.flags.name,
-        template: options.flags.template,
-        ..._,
-      })),
+      Effect.map(_ => ({ ...options.flags, ..._ })),
       Effect.flatMap(_ =>
-        pipe(
-          Schema.parse(Prompt)(_),
+        Schema.parse(Prompt)(_).pipe(
           Effect.catchTag('ParseError', error =>
             Effect.fail(
-              new PromptError({
+              new Inquirer.PromptError({
                 message: TreeFormatter.formatErrors(error.errors),
               }),
             ),
@@ -136,17 +131,35 @@ export class DefaultCommand extends BaseCommand {
 
   executeSafe = () =>
     pipe(
+      Git.isWorkingTreeClean(),
       // TODO: add ignore git
-      Git.checkWorkingTreeClean(),
-      Effect.flatMap(() => this.promptUserForMissingArgs()),
-      Effect.flatMap(writeAllTemplates),
-      Effect.map(this.print),
+
+      Effect.flatMap(
+        Effect.if({
+          onTrue: Effect.succeed(true),
+          onFalse: Effect.gen(function* ($) {
+            yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
+            return yield* $(Inquirer.continuePrompt());
+          }),
+        }),
+      ),
+
+      Effect.catchTag('SimpleGitError', () => Inquirer.continuePrompt()),
+
+      Effect.flatMap(
+        Effect.if({
+          onTrue: pipe(
+            this.promptUserForMissingArgs(),
+            // TODO: add error handling for overwriting files
+            Effect.flatMap(writeAllTemplates),
+            Effect.map(this.print),
+          ),
+          onFalse: Effect.unit,
+        }),
+      ),
     );
 }
 
-/**
- * Constructs and writes templates to files persistently
- */
 export const writeAllTemplates = (ctx: Ctx) =>
   pipe(
     ReadonlyRecord.get(ctx.input.template)(ctx.config.templates),
@@ -159,8 +172,7 @@ export const writeAllTemplates = (ctx: Ctx) =>
     ),
     _ => _.outputs,
     ReadonlyArray.map(output =>
-      pipe(
-        constructTemplate({ output, ...ctx }),
+      constructTemplate({ output, ...ctx }).pipe(
         Effect.map(ReadonlyArray.map(writeTemplate)),
         Effect.flatMap(Effect.all),
       ),
@@ -170,22 +182,25 @@ export const writeAllTemplates = (ctx: Ctx) =>
   );
 
 export const createConfigPathAbsolute = (filePath: string) =>
-  pipe(
-    Process.Process,
-    Effect.flatMap(_process =>
-      Effect.if(path.isAbsolute(filePath), {
-        onTrue: Effect.if(FS.isFile(filePath), {
-          onTrue: Effect.succeed(filePath),
-          // absolute directory, so set the filePath to default location
-          // TODO: use search from cosmic config to handle this
-          onFalse: Effect.succeed(
-            path.join(_process.cwd(), 'scribe.config.ts'),
-          ),
-        }),
-        onFalse: Effect.succeed(path.join(_process.cwd(), filePath)),
+  Effect.gen(function* ($) {
+    const process = yield* $(Process.Process);
+
+    const onAbsolutePath = () =>
+      Effect.if(FS.isFile(filePath), {
+        onTrue: Effect.succeed(filePath),
+        // absolute directory, so set the filePath to default location
+        // TODO: use search from cosmic config to handle this
+        onFalse: Effect.succeed(path.join(process.cwd(), 'scribe.config.ts')),
+      });
+
+    return yield* $(
+      path.isAbsolute(filePath),
+      Effect.if({
+        onTrue: onAbsolutePath(),
+        onFalse: Effect.succeed(path.join(process.cwd(), filePath)),
       }),
-    ),
-  );
+    );
+  });
 
 export class GetTemplateError extends Data.TaggedClass('GetTemplateError')<{
   readonly cause?: string;

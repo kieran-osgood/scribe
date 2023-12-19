@@ -16,39 +16,26 @@ export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
     catch: error => new SimpleGitError({ error: error as GitConstructError }),
   });
 
-export const checkWorkingTreeClean = (options?: TaskOptions) =>
-  pipe(
+export const status = (options?: TaskOptions) => {
+  return pipe(
     Process.Process,
     Effect.flatMap(_ => createSimpleGit({ baseDir: _.cwd() })),
     Effect.flatMap(_ =>
       Effect.async<never, GitStatusError, StatusResult>(resume => {
         void _.status(options, (error, status) => {
-          // TODO: remove development flags
-          if (process.env.NODE_ENV === 'development') {
-            resume(Effect.succeed(status));
-          }
-
           if (error) {
             resume(Effect.fail(new GitStatusError({ status, error })));
-          } else if (status.isClean()) {
-            resume(Effect.succeed(status));
           } else {
-            resume(Effect.fail(new GitStatusError({ status })));
+            resume(Effect.succeed(status));
           }
         });
       }),
     ),
+  );
+};
 
-    // TODO: inquirer for continue on dirty
-    // Effect.catchTag('GitStatusError', _ => {
-    //   // if (_.status.isClean() === false) {
-    //   //   // Not clean - Kick off Effect inquirer for continue dangerously
-    //   //   console.log(_.toString());
-    //   // } else {
-    //   //   // Unknown error/not git - Kick off Effect inquirer for continue dangerously
-    //   //   console.log(_.toString());
-    //   // }
-
-    //   return Effect.succeed(_.status);
-    // })
+export const isWorkingTreeClean = (options?: TaskOptions) =>
+  pipe(
+    status(options),
+    Effect.map(_ => _.isClean()),
   );

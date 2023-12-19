@@ -7,7 +7,7 @@ export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
 }> {
   override toString(): string {
     switch (true) {
-      case !(this.status.isClean()):
+      case !this.status.isClean():
         return '⚠️ Working directory not clean';
       case this.error instanceof GitError:
         if (this.error?.message.includes('not a git repository')) {
@@ -19,6 +19,12 @@ export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
     }
   }
 }
+
+export class DirtyGitConfirmError extends Data.TaggedClass(
+  'DirtyGitConfirmError',
+)<{
+  readonly confirmation: boolean;
+}> {}
 
 export class SimpleGitError extends Data.TaggedClass('SimpleGitError')<{
   readonly error: GitConstructError;
