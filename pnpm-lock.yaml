@@ -13,6 +13,9 @@ dependencies:
   '@effect/cli':
     specifier: ^0.26.0
     version: 0.26.0(@effect/platform@0.38.0)(@effect/printer-ansi@0.29.0)(@effect/printer@0.28.0)(@effect/schema@0.54.0)(effect@2.0.0-next.61)
+  '@effect/platform':
+    specifier: ^0.38.0
+    version: 0.38.0(@effect/schema@0.54.0)(effect@2.0.0-next.61)
   '@effect/platform-node':
     specifier: ^0.38.0
     version: 0.38.0(@effect/platform@0.38.0)(effect@2.0.0-next.61)
@@ -60,9 +63,6 @@ devDependencies:
   '@changesets/cli':
     specifier: ^2.26.2
     version: 2.26.2
-  '@effect/language-service':
-    specifier: ^0.0.21
-    version: 0.0.21
   '@expo/spawn-async':
     specifier: ^1.7.2
     version: 1.7.2
@@ -604,10 +604,6 @@ packages:
       '@effect/schema': 0.54.0(effect@2.0.0-next.61)(fast-check@3.13.2)
       effect: 2.0.0-next.61
     dev: false
-
-  /@effect/language-service@0.0.21:
-    resolution: {integrity: sha512-e8vfKbjnbYiyneBincEFS0tzXluopGK77OkVFbPRtUbNDS5tJfb+jiwOQEiqASDsadcZmd+9J9+Q6v/z7GuN2g==}
-    dev: true
 
   /@effect/platform-node@0.38.0(@effect/platform@0.38.0)(effect@2.0.0-next.61):
     resolution: {integrity: sha512-UlqO2VlOK1LxCMpC6tiu3KItXMqYnoYC46V33dV6+dKGJpJ0iIhUdMLUBl1iBMTQxvYnRAQfEI0EWaqDWVV5Lg==}

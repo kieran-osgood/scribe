@@ -1,93 +1,81 @@
-import { FS, Process } from '@scribe/services';
-import { Command, Option } from 'clipanion';
-import {
-  Cause,
-  Context,
-  Effect,
-  Exit,
-  Logger,
-  LogLevel,
-  pipe,
-  Runtime,
-} from 'effect';
+import { Process } from '@scribe/services';
+import { Cause, Effect, Exit, Runtime } from 'effect';
 import { Writable } from 'stream';
-import * as t from 'typanion';
 
-import { provideLoggerLayer } from '../../adapters/console';
 import { URLS } from '../../common/constants';
 
-export abstract class BaseCommand extends Command {
-  configPath = Option.String('-c,--config', 'scribe.config.ts', {
-    description: 'Path to the config (default: scribe.config.ts)',
-    validator: t.isString(),
-  });
-  test = Option.Boolean('--test', false, { hidden: true });
-  cwd = Option.String('--cwd', '', { hidden: true });
-  verbose = Option.Boolean('--verbose', false, {
-    description: 'More verbose logging and error stack traces',
-  });
-
-  abstract executeSafe: () => Effect.Effect<
-    Process.Process | FS.FS,
-    unknown,
-    void
-  >;
-
-  // TODO: extract to module - replace manual service adding in tests
-  private createContext = () =>
-    pipe(
-      Context.empty(),
-      Context.add(Process.Process, Process.make(this.cwd)),
-      Context.add(FS.FS, FS.getFS(this.test)),
-    );
-
-  private setLogLevel = () => {
-    if (process.env.NODE_ENV === 'production') {
-      return Logger.withMinimumLogLevel(LogLevel.Info);
-    }
-    if (this.verbose) {
-      return Logger.withMinimumLogLevel(LogLevel.All);
-    }
-
-    return Logger.withMinimumLogLevel(LogLevel.Debug);
-  };
-
-  private handleExecutionResult =
-    ({ stdout, verbose }: { stdout: Writable; verbose: boolean }) =>
-    (commandEffect: Effect.Effect<Process.Process | FS.FS, unknown, void>) =>
-      Effect.gen(function* ($) {
-        const result = yield* $(commandEffect, Effect.exit);
-
-        if (result._tag === 'Failure') {
-          return yield* $(printFailure({ stdout, verbose, result }));
-        }
-
-        return result.value;
-      });
-
-  execute = async (): Promise<void> => {
-    return pipe(
-      this.executeSafe(),
-      this.setLogLevel(),
-      this.handleExecutionResult({
-        stdout: this.context.stdout,
-        verbose: this.verbose,
-      }),
-
-      Effect.provide(this.createContext()),
-      Effect.provide(provideLoggerLayer(this.context.stdout)),
-
-      Effect.runPromise,
-    );
-  };
-}
+// export abstract class BaseCommand extends Command {
+//   configPath = Option.String('-c,--config', 'scribe.config.ts', {
+//     description: 'Path to the config (default: scribe.config.ts)',
+//     validator: t.isString(),
+//   });
+//   test = Option.Boolean('--test', false, { hidden: true });
+//   cwd = Option.String('--cwd', '', { hidden: true });
+//   verbose = Option.Boolean('--verbose', false, {
+//     description: 'More verbose logging and error stack traces',
+//   });
+//
+//   abstract executeSafe: () => Effect.Effect<
+//     Process.Process | FS.FS,
+//     unknown,
+//     void
+//   >;
+//
+//   // TODO: extract to module - replace manual service adding in tests
+//   private createContext = () =>
+//     pipe(
+//       Context.empty(),
+//       Context.add(Process.Process, Process.make(this.cwd)),
+//       Context.add(FS.FS, FS.getFS(this.test)),
+//     );
+//
+//   private setLogLevel = () => {
+//     if (process.env.NODE_ENV === 'production') {
+//       return Logger.withMinimumLogLevel(LogLevel.Info);
+//     }
+//     if (this.verbose) {
+//       return Logger.withMinimumLogLevel(LogLevel.All);
+//     }
+//
+//     return Logger.withMinimumLogLevel(LogLevel.Debug);
+//   };
+//
+//   private handleExecutionResult =
+//     ({ stdout, verbose }: { stdout: Writable; verbose: boolean }) =>
+//     (commandEffect: Effect.Effect<Process.Process | FS.FS, unknown, void>) =>
+//       Effect.gen(function* ($) {
+//         const result = yield* $(commandEffect, Effect.exit);
+//
+//         if (result._tag === 'Failure') {
+//           return yield* $(printFailure({ stdout, verbose, result }));
+//         }
+//
+//         return result.value;
+//       });
+//
+//   execute = async (): Promise<void> => {
+//     return pipe(
+//       this.executeSafe(),
+//       this.setLogLevel(),
+//       this.handleExecutionResult({
+//         stdout: this.context.stdout,
+//         verbose: this.verbose,
+//       }),
+//
+//       Effect.provide(this.createContext()),
+//       Effect.provide(provideLoggerLayer(this.context.stdout)),
+//
+//       Effect.runPromise,
+//     );
+//   };
+// }
 
 const hasErrorProperty = (object: unknown): object is { error: Error } =>
   Boolean(object) &&
   typeof object === 'object' &&
   Boolean((object as Record<string, unknown>).error);
 
-const extractNestedError = (object: unknown): string => {
+export const extractNestedError = (object: unknown): string => {
   if (hasErrorProperty(object)) {
     return extractNestedError(object.error);
   }
@@ -95,7 +83,7 @@ const extractNestedError = (object: unknown): string => {
   return object?.toString() ?? 'Error extraction failed';
 };
 
-const printFailure = ({
+export const printFailure = ({
   result,
   verbose,
   stdout,

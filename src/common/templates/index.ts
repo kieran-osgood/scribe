@@ -4,7 +4,7 @@ import { Effect, pipe, ReadonlyArray } from 'effect';
 import path from 'path';
 import { render } from 'template-file';
 
-import { DefaultCommand } from '../../cli/commands';
+import { promptUserForMissingArgs } from '../../cli/commands/default-command';
 import { Template } from '../config';
 
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
@@ -23,17 +23,15 @@ function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   });
 }
 
-type PromptUserForMissingArgs = InstanceType<
-  typeof DefaultCommand
->['promptUserForMissingArgs'];
-export type Ctx = Effect.Effect.Success<ReturnType<PromptUserForMissingArgs>>;
+export type Ctx = Effect.Effect.Success<
+  ReturnType<typeof promptUserForMissingArgs>
+>;
 
 export type ConstructTemplateCtx = Ctx & { output: Template };
 
 export function constructTemplate(ctx: ConstructTemplateCtx) {
   return pipe(
     createAbsFilePaths(ctx),
-    id => id,
     Effect.map(
       ReadonlyArray.map(_ =>
         pipe(
@@ -46,6 +44,7 @@ export function constructTemplate(ctx: ConstructTemplateCtx) {
     Effect.flatMap(Effect.all),
     Effect.map(
       // TODO: spread in ctx.input.variables
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       ReadonlyArray.map(_ => TemplateFile.render(_, { Name: ctx.input.name })),
     ),
     Effect.flatMap(Effect.all),
@@ -66,6 +65,7 @@ export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
     const _process = yield* $(Process.Process);
     const fileName = render(_.output.output.fileName, {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       Name: _.input.name,
     });
 

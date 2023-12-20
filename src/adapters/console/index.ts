@@ -10,42 +10,34 @@ import {
   red,
   yellow,
 } from 'colorette';
-import { Effect, flow, Logger, LogLevel, pipe } from 'effect';
-import { Writable } from 'stream';
+import { Console, Effect, flow, Logger, LogLevel, pipe } from 'effect';
 
 import { SYMBOLS } from '../../common/constants';
 import { center, file, spacer } from './formatter';
 
-export const provideLoggerLayer = (writable: Writable) =>
-  Logger.replace(Logger.defaultLogger, logger(writable));
+export const logger = Logger.make(({ logLevel, message }) => {
+  switch (logLevel._tag) {
+    case LogLevel.None._tag:
+      console.log(String(message));
+      break;
+    case LogLevel.Debug._tag:
+      console.log(cyan(String(message)));
+      break;
+    case LogLevel.Info._tag:
+      console.log(blue(String(message)));
+      break;
+    case LogLevel.Warning._tag:
+      console.log(`${SYMBOLS.warning} ${yellow(String(message))}`);
+      break;
+    case LogLevel.Error._tag:
+      console.log(`${SYMBOLS.error} ${red(String(message))}`);
+      break;
+  }
 
-export const logger = (writable: Writable) =>
-  Logger.make(({ logLevel, message }) => {
-    // TODO: look into using spans/annotations for groupings?
-    switch (logLevel._tag) {
-      case LogLevel.None._tag:
-        writable.write(String(message));
-        break;
-      case LogLevel.Debug._tag:
-        writable.write(cyan(String(message)));
-        break;
-      case LogLevel.Info._tag:
-        writable.write(blue(String(message)));
-        break;
-      case LogLevel.Warning._tag:
-        writable.write(SYMBOLS.warning);
-        writable.write(' ');
-        writable.write(yellow(String(message)));
-        break;
-      case LogLevel.Error._tag:
-        writable.write(SYMBOLS.error);
-        writable.write(' ');
-        writable.write(red(String(message)));
-        break;
-    }
+  // writable.write('\n');
+});
 
-    writable.write('\n');
-  });
+export const loggerLayer = Logger.replace(Logger.defaultLogger, logger);
 
 // Core - styling handled via {@logger}
 export const log = Effect.log;
@@ -61,7 +53,7 @@ export const logSuccess = (...s: string[]) =>
 export const logFile = (s: string) =>
   Effect.log(`${SYMBOLS.directory} ${file(s)}`);
 
-export const logHeader = (s: string) => Effect.log(bgBlue(black(center(s))));
+export const logHeader = flow(center, black, bgBlue, Console.log);
 
 type LogLevel = 'debug' | 'log' | 'info' | 'warn' | 'error' | 'success';
 const logBgColors = {
