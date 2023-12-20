@@ -1,7 +1,7 @@
 // @ts-ignore
 import * as React from 'react';
 
-type LoginProps = {}
-function LoginScreen() {
+type loginProps = {}
+function loginScreen() {
 
 }

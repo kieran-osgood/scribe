@@ -4,6 +4,7 @@ import { Context, Effect, pipe } from 'effect';
 import * as NFS from 'fs';
 import * as memfs from 'memfs';
 import path from 'path';
+import * as Process from '../process/process';
 
 import { MkDirError, ReadFileError, StatError, WriteFileError } from './error';
 
@@ -176,3 +177,24 @@ export const isDirectory = (
 //       )
 //     )
 //   );
+
+export const createConfigPathAbsolute = (filePath: string) =>
+  Effect.gen(function* ($) {
+    const process = yield* $(Process.Process);
+
+    const onAbsolutePath = () =>
+      Effect.if(isFile(filePath), {
+        onTrue: Effect.succeed(filePath),
+        // absolute directory, so set the filePath to default location
+        // TODO: use search from cosmic config to handle this
+        onFalse: Effect.succeed(path.join(process.cwd(), 'scribe.config.ts')),
+      });
+
+    return yield* $(
+      path.isAbsolute(filePath),
+      Effect.if({
+        onTrue: onAbsolutePath(),
+        onFalse: Effect.succeed(path.join(process.cwd(), filePath)),
+      }),
+    );
+  });
