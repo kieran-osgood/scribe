@@ -63,10 +63,8 @@ const fileContents = 'TEST';
 
 const _ctx = {
   config: mockConfig,
-  input: {
-    template: 'screen',
-    name: 'login',
-  },
+  template: 'screen',
+  name: 'login',
   templates: ['screen'],
 } satisfies Ctx;
 

@@ -14,6 +14,13 @@ import { render } from 'template-file';
 import { GetTemplateError } from '../../cli/commands/default-command';
 import { Template } from '../config';
 
+export type Ctx = {
+  name: string;
+  template: string;
+  config: Effect.Effect.Success<ReturnType<(typeof Config)['readConfig']>>;
+  templates: string[];
+};
+
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   return Effect.gen(function* ($) {
     const {
@@ -30,12 +37,7 @@ function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   });
 }
 
-export type ConstructTemplateCtx = {
-  name: string;
-  template: string;
-  config: Effect.Effect.Success<ReturnType<(typeof Config)['readConfig']>>;
-  templates: string[];
-} & { output: Template };
+export type ConstructTemplateCtx = Ctx & { output: Template };
 
 export function constructTemplate(ctx: ConstructTemplateCtx) {
   return pipe(
@@ -58,12 +60,7 @@ export function constructTemplate(ctx: ConstructTemplateCtx) {
   );
 }
 
-export type WriteTemplateCtx = {
-  name: string;
-  template: string;
-  config: Effect.Effect.Success<ReturnType<(typeof Config)['readConfig']>>;
-  templates: string[];
-} & {
+export type WriteTemplateCtx = Ctx & {
   fileContents: string;
   output: Template;
 };

@@ -4,8 +4,8 @@ import { Context, Effect, pipe } from 'effect';
 import * as NFS from 'fs';
 import * as memfs from 'memfs';
 import path from 'path';
-import * as Process from '../process/process';
 
+import * as Process from '../process/process';
 import { MkDirError, ReadFileError, StatError, WriteFileError } from './error';
 
 export interface FS {
