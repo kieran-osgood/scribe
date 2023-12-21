@@ -1,6 +1,7 @@
 import { Abortable } from 'node:events';
 
 import { Context, Effect, pipe } from 'effect';
+import * as Layer from 'effect/Layer';
 import * as NFS from 'fs';
 import * as memfs from 'memfs';
 import path from 'path';
@@ -22,8 +23,11 @@ export const FSLive = NFS;
 export const FSMock = memfs.fs as unknown as typeof NFS;
 
 export const getFS = (test: boolean) => {
-  return test ? FSMock : FSLive;
+  return test ? FS.of(FSMock) : FS.of(FSLive);
 };
+
+export const layer = (test = false) =>
+  Layer.scoped(FS, Effect.succeed(getFS(test)));
 
 export const writeFile = (
   file: NFS.PathOrFileDescriptor,

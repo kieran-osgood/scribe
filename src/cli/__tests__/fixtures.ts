@@ -1,10 +1,12 @@
 import spawnAsync, { SpawnOptions, SpawnResult } from '@expo/spawn-async';
 import * as child_process from 'child_process';
+import { ChildProcess } from 'child_process';
 import * as fs from 'fs';
 import path from 'path';
 import * as tempy from 'tempy';
 
-const cliPath = path.join(process.cwd(), 'dist', 'index.js');
+export const cliPath = path.join(process.cwd(), 'dist', 'index.js');
+export const configFlag = path.join('scribe.config.ts');
 
 function isSpawnResult(
   errorOrResult: Error,
@@ -139,4 +141,54 @@ export const arrowKey = {
   down: '\u001b[B',
   left: '\u001b[D',
   right: '\u001b[C',
+};
+
+const createDataListener = (cli: ChildProcess) => (cb: (s: string) => void) => {
+  cli.stdout?.on('data', (data: { toString(): string }) => {
+    cb(data.toString());
+  });
+};
+
+type Responses = {
+  continue?: 'y' | 'n';
+  templatePicker?: string;
+  fileName?: string;
+};
+
+export const registerInteractiveListeners = (cli: ChildProcess) => {
+  return (responses: Responses) => {
+    const registerOnDataListener = createDataListener(cli);
+
+    if (responses.continue) {
+      registerOnDataListener(s => {
+        if (s.includes('Continue?'))
+          cli.stdin?.write(`${responses.continue}\n`);
+      });
+    }
+
+    if (responses.templatePicker) {
+      registerOnDataListener(s => {
+        if (s.includes('Pick your template'))
+          cli.stdin?.write(`${responses.templatePicker}\n`);
+      });
+    }
+
+    if (responses.fileName) {
+      registerOnDataListener(s => {
+        if (s.includes('File name'))
+          cli.stdin?.write(`${responses.fileName}\n`);
+      });
+    }
+  };
+};
+
+export const getCliFromSpawn = (
+  _: spawnAsync.SpawnPromise<spawnAsync.SpawnResult>,
+) => {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (_.child === null) {
+    throw new Error('spawned process is null');
+  }
+
+  return _.child;
 };

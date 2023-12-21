@@ -88,11 +88,11 @@ export const ScribeInit = Command.make('init', {}, () =>
         }),
       }),
     ),
-
     //  Print: Not in git repository?
     // prompt: Continue?
     // TODO: test this
     Effect.catchTag('SimpleGitError', () => togglePrompt()),
+
     // Effect.flatMap(togglePrompt),
     Effect.flatMap(
       Effect.if({

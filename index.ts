@@ -3,9 +3,9 @@
 import * as NodeContext from '@effect/platform-node/NodeContext';
 import * as Runtime from '@effect/platform-node/Runtime';
 import * as Cli from '@scribe/cli';
-import { Context, Effect, Layer, Logger, LogLevel, pipe } from 'effect';
+import { Console, Effect, Layer, Logger, LogLevel } from 'effect';
 
-import { loggerLayer } from './src/adapters/console';
+import { consoleLayer } from './src/adapters/console';
 import { FS, Process } from './src/services';
 
 export { type ScribeConfig } from '@scribe/config';
@@ -13,13 +13,9 @@ export { type ScribeConfig } from '@scribe/config';
 Effect.suspend(() => Cli.run(process.argv.slice(2))).pipe(
   // Effect.withConfigProvider(ConfigProvider.nested(ConfigProvider.fromEnv(), "GIT")),
   Effect.provide(
-    pipe(
-      Context.empty(),
-      Context.add(Process.Process, Process.make(process.cwd())),
-      Context.add(FS.FS, FS.getFS(false)),
-    ),
+    Layer.mergeAll(NodeContext.layer, FS.layer(), Process.layer()),
   ),
-  Effect.provide(Layer.merge(loggerLayer, NodeContext.layer)),
+  Console.withConsole(consoleLayer),
   setLogLevel(),
   Runtime.runMain,
 );
@@ -33,7 +29,7 @@ function setLogLevel() {
   //   return Logger.withMinimumLogLevel(LogLevel.All);
   // }
 
-  return Logger.withMinimumLogLevel(LogLevel.Debug);
+  return Logger.withMinimumLogLevel(LogLevel.All);
 }
 
 //   private handleExecutionResult =
