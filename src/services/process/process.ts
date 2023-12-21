@@ -27,8 +27,8 @@ export const makeProcessMock = (cwd: string): Process => ({
   },
 });
 
-export const make = (cwd: string) => {
-  if (cwd.length > 0) {
+export const make = (cwd: string | undefined) => {
+  if (typeof cwd === 'string') {
     return Process.of(makeProcessMock(cwd));
   }
 
@@ -39,5 +39,6 @@ export const make = (cwd: string) => {
   return Process.of(ProcessLive);
 };
 
-export const layer = (cwd = process.cwd()) =>
-  Layer.scoped(Process, Effect.succeed(make(cwd)));
+export const layer = (cwd?: string) => {
+  return Layer.scoped(Process, Effect.succeed(make(cwd)));
+};

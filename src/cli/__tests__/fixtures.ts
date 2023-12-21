@@ -1,9 +1,17 @@
+import { CliApp } from '@effect/cli';
+import { FileSystem, Path } from '@effect/platform-node';
 import spawnAsync, { SpawnOptions, SpawnResult } from '@expo/spawn-async';
+import { FS } from '@scribe/services';
 import * as child_process from 'child_process';
 import { ChildProcess } from 'child_process';
+import { Console, Effect, Layer } from 'effect';
 import * as fs from 'fs';
 import path from 'path';
 import * as tempy from 'tempy';
+
+import * as Process from '../../services/process/process';
+import * as MockConsole from '../mock-console';
+import * as MockTerminal from '../mock-terminal';
 
 export const cliPath = path.join(process.cwd(), 'dist', 'index.js');
 export const configFlag = path.join('scribe.config.ts');
@@ -192,3 +200,31 @@ export const getCliFromSpawn = (
 
   return _.child;
 };
+
+export const MainLive = (cwd: string) =>
+  Effect.gen(function* (_) {
+    const _console = yield* _(MockConsole.make);
+    return Layer.mergeAll(
+      Console.setConsole(_console),
+      FileSystem.layer,
+      FS.layer(false),
+      MockTerminal.layer,
+      Process.layer(cwd),
+      Path.layer,
+    );
+  }).pipe(Layer.unwrapEffect);
+
+export const runEffect =
+  (cwd: string) =>
+  async <E, A>(
+    self: Effect.Effect<
+      CliApp.CliApp.Environment | FS.FS | Process.Process,
+      E,
+      A
+    >,
+  ): Promise<A> =>
+    Effect.provide(self, MainLive(cwd)).pipe(
+      // TODO: test different loglevels
+      // Logger.withMinimumLogLevel(LogLevel.All),
+      Effect.runPromise,
+    );

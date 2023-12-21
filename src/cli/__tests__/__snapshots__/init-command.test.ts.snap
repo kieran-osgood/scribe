@@ -57,3 +57,16 @@ const config = {
 export default config;
 "
 `;
+
+exports[`InitCommand > [Given] Git Clean > [When] user accepts [Then] create file 2`] = `
+"import { ScribeConfig } from '@kieran-osgood/scribe';
+
+export default {
+  options: {
+    rootOutDir: '.',
+    templatesDirectories: ['.'],
+  },
+  templates: {},
+} satisfies ScribeConfig;
+"
+`;

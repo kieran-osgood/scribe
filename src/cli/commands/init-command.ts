@@ -39,15 +39,14 @@ const checkConfigWritePathEmpty = () => {
 };
 
 const copyBaseScribeConfigToPath = () =>
-  pipe(
-    FS.readFile('public/base.ts'),
-    Effect.flatMap(configTxt =>
-      Process.Process.pipe(
-        Effect.map(createConfigPath),
-        Effect.flatMap(_ => FS.writeFile(_, configTxt.toString(), null)),
-      ),
-    ),
-  );
+  Effect.gen(function* ($) {
+    const _process = yield* $(Process.Process);
+    const configTxt = yield* $(
+      FS.readFile(path.join(_process.cwd(), 'public/base.ts')),
+    );
+    const configPath = createConfigPath(_process);
+    return yield* $(FS.writeFile(configPath, configTxt.toString(), null));
+  });
 
 const createFileExistsError = () =>
   Process.Process.pipe(
