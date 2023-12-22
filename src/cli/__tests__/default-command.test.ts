@@ -3,9 +3,9 @@ import fs from 'fs';
 import path from 'path';
 
 import * as Cli from '../cli';
-import * as MockConsole from '../mock-console';
-import * as MockTerminal from '../mock-terminal';
 import { configFlag, createMinimalProject, runEffect } from './fixtures';
+import * as MockConsole from './mock-console';
+import * as MockTerminal from './mock-terminal';
 
 describe('DefaultCommand', () => {
   describe('[Given] Git clean', () => {
