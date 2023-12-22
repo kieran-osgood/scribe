@@ -34,8 +34,7 @@ export const writeFile = (
   data: string | NodeJS.ArrayBufferView,
   options: NFS.WriteFileOptions,
 ) =>
-  pipe(
-    FS,
+  FS.pipe(
     Effect.flatMap(fs =>
       Effect.async<FS, WriteFileError, NFS.PathOrFileDescriptor>(resume => {
         fs.writeFile(file, data, options, error => {
@@ -68,8 +67,7 @@ export const readFile = (
     | undefined
     | null,
 ): Effect.Effect<FS, ReadFileError, string | Buffer> =>
-  pipe(
-    FS,
+  FS.pipe(
     Effect.flatMap(fs =>
       Effect.async<FS, ReadFileError, string | Buffer>(resume => {
         fs.readFile(path, options, (error, data) => {
@@ -91,8 +89,7 @@ export const mkdir = (
     recursive: false,
   },
 ): Effect.Effect<FS, MkDirError, string | undefined> =>
-  pipe(
-    FS,
+  FS.pipe(
     Effect.flatMap(fs =>
       Effect.async<FS, MkDirError, string | undefined>(resume => {
         fs.mkdir(file, options, (error, data) => {
@@ -107,8 +104,7 @@ export const mkdir = (
   );
 
 export const stat = (path: string) =>
-  pipe(
-    FS,
+  FS.pipe(
     Effect.flatMap(fs =>
       Effect.async<FS, StatError, NFS.Stats>(resume => {
         fs.stat(path, (error, stats) => {
