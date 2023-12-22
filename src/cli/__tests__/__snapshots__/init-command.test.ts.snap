@@ -1,4 +1,7 @@
-import type { ScribeConfig } from '../../config/index.js';
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`[Given] Git Clean > [When] filepath full [then] print failure 2`] = `
+"import type { ScribeConfig } from '@scribe/config';
 
 const config = {
   options: {
@@ -39,3 +42,18 @@ const config = {
 } satisfies ScribeConfig;
 
 export default config;
+"
+`;
+
+exports[`[Given] Git Clean > [When] user accepts [Then] create file 2`] = `
+"import { ScribeConfig } from '@kieran-osgood/scribe';
+
+export default {
+  options: {
+    rootOutDir: '.',
+    templatesDirectories: ['.'],
+  },
+  templates: {},
+} satisfies ScribeConfig;
+"
+`;

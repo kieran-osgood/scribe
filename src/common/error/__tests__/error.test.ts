@@ -2,7 +2,7 @@ import { pipe, String } from 'effect';
 import * as fc from 'fast-check';
 import { describe } from 'vitest';
 
-import { fmtError } from '../error';
+import { fmtError } from '../error.js';
 
 describe('formatErrorMessage', () => {
   it('should format the errors if it was a Error instance', () => {

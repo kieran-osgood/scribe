@@ -1,4 +1,5 @@
-import { Context } from 'effect';
+import { Context, Effect } from 'effect';
+import * as Layer from 'effect/Layer';
 
 export type Process = {
   cwd: () => string;
@@ -26,14 +27,18 @@ export const makeProcessMock = (cwd: string): Process => ({
   },
 });
 
-export const make = (cwd: string) => {
-  if (cwd.length > 0) {
-    return makeProcessMock(cwd);
+export const make = (cwd: string | undefined) => {
+  if (typeof cwd === 'string') {
+    return Process.of(makeProcessMock(cwd));
   }
 
   if (process.env.NODE_ENV === 'test') {
-    return ProcessMock;
+    return Process.of(ProcessMock);
   }
 
-  return ProcessLive;
+  return Process.of(ProcessLive);
+};
+
+export const layer = (cwd?: string) => {
+  return Layer.scoped(Process, Effect.succeed(make(cwd)));
 };

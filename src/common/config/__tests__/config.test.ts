@@ -5,8 +5,8 @@ import {
   extractConfig,
   readConfig,
   readUserTemplateOptions,
-} from '../config';
-import { ConfigParseError, CosmicConfigError } from '../error';
+} from '../config.js';
+import { ConfigParseError, CosmicConfigError } from '../error.js';
 
 describe('config', function () {
   // describe('getCosmicExplorer', () => {

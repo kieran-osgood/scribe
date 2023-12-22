@@ -10,58 +10,69 @@ import {
   red,
   yellow,
 } from 'colorette';
-import { Effect, flow, Logger, LogLevel, pipe } from 'effect';
-import { Writable } from 'stream';
+import { Console, Effect, flow, LogLevel, pipe } from 'effect';
+import * as Context from 'effect/Context';
 
-import { SYMBOLS } from '../../common/constants';
-import { center, file, spacer } from './formatter';
+import { SYMBOLS } from '../../common/constants.js';
+import { center, file, spacer } from './formatter.js';
 
-export const provideLoggerLayer = (writable: Writable) =>
-  Logger.replace(Logger.defaultLogger, logger(writable));
+export const ConsoleTag = Context.Tag<Console.Console, Console.Console>(
+  'effect/Console',
+);
 
-export const logger = (writable: Writable) =>
-  Logger.make(({ logLevel, message }) => {
-    // TODO: look into using spans/annotations for groupings?
-    switch (logLevel._tag) {
-      case LogLevel.None._tag:
-        writable.write(String(message));
-        break;
-      case LogLevel.Debug._tag:
-        writable.write(cyan(String(message)));
-        break;
-      case LogLevel.Info._tag:
-        writable.write(blue(String(message)));
-        break;
-      case LogLevel.Warning._tag:
-        writable.write(SYMBOLS.warning);
-        writable.write(' ');
-        writable.write(yellow(String(message)));
-        break;
-      case LogLevel.Error._tag:
-        writable.write(SYMBOLS.error);
-        writable.write(' ');
-        writable.write(red(String(message)));
-        break;
-    }
-
-    writable.write('\n');
-  });
+export const consoleLayer = ConsoleTag.of({
+  [Console.TypeId]: Console.TypeId,
+  debug: (...args: string[]) =>
+    Effect.sync(() => {
+      console.debug(cyan(String(args.join())));
+    }),
+  log: (...args: string[]) =>
+    Effect.sync(() => {
+      console.log(String(args.join()));
+    }),
+  info: (...args: string[]) =>
+    Effect.sync(() => {
+      console.info(blue(String(args.join())));
+    }),
+  warn: (...args: string[]) =>
+    Effect.sync(() => {
+      console.warn(`${SYMBOLS.warning} ${yellow(String(args.join()))}`);
+    }),
+  error: (...args: string[]) =>
+    Effect.sync(() => {
+      console.error(`${SYMBOLS.error} ${red(String(args.join()))}`);
+    }),
+  unsafe: globalThis.console,
+  assert: () => Effect.unit,
+  clear: Effect.unit,
+  count: () => Effect.unit,
+  countReset: () => Effect.unit,
+  dir: () => Effect.unit,
+  dirxml: () => Effect.unit,
+  group: () => Effect.unit,
+  groupEnd: Effect.unit,
+  table: () => Effect.unit,
+  time: () => Effect.unit,
+  timeEnd: () => Effect.unit,
+  timeLog: () => Effect.unit,
+  trace: () => Effect.unit,
+});
 
 // Core - styling handled via {@logger}
-export const log = Effect.log;
-export const logDebug = Effect.logDebug;
-export const logInfo = Effect.logInfo;
-export const logWarn = Effect.logWarning;
-export const logError = Effect.logError;
+export const log = Console.log;
+export const logDebug = Console.debug;
+export const logInfo = Console.info;
+export const logWarn = Console.warn;
+export const logError = Console.error;
 
 // Custom implementations
 export const logSuccess = (...s: string[]) =>
-  Effect.log(`${SYMBOLS.success}  ${green(s.join())}`);
+  Console.log(`${SYMBOLS.success}  ${green(s.join())}`);
 
 export const logFile = (s: string) =>
-  Effect.log(`${SYMBOLS.directory} ${file(s)}`);
+  Console.log(`${SYMBOLS.directory} ${file(s)}`);
 
-export const logHeader = (s: string) => Effect.log(bgBlue(black(center(s))));
+export const logHeader = flow(center, black, bgBlue, Console.log);
 
 type LogLevel = 'debug' | 'log' | 'info' | 'warn' | 'error' | 'success';
 const logBgColors = {
@@ -73,9 +84,8 @@ const logBgColors = {
   success: flow(bgGreen, black),
 } satisfies Record<LogLevel, (s: string) => string>;
 
-export const logGroup = (logLevel: LogLevel, g: string) => (s?: string) => {
-  return pipe(
-    Effect.log(logBgColors[logLevel](spacer(g))),
-    Effect.tap(() => (s ? Effect.log(s) : Effect.unit)),
+export const logGroup = (logLevel: LogLevel, g: string) => (s?: string) =>
+  pipe(
+    Console.log(logBgColors[logLevel](spacer(g))),
+    Effect.tap(() => (s ? Console.log(s) : Effect.unit)),
   );
-};

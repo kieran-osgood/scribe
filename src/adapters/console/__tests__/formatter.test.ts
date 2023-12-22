@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 
-import { center, file, spacer } from '../formatter';
+import { center, file, spacer } from '../formatter.js';
 
 describe('Formatter', () => {
   describe('file()', () => {

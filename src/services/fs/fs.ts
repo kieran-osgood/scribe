@@ -1,11 +1,18 @@
 import { Abortable } from 'node:events';
 
 import { Context, Effect, pipe } from 'effect';
+import * as Layer from 'effect/Layer';
 import * as NFS from 'fs';
 import * as memfs from 'memfs';
 import path from 'path';
 
-import { MkDirError, ReadFileError, StatError, WriteFileError } from './error';
+import * as Process from '../process/process.js';
+import {
+  MkDirError,
+  ReadFileError,
+  StatError,
+  WriteFileError,
+} from './error.js';
 
 export interface FS {
   writeFile: typeof NFS.writeFile;
@@ -21,16 +28,18 @@ export const FSLive = NFS;
 export const FSMock = memfs.fs as unknown as typeof NFS;
 
 export const getFS = (test: boolean) => {
-  return test ? FSMock : FSLive;
+  return test ? FS.of(FSMock) : FS.of(FSLive);
 };
+
+export const layer = (test = false) =>
+  Layer.scoped(FS, Effect.succeed(getFS(test)));
 
 export const writeFile = (
   file: NFS.PathOrFileDescriptor,
   data: string | NodeJS.ArrayBufferView,
   options: NFS.WriteFileOptions,
 ) =>
-  pipe(
-    FS,
+  FS.pipe(
     Effect.flatMap(fs =>
       Effect.async<FS, WriteFileError, NFS.PathOrFileDescriptor>(resume => {
         fs.writeFile(file, data, options, error => {
@@ -63,8 +72,7 @@ export const readFile = (
     | undefined
     | null,
 ): Effect.Effect<FS, ReadFileError, string | Buffer> =>
-  pipe(
-    FS,
+  FS.pipe(
     Effect.flatMap(fs =>
       Effect.async<FS, ReadFileError, string | Buffer>(resume => {
         fs.readFile(path, options, (error, data) => {
@@ -86,8 +94,7 @@ export const mkdir = (
     recursive: false,
   },
 ): Effect.Effect<FS, MkDirError, string | undefined> =>
-  pipe(
-    FS,
+  FS.pipe(
     Effect.flatMap(fs =>
       Effect.async<FS, MkDirError, string | undefined>(resume => {
         fs.mkdir(file, options, (error, data) => {
@@ -102,8 +109,7 @@ export const mkdir = (
   );
 
 export const stat = (path: string) =>
-  pipe(
-    FS,
+  FS.pipe(
     Effect.flatMap(fs =>
       Effect.async<FS, StatError, NFS.Stats>(resume => {
         fs.stat(path, (error, stats) => {
@@ -176,3 +182,24 @@ export const isDirectory = (
 //       )
 //     )
 //   );
+
+export const createConfigPathAbsolute = (filePath: string) =>
+  Effect.gen(function* ($) {
+    const process = yield* $(Process.Process);
+
+    const onAbsolutePath = () =>
+      Effect.if(isFile(filePath), {
+        onTrue: Effect.succeed(filePath),
+        // absolute directory, so set the filePath to default location
+        // TODO: use search from cosmic config to handle this
+        onFalse: Effect.succeed(path.join(process.cwd(), 'scribe.config.ts')),
+      });
+
+    return yield* $(
+      path.isAbsolute(filePath),
+      Effect.if({
+        onTrue: onAbsolutePath(),
+        onFalse: Effect.succeed(path.join(process.cwd(), filePath)),
+      }),
+    );
+  });

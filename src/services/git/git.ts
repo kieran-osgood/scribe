@@ -1,13 +1,14 @@
 import { Process } from '@scribe/services';
 import { Effect, pipe } from 'effect';
-import simpleGit, {
+import {
   GitConstructError,
+  simpleGit,
   SimpleGitOptions,
   StatusResult,
   TaskOptions,
 } from 'simple-git';
 
-import GitStatusError, { SimpleGitError } from './error';
+import GitStatusError, { SimpleGitError } from './error.js';
 
 export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
   Effect.try({
@@ -17,8 +18,7 @@ export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
   });
 
 export const status = (options?: TaskOptions) => {
-  return pipe(
-    Process.Process,
+  return Process.Process.pipe(
     Effect.flatMap(_ => createSimpleGit({ baseDir: _.cwd() })),
     Effect.flatMap(_ =>
       Effect.async<never, GitStatusError, StatusResult>(resume => {
