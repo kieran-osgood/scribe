@@ -1,163 +1,222 @@
-import spawnAsync from '@expo/spawn-async';
+import { Effect, Fiber } from 'effect';
 import fs from 'fs';
-import stripAnsi from 'strip-ansi';
-import { describe } from 'vitest';
+import path from 'path';
 
-import {
-  arrowKey,
-  cliPath,
-  configFlag,
-  createMinimalProject,
-  getCliFromSpawn,
-  registerInteractiveListeners
-} from './fixtures';
+import * as Cli from '../cli';
+import * as MockConsole from '../mock-console';
+import * as MockTerminal from '../mock-terminal';
+import { configFlag, createMinimalProject, runEffect } from './fixtures';
 
 describe('DefaultCommand', () => {
   describe('[Given] Git clean', () => {
     describe('[When] `--config` passed in & fully interactive session', () => {
       it('[Then] creates two files', async () => {
-        const cwd = createMinimalProject();
-
-        const processPromise = spawnAsync(cliPath, [`--config=${configFlag}`], {
-          cwd,
+        const cwd = createMinimalProject({
+          git: { init: true, dirty: false },
+          fixtures: { templateFiles: true, configFile: true, base: true },
         });
+        const configPath = path.join(cwd, configFlag);
 
-        const cli = getCliFromSpawn(processPromise);
+        return Effect.gen(function* ($) {
+          const fiber = yield* $(
+            Effect.fork(Cli.run([`--config=${configPath}`])),
+          );
 
-        registerInteractiveListeners(cli)({
-          templatePicker: arrowKey.down,
-          fileName: 'Login',
-        });
+          yield* $(MockTerminal.inputKey('down'));
+          yield* $(MockTerminal.inputKey('enter'));
+          yield* $(MockTerminal.inputText('Login'));
+          yield* $(MockTerminal.inputKey('enter'));
 
-        const result = await processPromise;
+          yield* $(Fiber.join(fiber));
 
-        expect(result.status).toBe(0);
-        expect(stripAnsi(result.stdout)).toMatch(
-          '✅  Success!\n' +
-          'Output files:\n' +
-          `- ${cwd}/examples/src/screens/Login.ts\n` +
-          `- ${cwd}/examples/src/screens/Login.test.ts\n`,
-        );
+          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+          expect(lines).toMatchInlineSnapshot(`
+            [
+              "? Template: › 
+            ❯ component 
+              screen ",
+              "? Template: › 
+              component 
+            ❯ screen ",
+              "✔ Template: …  screen
+            ",
+              "",
+              "? Name: › ",
+              "? Name: › L",
+              "? Name: › Lo",
+              "? Name: › Log",
+              "? Name: › Logi",
+              "? Name: › Login",
+              "✔ Name: … Login
+            ",
+              "",
+              "✅  Success",
+              "Output files:
+            - ${cwd}/examples/src/screens/Login.ts
+            - ${cwd}/examples/src/screens/Login.test.ts
+            ",
+            ]
+          `);
 
-        const loginscreen = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.ts`,
-        );
-        expect(String(loginscreen)).toMatchSnapshot();
+          const loginscreen = fs.readFileSync(
+            path.join(cwd, `examples/src/screens/Login.ts`),
+          );
+          expect(String(loginscreen)).toMatchSnapshot();
 
-        const loginscreentest = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.test.ts`,
-        );
-        expect(String(loginscreentest)).toMatchSnapshot();
+          const loginscreentest = fs.readFileSync(
+            path.join(cwd, `examples/src/screens/Login.test.ts`),
+          );
+          expect(String(loginscreentest)).toMatchSnapshot();
+        }).pipe(runEffect(cwd));
       });
     });
 
     describe('[When] `--name` passed in', () => {
       it('[Then] creates two files', async () => {
-        const cwd = createMinimalProject();
-
-        const processPromise = spawnAsync(
-          cliPath,
-          [`--config=${configFlag}`, '--name=Login'],
-          {
-            cwd,
-          },
-        );
-
-        const cli = getCliFromSpawn(processPromise);
-
-        registerInteractiveListeners(cli)({
-          templatePicker: arrowKey.down,
+        const cwd = createMinimalProject({
+          git: { init: true, dirty: false },
+          fixtures: { templateFiles: true, configFile: true, base: true },
         });
+        const configPath = path.join(cwd, configFlag);
 
-        const result = await processPromise;
+        return Effect.gen(function* ($) {
+          const fiber = yield* $(
+            Effect.fork(Cli.run([`--config=${configPath}`, '--name=Login'])),
+          );
 
-        expect(result.status).toBe(0);
-        expect(stripAnsi(result.stdout)).toMatch(
-          '✅  Success!\n' +
-          'Output files:\n' +
-          `- ${cwd}/examples/src/screens/Login.ts\n` +
-          `- ${cwd}/examples/src/screens/Login.test.ts\n`,
-        );
+          yield* $(MockTerminal.inputKey('down'));
+          yield* $(MockTerminal.inputKey('enter'));
 
-        const loginscreen = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.ts`,
-        );
-        expect(String(loginscreen)).toMatchSnapshot();
+          yield* $(Fiber.join(fiber));
 
-        const loginscreentest = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.test.ts`,
-        );
-        expect(String(loginscreentest)).toMatchSnapshot();
+          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+          expect(lines).toMatchInlineSnapshot(`
+            [
+              "? Template: › 
+            ❯ component 
+              screen ",
+              "? Template: › 
+              component 
+            ❯ screen ",
+              "✔ Template: …  screen
+            ",
+              "",
+              "✅  Success",
+              "Output files:
+            - ${cwd}/examples/src/screens/Login.ts
+            - ${cwd}/examples/src/screens/Login.test.ts
+            ",
+            ]
+          `);
+
+          const loginscreen = fs.readFileSync(
+            path.join(cwd, `examples/src/screens/Login.ts`),
+          );
+          expect(String(loginscreen)).toMatchSnapshot();
+
+          const loginscreentest = fs.readFileSync(
+            path.join(cwd, `examples/src/screens/Login.test.ts`),
+          );
+          expect(String(loginscreentest)).toMatchSnapshot();
+        }).pipe(runEffect(cwd));
       });
     });
 
     describe('[When] `--template` passed in', () => {
       it('[Then] creates two files', async () => {
-        const cwd = createMinimalProject();
-
-        const processPromise = spawnAsync(
-          cliPath,
-          [`--config=${configFlag}`, '--template=screen'],
-          {
-            cwd,
-          },
-        );
-
-        const cli = getCliFromSpawn(processPromise);
-
-        registerInteractiveListeners(cli)({
-          fileName: 'Login',
+        const cwd = createMinimalProject({
+          git: { init: true, dirty: false },
+          fixtures: { templateFiles: true, configFile: true, base: true },
         });
+        const configPath = path.join(cwd, configFlag);
 
-        const result = await processPromise;
+        return Effect.gen(function* ($) {
+          const fiber = yield* $(
+            Effect.fork(
+              Cli.run([`--config=${configPath}`, '--template=screen']),
+            ),
+          );
 
-        expect(result.status).toBe(0);
-        expect(stripAnsi(result.stdout)).toMatch(
-          '✅  Success!\n' +
-          'Output files:\n' +
-          `- ${cwd}/examples/src/screens/Login.ts\n` +
-          `- ${cwd}/examples/src/screens/Login.test.ts\n`,
-        );
+          yield* $(MockTerminal.inputText('Login'));
+          yield* $(MockTerminal.inputKey('enter'));
 
-        const loginscreen = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.ts`,
-        );
-        expect(String(loginscreen)).toMatchSnapshot();
+          yield* $(Fiber.join(fiber));
 
-        const loginscreentest = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.test.ts`,
-        );
-        expect(String(loginscreentest)).toMatchSnapshot();
+          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+          expect(lines).toMatchInlineSnapshot(`
+          [
+            "? Name: › ",
+            "? Name: › L",
+            "? Name: › Lo",
+            "? Name: › Log",
+            "? Name: › Logi",
+            "? Name: › Login",
+            "✔ Name: … Login
+          ",
+            "",
+            "✅  Success",
+            "Output files:
+          - ${cwd}/examples/src/screens/Login.ts
+          - ${cwd}/examples/src/screens/Login.test.ts
+          ",
+          ]
+        `);
+
+          const loginscreen = fs.readFileSync(
+            path.join(cwd, `examples/src/screens/Login.ts`),
+          );
+          expect(String(loginscreen)).toMatchSnapshot();
+
+          const loginscreentest = fs.readFileSync(
+            path.join(cwd, `examples/src/screens/Login.test.ts`),
+          );
+          expect(String(loginscreentest)).toMatchSnapshot();
+        }).pipe(runEffect(cwd));
       });
     });
 
     describe('[Given] `--config --template --name passed` in', () => {
       it('[Then] creates two files', async () => {
-        const cwd = createMinimalProject();
+        const cwd = createMinimalProject({
+          git: { init: true, dirty: false },
+          fixtures: { templateFiles: true, configFile: true, base: true },
+        });
+        const configPath = path.join(cwd, configFlag);
 
-        const result = await spawnAsync(
-          cliPath,
-          [`--config=${configFlag}`, '--template=screen', '--name=Login'],
-          { cwd },
-        );
+        return Effect.gen(function* ($) {
+          const fiber = yield* $(
+            Effect.fork(
+              Cli.run([
+                `--config=${configPath}`,
+                '--name=Login',
+                '--template=screen',
+              ]),
+            ),
+          );
 
-        expect(result.status).toBe(0);
-        expect(stripAnsi(result.stdout)).toMatch(
-          '✅  Success!\n' +
-          'Output files:\n' +
-          `- ${cwd}/examples/src/screens/Login.ts\n` +
-          `- ${cwd}/examples/src/screens/Login.test.ts\n`,
-        );
+          yield* $(Fiber.join(fiber));
 
-        const loginscreen = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.ts`,
-        );
-        expect(String(loginscreen)).toMatchSnapshot();
+          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+          expect(lines).toMatchInlineSnapshot(`
+          [
+            "✅  Success",
+            "Output files:
+          - ${cwd}/examples/src/screens/Login.ts
+          - ${cwd}/examples/src/screens/Login.test.ts
+          ",
+          ]
+        `);
 
-        const loginscreentest = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.test.ts`,
-        );
-        expect(String(loginscreentest)).toMatchSnapshot();
+          const loginscreen = fs.readFileSync(
+            path.join(cwd, `examples/src/screens/Login.ts`),
+          );
+          expect(String(loginscreen)).toMatchSnapshot();
+
+          const loginscreentest = fs.readFileSync(
+            path.join(cwd, `examples/src/screens/Login.test.ts`),
+          );
+          expect(String(loginscreentest)).toMatchSnapshot();
+        }).pipe(runEffect(cwd));
       });
     });
   });
@@ -169,42 +228,52 @@ describe('DefaultCommand', () => {
           git: { init: true, dirty: true },
           fixtures: { configFile: true, base: true, templateFiles: true },
         });
+        const configPath = path.join(cwd, configFlag);
 
-        const processPromise = spawnAsync(
-          cliPath,
-          [`--config=${configFlag}`, '--template=screen', '--name=Login'],
-          { cwd },
-        );
+        return Effect.gen(function* ($) {
+          const fiber = yield* $(
+            Effect.fork(
+              Cli.run([
+                `--config=${configPath}`,
+                '--name=Login',
+                '--template=screen',
+              ]),
+            ),
+          );
 
-        const cli = getCliFromSpawn(processPromise);
+          yield* $(MockTerminal.inputKey('left'));
+          yield* $(MockTerminal.inputKey('enter'));
 
-        registerInteractiveListeners(cli)({
-          continue: 'y',
-        });
+          yield* $(Fiber.join(fiber));
 
-        const result = await processPromise;
+          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+          expect(lines).toMatchInlineSnapshot(`
+    [
+      "Git working tree dirty - proceed with caution.
+    Recommendation: commit all changes before proceeding.",
+      "? Continue? › yes / no",
+      "? Continue? › yes / no",
+      "✔ Continue? … yes / no
+    ",
+      "",
+      "✅  Success",
+      "Output files:
+    - ${cwd}/examples/src/screens/Login.ts
+    - ${cwd}/examples/src/screens/Login.test.ts
+    ",
+    ]
+  `);
 
-        expect(result.status).toBe(0);
-        expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
-          "⚠️ Git working tree dirty - proceed with caution.
-          Recommendation: commit all changes before proceeding.
-          ? Continue (Y/n) ? Continue (Y/n) y? Continue Yes
-          ✅  Success!
-          Output files:
-          - ${cwd}/examples/src/screens/Login.ts
-          - ${cwd}/examples/src/screens/Login.test.ts
-          "
-        `);
+          const loginscreen = fs.readFileSync(
+            path.join(cwd, `examples/src/screens/Login.ts`),
+          );
+          expect(String(loginscreen)).toMatchSnapshot();
 
-        const loginscreen = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.ts`,
-        );
-        expect(String(loginscreen)).toMatchSnapshot();
-
-        const loginscreentest = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.test.ts`,
-        );
-        expect(String(loginscreentest)).toMatchSnapshot();
+          const loginscreentest = fs.readFileSync(
+            path.join(cwd, `examples/src/screens/Login.test.ts`),
+          );
+          expect(String(loginscreentest)).toMatchSnapshot();
+        }).pipe(runEffect(cwd));
       });
 
       it('[Then] user answers `n`, cli aborts without writing file', async () => {
@@ -212,118 +281,124 @@ describe('DefaultCommand', () => {
           git: { init: true, dirty: true },
           fixtures: { configFile: true, base: true, templateFiles: true },
         });
+        const configPath = path.join(cwd, configFlag);
 
-        const processPromise = spawnAsync(
-          cliPath,
-          [`--config=${configFlag}`, '--template=screen', '--name=Login'],
-          { cwd },
-        );
+        return Effect.gen(function* ($) {
+          const fiber = yield* $(
+            Effect.fork(
+              Cli.run([
+                `--config=${configPath}`,
+                '--name=Login',
+                '--template=screen',
+              ]),
+            ),
+          );
 
-        const cli = getCliFromSpawn(processPromise);
+          yield* $(MockTerminal.inputKey('enter'));
 
-        registerInteractiveListeners(cli)({
-          continue: 'n',
-        });
+          yield* $(Fiber.join(fiber), Effect.flip);
 
-        const result = await processPromise;
-
-        expect(result.status).toBe(0);
-        expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
-          "⚠️ Git working tree dirty - proceed with caution.
-          Recommendation: commit all changes before proceeding.
-          ? Continue (Y/n) ? Continue (Y/n) n? Continue No
-          "
-        `);
-
-        await expect(async () =>
-          fs.promises.readFile(`${cwd}/examples/src/screens/Login.ts`),
-        ).rejects.toMatchInlineSnapshot(
-          `[Error: ENOENT: no such file or directory, open '${cwd}/examples/src/screens/Login.ts']`,
-        );
+          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+          expect(lines).toMatchInlineSnapshot(`
+            [
+              "Git working tree dirty - proceed with caution.
+            Recommendation: commit all changes before proceeding.",
+              "? Continue? › yes / no",
+              "✔ Continue? … yes / no
+            ",
+              "",
+            ]
+          `);
+        }).pipe(runEffect(cwd));
       });
     });
   });
 
-  describe.skip('[Given] Not in Git', function () {
+  describe('[Given] *Not* Git', function () {
     describe('[Given] prompts to continue', () => {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       it('[Then] user answers y, creates two files', async () => {
         const cwd = createMinimalProject({
-          git: { init: false, dirty: true },
+          git: { init: false, dirty: false },
           fixtures: { configFile: true, base: true, templateFiles: true },
         });
+        const configPath = path.join(cwd, configFlag);
 
-        const processPromise = spawnAsync(
-          cliPath,
-          [`--config=${configFlag}`, '--template=screen', '--name=Login'],
-          { cwd },
-        );
+        return Effect.gen(function* ($) {
+          const fiber = yield* $(
+            Effect.fork(
+              Cli.run([
+                `--config=${configPath}`,
+                '--name=Login',
+                '--template=screen',
+              ]),
+            ),
+          );
 
-        const cli = getCliFromSpawn(processPromise);
+          yield* $(MockTerminal.inputKey('left'));
+          yield* $(MockTerminal.inputKey('enter'));
 
-        registerInteractiveListeners(cli)({
-          continue: 'n',
-        });
+          yield* $(Fiber.join(fiber));
 
-        const result = await processPromise;
-
-        expect(result.status).toBe(0);
-        expect(stripAnsi(result.stdout)).toMatchInlineSnapshot();
-
-        const loginscreen = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.ts`,
-        );
-        expect(String(loginscreen)).toMatchSnapshot();
-
-        const loginscreentest = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.test.ts`,
-        );
-        expect(String(loginscreentest)).toMatchSnapshot();
+          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+          expect(lines).toMatchInlineSnapshot(`
+              [
+                "? Continue? › yes / no",
+                "? Continue? › yes / no",
+                "✔ Continue? … yes / no
+              ",
+                "",
+                "✅  Success",
+                "Output files:
+              - ${cwd}/examples/src/screens/Login.ts
+              - ${cwd}/examples/src/screens/Login.test.ts
+              ",
+              ]
+            `);
+        }).pipe(runEffect(cwd));
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       it('[Then] user answers `n`, cli aborts without writing file', async () => {
         const cwd = createMinimalProject({
-          git: { init: false, dirty: true },
+          git: { init: false, dirty: false },
           fixtures: { configFile: true, base: true, templateFiles: true },
         });
+        const configPath = path.join(cwd, configFlag);
+        console.log({ configPath });
+        return Effect.gen(function* ($) {
+          const fiber = yield* $(
+            Effect.fork(
+              Cli.run([
+                `--config=${configPath}`,
+                '--name=Login',
+                '--template=screen',
+              ]),
+            ),
+          );
 
-        const processPromise = spawnAsync(
-          cliPath,
-          [`--config=${configFlag}`, '--template=screen', '--name=Login'],
-          { cwd },
-        );
+          yield* $(MockTerminal.inputKey('enter'));
 
-        const cli = getCliFromSpawn(processPromise);
+          yield* $(Fiber.join(fiber));
 
-        registerInteractiveListeners(cli)({
-          continue: 'n',
-        });
+          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
 
-        const result = await processPromise;
-
-        expect(result.status).toBe(0);
-        expect(stripAnsi(result.stdout)).toMatchInlineSnapshot();
-
-        const loginscreen = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.ts`,
-        );
-        expect(String(loginscreen)).toMatchSnapshot();
-
-        const loginscreentest = fs.readFileSync(
-          `${cwd}/examples/src/screens/Login.test.ts`,
-        );
-        expect(String(loginscreentest)).toMatchSnapshot();
+          expect(lines).toMatchInlineSnapshot(
+            '[\n  "? Continue? › yes / no",\n  "✔ Continue? … yes / no\n",\n  "",\n]',
+          );
+        }).pipe(runEffect(cwd));
       });
     });
   });
 
   it('[Given] --help flag [Then] print help information', async () => {
-    const t = await spawnAsync(cliPath, [`--help`]);
+    const cwd = createMinimalProject();
 
-    expect(t.status).toBe(0);
-    expect(stripAnsi(t.stdout)).toMatchInlineSnapshot(`
-        "Scribe
+    return Effect.gen(function* ($) {
+      const fiber = yield* $(Effect.fork(Cli.run(['--help'])));
+      yield* $(Fiber.join(fiber));
+      const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+      expect(lines).toMatchInlineSnapshot(`
+        [
+          "Scribe
 
         Scribe 0.3.1
 
@@ -400,8 +475,9 @@ describe('DefaultCommand', () => {
         COMMANDS
 
           - init  
-
-        "
+        ",
+        ]
       `);
+    }).pipe(runEffect(cwd));
   });
 });

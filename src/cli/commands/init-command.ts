@@ -90,7 +90,7 @@ export const ScribeInit = Command.make('init', {}, () =>
     //  Print: Not in git repository?
     // prompt: Continue?
     // TODO: test this
-    Effect.catchTag('SimpleGitError', () => togglePrompt()),
+    Effect.catchTag('GitStatusError', () => togglePrompt()),
 
     // Effect.flatMap(togglePrompt),
     Effect.flatMap(
@@ -128,5 +128,6 @@ export const ScribeInit = Command.make('init', {}, () =>
 
       return Effect.unit;
     }),
+    Effect.catchTag('QuitException', () => Effect.unit),
   ),
 );

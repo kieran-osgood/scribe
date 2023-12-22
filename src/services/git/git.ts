@@ -37,5 +37,8 @@ export const status = (options?: TaskOptions) => {
 export const isWorkingTreeClean = (options?: TaskOptions) =>
   pipe(
     status(options),
+    // Effect.catchTag('SimpleGitError', () =>
+    //   Effect.succeed({ isClean: () => false }),
+    // ),
     Effect.map(_ => _.isClean()),
   );

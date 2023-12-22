@@ -3,17 +3,21 @@ import { GitConstructError, GitError, StatusResult } from 'simple-git';
 
 export default class GitStatusError extends Data.TaggedClass('GitStatusError')<{
   readonly status: StatusResult;
-  readonly error?: Error;
+  readonly error?: GitError;
 }> {
+  get isGitRepository() {
+    return this.error?.message.includes('not a git repository') ?? false;
+  }
+
   override toString(): string {
     switch (true) {
-      case !this.status.isClean():
-        return '⚠️ Working directory not clean';
       case this.error instanceof GitError:
-        if (this.error?.message.includes('not a git repository')) {
+        if (this.isGitRepository) {
           return "You're not running within a git repository, continue?";
         }
         return 'Unknown Git error';
+      case !this.status.isClean():
+        return '⚠️ Working directory not clean';
       default:
         return '❗️Unable to check Git status, are you in a git repository?';
     }

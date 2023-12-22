@@ -1,7 +1,6 @@
 import { Effect, Fiber, ReadonlyArray } from 'effect';
 import fs from 'fs';
 import path from 'path';
-import { describe } from 'vitest';
 
 import * as Cli from '../cli';
 import * as MockConsole from '../mock-console';

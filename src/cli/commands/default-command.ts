@@ -40,6 +40,14 @@ const _cwd = Options.text('cwd').pipe(
 //   verbose = Option.Boolean('--verbose', false, {
 //     description: 'More verbose logging and error stack traces',
 //   });
+const continueOrQuit = () =>
+  pipe(
+    Prompts.continueWarning,
+    Effect.if({
+      onTrue: Effect.unit,
+      onFalse: Effect.fail(new QuitException()),
+    }),
+  );
 
 export const ScribeDefault = Command.make(
   'scribe',
@@ -53,18 +61,12 @@ export const ScribeDefault = Command.make(
           onTrue: Effect.unit,
           onFalse: Effect.gen(function* ($) {
             yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
-            return yield* $(
-              Prompts.continueWarning,
-              Effect.if({
-                onTrue: Effect.unit,
-                onFalse: Effect.fail(new QuitException()),
-              }),
-            );
+            return yield* $(continueOrQuit());
           }),
         }),
       ),
 
-      Effect.catchTag('SimpleGitError', () => Prompts.continueWarning),
+      Effect.catchTag('GitStatusError', () => continueOrQuit()),
 
       Effect.flatMap(() =>
         Effect.gen(function* ($) {
@@ -110,6 +112,7 @@ export const ScribeDefault = Command.make(
           Effect.tap(() => Console.log(`Output files:\n${_}\n`)),
         ),
       ),
+      Effect.catchTag('QuitException', () => Effect.unit),
     ),
 );
 
