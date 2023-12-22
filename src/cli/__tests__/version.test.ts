@@ -1,17 +1,25 @@
-import spawnAsync from '@expo/spawn-async';
+import * as Cli from '@scribe/cli';
+import { Effect, Fiber, ReadonlyArray } from 'effect';
 import { describe } from 'vitest';
 
 import packageJson from '../../../package.json';
-import { cliPath } from './fixtures';
+import { runEffect } from './fixtures';
+import * as MockConsole from './mock-console';
 
 describe('VersionCommand', () => {
   it('[Given] --version flag [Then] print version from package.json', async () => {
-    const t = await spawnAsync(cliPath, [`--version`]);
-    expect(t.status).toBe(0);
-    expect(t.stdout).toMatchInlineSnapshot(`
+    return Effect.gen(function* ($) {
+      const args = ReadonlyArray.make('--version');
+      const fiber = yield* $(Effect.fork(Cli.run(args)));
+
+      yield* $(Fiber.join(fiber));
+
+      const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+      expect(lines).toMatchInlineSnapshot(`
         "${packageJson.version}
         
         "
       `);
+    }).pipe(runEffect(''));
   });
 });
