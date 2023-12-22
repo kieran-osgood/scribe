@@ -28,6 +28,7 @@
     "tsc": "tsc",
     "build": "tsup index.ts",
     "ci": "run-s ci:*",
+    "ci:build": "pnpm run build",
     "ci:typecheck": "pnpm run tsc",
     "ci:lint": "pnpm run lint",
     "ci:test": "pnpm run test",
