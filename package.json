@@ -68,8 +68,8 @@
     "@types/yargs": "^17.0.24",
     "@typescript-eslint/eslint-plugin": "^6.13.2",
     "@typescript-eslint/parser": "^6.13.2",
-    "@vitest/coverage-istanbul": "^0.31.4",
-    "@vitest/ui": "^0.33.0",
+    "@vitest/coverage-istanbul": "^1.1.0",
+    "@vitest/ui": "^1.1.0",
     "changeset": "^0.2.6",
     "eslint": "^8.55.0",
     "eslint-plugin-communist-spelling": "^1.0.0",
@@ -91,7 +91,7 @@
     "typescript": "^5.2.2",
     "vite": "^4.4.4",
     "vite-node": "^0.29.8",
-    "vitest": "0.33.0"
+    "vitest": "1.1.0"
   },
   "size-limit": [
     {
@@ -142,7 +142,6 @@
       "@typescript-eslint/no-unsafe-member-access": "off",
       "@typescript-eslint/no-unsafe-argument": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
-
       "@typescript-eslint/no-unnecessary-boolean-literal-compare": "off",
       "@typescript-eslint/no-misused-promises": "error",
       "@typescript-eslint/promise-function-async": "error",
