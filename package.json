@@ -42,18 +42,12 @@
     "@effect/platform": "^0.38.0",
     "@effect/platform-node": "^0.38.0",
     "@effect/schema": "^0.54.0",
-    "case-anything": "^2.1.13",
-    "clipanion": "^3.2.1",
     "colorette": "^2.0.20",
     "cosmiconfig": "^8.2.0",
     "cosmiconfig-typescript-loader": "^4.3.0",
     "effect": "2.0.0-next.61",
-    "inquirer": "8.0.0",
     "simple-git": "^3.19.1",
-    "strip-ansi": "^7.1.0",
-    "template-file": "^6.0.1",
-    "typanion": "^3.13.0",
-    "yargs": "^17.7.2"
+    "template-file": "^6.0.1"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
@@ -95,8 +89,8 @@
   },
   "size-limit": [
     {
-      "path": "dist/main.js",
-      "limit": "10 kb"
+      "path": "dist/index.js",
+      "limit": "80 kb"
     }
   ],
   "prettier": {
@@ -160,11 +154,6 @@
       ],
       "simple-import-sort/exports": "error",
       "simple-import-sort/imports": "error"
-    }
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "clipanion@3.2.1": "patches/clipanion@3.2.1.patch"
     }
   }
 }

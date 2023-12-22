@@ -10,7 +10,7 @@ export default defineConfig({
   env: {
     NODE_ENV: 'production',
   },
-  minify: 'terser', // ~171kb -> ~70kb
+  minify: 'terser',
   publicDir: 'public',
   entry: ['index.ts'],
   tsconfig: './tsconfig.json',
