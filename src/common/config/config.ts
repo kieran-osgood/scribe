@@ -1,17 +1,16 @@
 import { Schema } from '@effect/schema';
-import { cosmiconfig } from 'cosmiconfig';
-import { CosmiconfigResult } from 'cosmiconfig/dist/types';
+import { cosmiconfig, CosmiconfigResult } from 'cosmiconfig';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
 import { Effect, flow, pipe, ReadonlyArray, Tuple } from 'effect';
 
 import PackageJson from '../../../package.json';
-import { ConfigParseError, CosmicConfigError } from './error';
-import { ScribeConfig } from './schema';
+import { ConfigParseError, CosmicConfigError } from './error.js';
+import { ScribeConfig } from './schema.js';
 
 export const getCosmicExplorer = () =>
   cosmiconfig(PackageJson.name, {
     loaders: {
-      '.ts': TypeScriptLoader({ transpileOnly: true }),
+      '.ts': TypeScriptLoader(),
     },
   });
 
@@ -26,8 +25,8 @@ export const readConfig = (path: string) =>
     }),
     Effect.flatMap(extractConfig),
     Effect.flatMap(Schema.parse(ScribeConfig)),
-    Effect.catchTag('ParseError', ({ errors }) =>
-      Effect.fail(new ConfigParseError({ errors, path })),
+    Effect.catchTag('ParseError', parseError =>
+      Effect.fail(new ConfigParseError({ parseError, path })),
     ),
   );
 

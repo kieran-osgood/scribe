@@ -1,7 +1,6 @@
 import { TreeFormatter } from '@effect/schema';
-import { ParseErrors } from '@effect/schema/ParseResult';
+import { ParseError } from '@effect/schema/ParseResult';
 import { Data } from 'effect';
-import { NonEmptyReadonlyArray } from 'effect/ReadonlyArray';
 
 export class CosmicConfigError extends Data.TaggedClass('CosmicConfigError')<{
   readonly error:
@@ -15,12 +14,12 @@ export class CosmicConfigError extends Data.TaggedClass('CosmicConfigError')<{
   }
 }
 
-export class ConfigParseError extends Data.TaggedClass('ParseError')<{
-  readonly errors: NonEmptyReadonlyArray<ParseErrors>;
+export class ConfigParseError extends Data.TaggedClass('ConfigParseError')<{
+  readonly parseError: ParseError;
   readonly path: string;
 }> {
   override toString() {
     return `⚠️ Config parsing error: '${this.path}' 
- ${TreeFormatter.formatErrors(this.errors)}`;
+ ${TreeFormatter.formatErrors(this.parseError.errors)}`;
   }
 }

@@ -1,3 +1,3 @@
-export * as FS from './fs/index';
-export * as Git from './git/index';
-export * as Process from './process/process';
+export * as FS from './fs/index.js';
+export * as Git from './git/index.js';
+export * as Process from './process/process.js';

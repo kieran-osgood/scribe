@@ -19,7 +19,8 @@ jobs:
           node-version: 19.7.0
           cache: "pnpm"
 
-      - run: pnpm install --frozen-lockfile
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Link @kieran-osgood/scribe -> scribe
         run: pnpm link .

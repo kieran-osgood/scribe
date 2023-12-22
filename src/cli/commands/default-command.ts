@@ -1,191 +1,120 @@
-import { TreeFormatter } from '@effect/schema';
-import * as Schema from '@effect/schema/Schema';
-import { Inquirer, PromptError } from '@scribe/adapters';
-import { FS, Git, Process } from '@scribe/services';
-import { Command, Option } from 'clipanion';
-import { green } from 'colorette';
-import {
-  Data,
-  Effect,
-  Option as O,
-  pipe,
-  ReadonlyArray,
-  ReadonlyRecord,
-} from 'effect';
-import { PathOrFileDescriptor } from 'fs';
-import { QuestionCollection } from 'inquirer';
-import path from 'path';
-import * as Config from 'src/common/config';
-import * as t from 'typanion';
+import { Command, Options } from '@effect/cli';
+import { QuitException } from '@effect/platform/Terminal';
+import { Console } from '@scribe/adapters';
+import * as Config from '@scribe/config';
+import { FS, Git } from '@scribe/services';
+import { Data, Effect, flow, Option as O, pipe, ReadonlyArray } from 'effect';
 
-import { constructTemplate, Ctx, writeTemplate } from '../../common/templates';
-import { BaseCommand } from './base-command';
+import { WARNINGS } from '../../common/constants.js';
+import { writeAllTemplates } from '../../common/templates/index.js';
+import * as Prompts from '../prompts/index.js';
 
-const Prompt = Schema.struct({
-  template: Schema.string,
-  name: Schema.string,
-});
+const _name = Options.text('name').pipe(
+  Options.withAlias('n'),
+  Options.withDescription('The key of templates to generate.'),
+  Options.optional,
+);
 
-export type Prompt = Schema.Schema.To<typeof Prompt>;
-type Flags = { template: string | undefined; name: string | undefined };
+const _template = Options.text('template').pipe(
+  Options.withAlias('t'),
+  Options.withDescription(
+    'Specify the name of the template to generate. Must be a key under templates in config.',
+  ),
+  Options.optional,
+);
 
-export class DefaultCommand extends BaseCommand {
-  static override paths = [Command.Default];
+const _config = Options.text('config').pipe(
+  Options.withAlias('c'),
+  Options.withDescription('Path to the config (default: scribe.config.ts)'),
+  Options.withDefault('scribe.config.ts'),
+);
+const _cwd = Options.text('cwd').pipe(
+  Options.withDescription('Override the cwd (default: process.cwd()'),
+  Options.withDefault(process.cwd()),
+);
 
-  static override usage = Command.Usage({
-    description: 'Scribe generates files based on mustache templates.',
-    examples: [
-      [`Interactively select template to use`, `$0`],
-      [`Select via args`, `$0 --template screen --name Login`],
-    ],
-  });
+//   test = Option.Boolean('--test', false, { hidden: true });
 
-  name = Option.String('-n,--name', {
-    description: 'The key of templates to generate.',
-    validator: t.isString(),
-    required: false,
-  });
+//   cwd = Option.String('--cwd', '', { hidden: true });
 
-  template = Option.String('-t,--template', {
-    description:
-      'Specify the name of the template to generate. Must be a key under templates in config.',
-    validator: t.isString(),
-    required: false,
-  });
+//   verbose = Option.Boolean('--verbose', false, {
+//     description: 'More verbose logging and error stack traces',
+//   });
+const continueOrQuit = () =>
+  pipe(
+    Prompts.continueWarning,
+    Effect.if({
+      onTrue: Effect.unit,
+      onFalse: Effect.fail(new QuitException()),
+    }),
+  );
 
-  promptUserForMissingArgs = () => {
-    const { configPath, template, name, launchPrompt } = this;
-
-    return pipe(
-      Effect.gen(function* ($) {
-        const _configPath = yield* $(createConfigPathAbsolute(configPath));
-        const templates = yield* $(Config.readUserTemplateOptions(_configPath));
-        const input = yield* $(
-          launchPrompt({ templates, flags: { name, template } }),
-        );
-
-        const config = yield* $(Config.readConfig(_configPath));
-        return { config, input, templates } as const;
-      }),
-      Effect.tap(_ =>
-        Effect.sync(() => {
-          this.name = _.input.name;
-          this.template = _.input.template;
+export const ScribeDefault = Command.make(
+  'scribe',
+  { configPath: _config, name: _name, template: _template, cwd: _cwd },
+  ({ configPath, name, template }) =>
+    pipe(
+      Git.isWorkingTreeClean(),
+      // TODO: add ignore git
+      Effect.flatMap(
+        Effect.if({
+          onTrue: Effect.unit,
+          onFalse: Effect.gen(function* ($) {
+            yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
+            return yield* $(continueOrQuit());
+          }),
         }),
       ),
-    );
-  };
 
-  launchPrompt = (options: { templates: string[]; flags: Flags }) =>
-    pipe(
-      this.createQuestionCollection(options),
-      Inquirer.prompt,
-      Effect.map(_ => ({
-        // TODO: need to validate this in test
-        name: options.flags.name,
-        template: options.flags.template,
-        ..._,
-      })),
-      Effect.flatMap(_ =>
-        pipe(
-          Schema.parse(Prompt)(_),
-          Effect.catchTag('ParseError', error =>
-            Effect.fail(
-              new PromptError({
-                message: TreeFormatter.formatErrors(error.errors),
-              }),
-            ),
-          ),
+      Effect.catchTag('GitStatusError', () => continueOrQuit()),
+
+      Effect.flatMap(() =>
+        Effect.gen(function* ($) {
+          const _configPath = yield* $(FS.createConfigPathAbsolute(configPath));
+          const templates = yield* $(
+            Config.readUserTemplateOptions(_configPath),
+          );
+
+          const _template = yield* $(
+            template,
+            O.match({
+              onSome: Effect.succeed,
+              onNone: () => Prompts.templates(templates),
+            }),
+          );
+
+          const _name = yield* $(
+            name,
+            O.match({ onSome: Effect.succeed, onNone: () => Prompts.fileName }),
+          );
+
+          const config = yield* $(Config.readConfig(_configPath));
+
+          return {
+            name: _name,
+            template: _template,
+            config,
+            templates,
+          } as const;
+        }),
+      ),
+
+      Effect.flatMap(writeAllTemplates),
+      Effect.map(
+        flow(
+          ReadonlyArray.map(s => `- ${String(s)}`),
+          ReadonlyArray.join('\n'),
         ),
       ),
-    );
-
-  createQuestionCollection = (options: {
-    templates: string[];
-    flags: Flags;
-  }): QuestionCollection => [
-    {
-      name: 'template',
-      type: 'list',
-      message: 'Pick your template',
-      choices: options.templates,
-      when: () =>
-        !options.flags.template || typeof options.flags.template !== 'string',
-    },
-    {
-      name: 'name',
-      type: 'input',
-      message: 'File name:',
-      when: () => !options.flags.name || typeof options.flags.name !== 'string',
-      validate: (s: string) => {
-        if (/^([A-Za-z\-_\d])+$/.test(s)) return true;
-        return 'File name may only include letters, numbers & underscores.';
-      },
-    },
-  ];
-
-  print = (_: PathOrFileDescriptor[]) => {
-    const results = pipe(
-      _,
-      ReadonlyArray.map(s => `- ${String(s)}`),
-      ReadonlyArray.join('\n'),
-    );
-    this.context.stdout.write(green(`✅  Success!\n`));
-    this.context.stdout.write(`Output files:\n${results}\n`);
-  };
-
-  executeSafe = () =>
-    pipe(
-      // TODO: add ignore git
-      Git.checkWorkingTreeClean(),
-      Effect.flatMap(() => this.promptUserForMissingArgs()),
-      Effect.flatMap(writeAllTemplates),
-      Effect.map(this.print),
-    );
-}
-
-/**
- * Constructs and writes templates to files persistently
- */
-export const writeAllTemplates = (ctx: Ctx) =>
-  pipe(
-    ReadonlyRecord.get(ctx.input.template)(ctx.config.templates),
-    O.getOrThrowWith(() =>
-      Effect.fail(
-        new GetTemplateError({
-          cause: `Template Missing: ${ctx.input.template}`,
-        }),
+      Effect.flatMap(_ =>
+        pipe(
+          Console.logSuccess('Success'),
+          Effect.tap(() => Console.log(`Output files:\n${_}\n`)),
+        ),
       ),
+      Effect.catchTag('QuitException', () => Effect.unit),
     ),
-    _ => _.outputs,
-    ReadonlyArray.map(output =>
-      pipe(
-        constructTemplate({ output, ...ctx }),
-        Effect.map(ReadonlyArray.map(writeTemplate)),
-        Effect.flatMap(Effect.all),
-      ),
-    ),
-    Effect.all,
-    Effect.map(ReadonlyArray.flatten),
-  );
-
-export const createConfigPathAbsolute = (filePath: string) =>
-  pipe(
-    Process.Process,
-    Effect.flatMap(_process =>
-      Effect.if(path.isAbsolute(filePath), {
-        onTrue: Effect.if(FS.isFile(filePath), {
-          onTrue: Effect.succeed(filePath),
-          // absolute directory, so set the filePath to default location
-          // TODO: use search from cosmic config to handle this
-          onFalse: Effect.succeed(
-            path.join(_process.cwd(), 'scribe.config.ts'),
-          ),
-        }),
-        onFalse: Effect.succeed(path.join(_process.cwd(), filePath)),
-      }),
-    ),
-  );
+);
 
 export class GetTemplateError extends Data.TaggedClass('GetTemplateError')<{
   readonly cause?: string;

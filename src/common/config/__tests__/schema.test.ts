@@ -1,7 +1,7 @@
 import { Schema as S } from '@effect/schema';
 import { Effect, pipe } from 'effect';
 
-import { ScribeConfig } from '../schema';
+import { ScribeConfig } from '../schema.js';
 
 describe('Config', () => {
   it('Parses successfully with templates', () => {
@@ -50,11 +50,10 @@ describe('Config', () => {
 
   it('throws with invalid config', () => {
     const result = Effect.runSync(pipe(S.parse(ScribeConfig)({}), Effect.flip));
-
     expect(String(result)).toMatchInlineSnapshot(`
-        "error(s) found
-        └─ [\\"templates\\"]
-           └─ is missing"
-      `);
+      "error(s) found
+      └─ ["templates"]
+         └─ is missing"
+    `);
   });
 });

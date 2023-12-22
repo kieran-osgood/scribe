@@ -1,1 +1,2 @@
-export * from './git';
+export * from './error.js';
+export * from './git.js';

@@ -1,8 +1,8 @@
 import { Schema as S } from '@effect/schema';
 import { Effect } from 'effect';
 
-import BaseConfig from '../../../../public/base';
-import { ScribeConfig } from '../schema';
+import BaseConfig from '../../../../public/base.js';
+import { ScribeConfig } from '../schema.js';
 
 describe('Base Config', () => {
   it('Parses successfully', () => {

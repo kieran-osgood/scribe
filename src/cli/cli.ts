@@ -1,33 +1,12 @@
-import { Builtins, Cli } from 'clipanion';
-import { BaseContext } from 'clipanion/lib/advanced/Cli';
-import { Effect } from 'effect';
+import { Command } from '@effect/cli';
 
 import packageJson from '../../package.json';
-import { DefaultCommand, InitCommand } from './commands';
+import { ScribeDefault } from './commands/default-command.js';
+import { ScribeInit } from './commands/index.js';
 
-export async function _Cli(
-  args: string[],
-  contextOverrides?: Partial<BaseContext>,
-) {
-  const cli = new Cli({
-    binaryLabel: `scribe`,
-    binaryName: 'scribe',
-    enableCapture: true,
-    binaryVersion: packageJson.version,
-  });
+const command = ScribeDefault.pipe(Command.withSubcommands([ScribeInit]));
 
-  cli.register(DefaultCommand);
-  cli.register(InitCommand);
-
-  cli.register(Builtins.DefinitionsCommand);
-  cli.register(Builtins.HelpCommand);
-  cli.register(Builtins.VersionCommand);
-
-  return cli.runExit(args, { ...Cli.defaultContext, ...contextOverrides });
-}
-
-type ContextOverrides = Partial<BaseContext>;
-
-export function run(args: string[], contextOverrides: ContextOverrides = {}) {
-  return Effect.tryPromise(async () => _Cli(args.slice(2), contextOverrides));
-}
+export const run = Command.run(command, {
+  name: 'Scribe',
+  version: packageJson.version,
+});

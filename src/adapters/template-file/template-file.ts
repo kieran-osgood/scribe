@@ -1,7 +1,7 @@
 import { Effect } from 'effect';
 import * as TF from 'template-file';
 
-import { TemplateFileError } from './error';
+import { TemplateFileError } from './error.js';
 
 export const render = (
   template: string,

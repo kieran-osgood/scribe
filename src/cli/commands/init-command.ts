@@ -1,87 +1,52 @@
+import '@effect/platform/Terminal';
+
+import { Command, Prompt } from '@effect/cli';
+import { Console } from '@scribe/adapters';
 import { FS, Git, Process } from '@scribe/services';
-import { Command } from 'clipanion';
 import { Effect, pipe } from 'effect';
-import { PathOrFileDescriptor } from 'fs';
 import path from 'path';
-import { StatusResult } from 'simple-git';
-import { Writable } from 'stream';
 
-import GitStatusError, { SimpleGitError } from '../../services/git/error';
-import { BaseCommand } from './base-command';
-
-export class InitCommand extends BaseCommand {
-  static override paths = [['init']];
-
-  static override usage = Command.Usage({
-    description: 'Generates a scribe.config.ts file.',
-  });
-
-  executeSafe = () =>
-    pipe(
-      // TODO: add ignore git
-      Git.checkWorkingTreeClean(),
-      checkConfigWritePathEmpty,
-      Effect.flatMap(copyBaseScribeConfigToPath),
-      Effect.flatMap(logSuccess(this.context.stdout)),
-    );
-}
+import { WARNINGS } from '../../common/constants.js';
 
 const createConfigPath = (_process: Process.Process) =>
   path.join(_process.cwd(), 'scribe.config.ts');
 
-const checkConfigWritePathEmpty = (
-  _: Effect.Effect<
-    Process.Process,
-    SimpleGitError | GitStatusError,
-    StatusResult
-  >,
-) => {
-  return pipe(
-    _,
-    Effect.flatMap(() =>
-      Process.Process.pipe(
-        Effect.flatMap(_process =>
-          pipe(
-            _process,
-            createConfigPath,
-            FS.isFileOrDirectory,
-            Effect.if({
-              onTrue: createFileExistsError(),
-              onFalse: Effect.unit,
-            }),
-            Effect.catchTag('@scribe/core/fs/StatError', error => {
-              /**
-               * ENOENT indicates the path is clear, and we can safely write there
-               */
-              if (error.error.code === 'ENOENT') {
-                return Effect.unit;
-              }
+const checkConfigWritePathEmpty = () => {
+  return Process.Process.pipe(
+    Effect.flatMap(_process =>
+      pipe(
+        createConfigPath(_process),
+        FS.isFileOrDirectory,
+        Effect.if({
+          onTrue: createFileExistsError(),
+          onFalse: Effect.unit,
+        }),
+        Effect.catchTag('@scribe/core/fs/StatError', error => {
+          /**
+           * ENOENT indicates the path is clear, and we can safely write there
+           */
+          if (error.error.code === 'ENOENT') {
+            return Effect.unit;
+          }
 
-              // TODO: add ignore file exists
-              // TODO: test case that hits this?
-              return Effect.fail(error);
-            }),
-          ),
-        ),
+          // TODO: add ignore file exists
+          // TODO: test case that hits this?
+          return Effect.fail(error);
+        }),
       ),
     ),
   );
 };
 
-const copyBaseScribeConfigToPath = () => {
-  return pipe(
-    FS.readFile('public/base.ts'),
-    Effect.flatMap(configTxt =>
-      Process.Process.pipe(
-        Effect.flatMap(_process =>
-          pipe(_process, createConfigPath, _ =>
-            FS.writeFile(_, configTxt.toString(), null),
-          ),
-        ),
-      ),
-    ),
-  );
-};
+const copyBaseScribeConfigToPath = () =>
+  Effect.gen(function* ($) {
+    const _process = yield* $(Process.Process);
+    const configTxt = yield* $(
+      FS.readFile(path.join(_process.cwd(), 'public/base.ts')),
+    );
+    const configPath = createConfigPath(_process);
+    return yield* $(FS.writeFile(configPath, configTxt.toString(), null));
+  });
 
 const createFileExistsError = () =>
   Process.Process.pipe(
@@ -98,5 +63,71 @@ const createFileExistsError = () =>
     ),
   );
 
-const logSuccess = (stdout: Writable) => (path: PathOrFileDescriptor) =>
-  Effect.sync(() => stdout.write(`Scribe config created: ${path.toString()}`));
+const togglePrompt = () =>
+  Prompt.toggle({
+    message: 'Continue?',
+    active: 'yes',
+    inactive: 'no',
+  });
+
+export const ScribeInit = Command.make('init', {}, () =>
+  pipe(
+    Console.logHeader(`Init`),
+    Effect.tap(() =>
+      Console.logGroup('info', 'Git')('Checking working tree clean'),
+    ),
+    Effect.flatMap(() => Git.isWorkingTreeClean()),
+
+    Effect.flatMap(
+      Effect.if({
+        onTrue: Effect.succeed(true),
+        onFalse: Effect.gen(function* ($) {
+          yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
+          return yield* $(togglePrompt());
+        }),
+      }),
+    ),
+    //  Print: Not in git repository?
+    // prompt: Continue?
+    // TODO: test this
+    Effect.catchTag('GitStatusError', () => togglePrompt()),
+
+    // Effect.flatMap(togglePrompt),
+    Effect.flatMap(
+      Effect.if({
+        onTrue: pipe(
+          Console.logGroup('info', 'Config')('Checking write path clear'),
+          Effect.flatMap(() => checkConfigWritePathEmpty()),
+          Effect.tap(() => Console.logInfo('Writing...')),
+          Effect.flatMap(copyBaseScribeConfigToPath),
+        ),
+        onFalse: Effect.unit,
+      }),
+    ),
+
+    Effect.catchTag('@scribe/core/fs/FileExistsError', error =>
+      pipe(
+        Console.logError(`Failed to create config. Path not empty.`),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+        Effect.tap(() => Console.logFile(error.error.path.toString())),
+      ),
+    ),
+
+    Effect.flatMap(fileDescriptor => {
+      if (fileDescriptor) {
+        return Console.logGroup(`success`, 'Success')().pipe(
+          Effect.tap(() =>
+            Console.logSuccess(
+              'Scribe init complete. Edit the config to begin templating.',
+            ),
+          ),
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
+          Effect.tap(() => Console.logFile(fileDescriptor.toString())),
+        );
+      }
+
+      return Effect.unit;
+    }),
+    Effect.catchTag('QuitException', () => Effect.unit),
+  ),
+);
