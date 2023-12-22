@@ -3,9 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 import packageJson from '../../../package.json';
-
 import { readConfig } from '../../common/config/index.js';
-
 import * as Cli from '../cli.js';
 import { createMinimalProject, runEffect } from './fixtures.js';
 import * as MockConsole from './mock-console.js';
