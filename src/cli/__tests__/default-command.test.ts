@@ -2,6 +2,7 @@ import { Effect, Fiber } from 'effect';
 import fs from 'fs';
 import path from 'path';
 
+import packageJson from '../../../package.json';
 import * as Cli from '../cli.js';
 import { configFlag, createMinimalProject, runEffect } from './fixtures.js';
 import * as MockConsole from './mock-console.js';
@@ -399,7 +400,7 @@ describe('DefaultCommand', () => {
         [
           "Scribe
 
-        Scribe 0.3.1
+        Scribe ${packageJson.version}
 
         USAGE
 

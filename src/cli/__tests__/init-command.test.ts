@@ -2,6 +2,7 @@ import { Effect, Fiber, ReadonlyArray } from 'effect';
 import fs from 'fs';
 import path from 'path';
 
+import packageJson from '../../../package.json';
 import * as Cli from '../cli.js';
 import { createMinimalProject, runEffect } from './fixtures.js';
 import * as MockConsole from './mock-console.js';
@@ -166,7 +167,7 @@ it('[Given] --help flag [Then] print help information', async () => {
         [
           "Scribe
 
-        Scribe 0.3.1
+        Scribe ${packageJson.version}
 
         USAGE
 
