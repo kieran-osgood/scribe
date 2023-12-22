@@ -19,12 +19,12 @@ describe('error', () => {
         parseError: parseError([
           { _tag: 'Key', key: 'templates', errors: [{ _tag: 'Missing' }] },
         ]),
-      }).toString();
+      });
 
-      expect(result).toMatchInlineSnapshot(`
+      expect(result.toString()).toMatchInlineSnapshot(`
         "⚠️ Config parsing error: 'config.ts' 
          error(s) found
-        └─ [\\"templates\\"]
+        └─ ["templates"]
            └─ is missing"
       `);
     });

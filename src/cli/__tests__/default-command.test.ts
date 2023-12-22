@@ -296,7 +296,7 @@ describe('DefaultCommand', () => {
 
           yield* $(MockTerminal.inputKey('enter'));
 
-          yield* $(Fiber.join(fiber), Effect.flip);
+          yield* $(Fiber.join(fiber));
 
           const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
           expect(lines).toMatchInlineSnapshot(`
@@ -363,7 +363,6 @@ describe('DefaultCommand', () => {
           fixtures: { configFile: true, base: true, templateFiles: true },
         });
         const configPath = path.join(cwd, configFlag);
-        console.log({ configPath });
         return Effect.gen(function* ($) {
           const fiber = yield* $(
             Effect.fork(
