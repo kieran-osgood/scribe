@@ -6,7 +6,7 @@ import { FS, Git, Process } from '@scribe/services';
 import { Effect, pipe } from 'effect';
 import path from 'path';
 
-import { WARNINGS } from '../../common/constants';
+import { WARNINGS } from '../../common/constants.js';
 
 const createConfigPath = (_process: Process.Process) =>
   path.join(_process.cwd(), 'scribe.config.ts');
@@ -109,7 +109,7 @@ export const ScribeInit = Command.make('init', {}, () =>
       pipe(
         Console.logError(`Failed to create config. Path not empty.`),
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        Effect.tap(() => Console.logFile(`${error.error.path.toString()}`)),
+        Effect.tap(() => Console.logFile(error.error.path.toString())),
       ),
     ),
 
@@ -122,7 +122,7 @@ export const ScribeInit = Command.make('init', {}, () =>
             ),
           ),
           // eslint-disable-next-line @typescript-eslint/no-base-to-string
-          Effect.tap(() => Console.logFile(`${fileDescriptor.toString()}`)),
+          Effect.tap(() => Console.logFile(fileDescriptor.toString())),
         );
       }
 

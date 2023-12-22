@@ -1,13 +1,14 @@
 import { Process } from '@scribe/services';
 import { Effect, pipe } from 'effect';
-import simpleGit, {
+import {
   GitConstructError,
+  simpleGit,
   SimpleGitOptions,
   StatusResult,
   TaskOptions,
 } from 'simple-git';
 
-import GitStatusError, { SimpleGitError } from './error';
+import GitStatusError, { SimpleGitError } from './error.js';
 
 export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
   Effect.try({

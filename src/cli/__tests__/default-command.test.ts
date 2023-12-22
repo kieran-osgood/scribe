@@ -2,10 +2,10 @@ import { Effect, Fiber } from 'effect';
 import fs from 'fs';
 import path from 'path';
 
-import * as Cli from '../cli';
-import { configFlag, createMinimalProject, runEffect } from './fixtures';
-import * as MockConsole from './mock-console';
-import * as MockTerminal from './mock-terminal';
+import * as Cli from '../cli.js';
+import { configFlag, createMinimalProject, runEffect } from './fixtures.js';
+import * as MockConsole from './mock-console.js';
+import * as MockTerminal from './mock-terminal.js';
 
 describe('DefaultCommand', () => {
   describe('[Given] Git clean', () => {

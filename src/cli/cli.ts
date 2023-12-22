@@ -1,8 +1,8 @@
 import { Command } from '@effect/cli';
 
 import packageJson from '../../package.json';
-import { ScribeInit } from './commands';
-import { ScribeDefault } from './commands/default-command';
+import { ScribeDefault } from './commands/default-command.js';
+import { ScribeInit } from './commands/index.js';
 
 const command = ScribeDefault.pipe(Command.withSubcommands([ScribeInit]));
 

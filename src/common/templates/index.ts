@@ -11,8 +11,8 @@ import {
 import path from 'path';
 import { render } from 'template-file';
 
-import { GetTemplateError } from '../../cli/commands/default-command';
-import { Template } from '../config';
+import { GetTemplateError } from '../../cli/commands/default-command.js';
+import { Template } from '../config/index.js';
 
 export type Ctx = {
   name: string;

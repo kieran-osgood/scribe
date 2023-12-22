@@ -10,7 +10,7 @@ import {
   Ctx,
   writeTemplate,
   WriteTemplateCtx,
-} from '../index';
+} from '../index.js';
 
 beforeEach(() => {
   vi.restoreAllMocks();

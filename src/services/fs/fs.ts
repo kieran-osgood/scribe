@@ -6,8 +6,13 @@ import * as NFS from 'fs';
 import * as memfs from 'memfs';
 import path from 'path';
 
-import * as Process from '../process/process';
-import { MkDirError, ReadFileError, StatError, WriteFileError } from './error';
+import * as Process from '../process/process.js';
+import {
+  MkDirError,
+  ReadFileError,
+  StatError,
+  WriteFileError,
+} from './error.js';
 
 export interface FS {
   writeFile: typeof NFS.writeFile;

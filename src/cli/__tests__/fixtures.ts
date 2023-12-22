@@ -7,9 +7,9 @@ import * as fs from 'fs';
 import path from 'path';
 import * as tempy from 'tempy';
 
-import * as Process from '../../services/process/process';
-import * as MockConsole from './mock-console';
-import * as MockTerminal from './mock-terminal';
+import * as Process from '../../services/process/process.js';
+import * as MockConsole from './mock-console.js';
+import * as MockTerminal from './mock-terminal.js';
 
 export const cliPath = path.join(process.cwd(), 'dist', 'index.js');
 export const configFlag = path.join('scribe.config.ts');

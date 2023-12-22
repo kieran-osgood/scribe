@@ -3,8 +3,8 @@ import { Effect, Fiber, ReadonlyArray } from 'effect';
 import { describe } from 'vitest';
 
 import packageJson from '../../../package.json';
-import { runEffect } from './fixtures';
-import * as MockConsole from './mock-console';
+import { runEffect } from './fixtures.js';
+import * as MockConsole from './mock-console.js';
 
 describe('VersionCommand', () => {
   it('[Given] --version flag [Then] print version from package.json', async () => {
@@ -16,9 +16,10 @@ describe('VersionCommand', () => {
 
       const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
       expect(lines).toMatchInlineSnapshot(`
-        "${packageJson.version}
-        
-        "
+        [
+          "${packageJson.version}
+        ",
+        ]
       `);
     }).pipe(runEffect(''));
   });

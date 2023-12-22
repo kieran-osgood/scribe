@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@tsconfig/node18/tsconfig.json",
+  "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "strict": true,
     "strictNullChecks": true,
@@ -9,31 +9,32 @@
     "declaration": true,
     "noImplicitOverride": true,
     "resolveJsonModule": true,
+    "moduleResolution": "NodeNext",
     "noEmit": true,
     "paths": {
       "@scribe/adapters": [
-        "src/adapters/index"
+        "src/adapters/index.js"
       ],
       "@scribe/config": [
-        "src/common/config/index"
+        "src/common/config/index.js"
       ],
       "@scribe/reader": [
-        "src/reader/index"
+        "src/reader/index.js"
       ],
       "@scribe/git": [
-        "src/git/index"
+        "src/git/index.js"
       ],
       "@scribe/commands": [
-        "src/commands/index"
+        "src/commands/index.js"
       ],
       "@scribe/fs": [
-        "src/common/fs/index"
+        "src/common/fs/index.js"
       ],
       "@scribe/cli": [
-        "src/cli/cli"
+        "src/cli/cli.js"
       ],
       "@scribe/services": [
-        "src/services/index"
+        "src/services/index.js"
       ]
     },
     "lib": [

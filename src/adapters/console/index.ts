@@ -13,8 +13,8 @@ import {
 import { Console, Effect, flow, LogLevel, pipe } from 'effect';
 import * as Context from 'effect/Context';
 
-import { SYMBOLS } from '../../common/constants';
-import { center, file, spacer } from './formatter';
+import { SYMBOLS } from '../../common/constants.js';
+import { center, file, spacer } from './formatter.js';
 
 export const ConsoleTag = Context.Tag<Console.Console, Console.Console>(
   'effect/Console',

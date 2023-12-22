@@ -1,7 +1,7 @@
 import { Schema as S } from '@effect/schema';
 import { Effect, pipe } from 'effect';
 
-import { ScribeConfig } from '../schema';
+import { ScribeConfig } from '../schema.js';
 
 describe('Config', () => {
   it('Parses successfully with templates', () => {

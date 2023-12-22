@@ -1,6 +1,6 @@
 import { parseError } from '@effect/schema/ParseResult';
 
-import { ConfigParseError, CosmicConfigError } from '../error';
+import { ConfigParseError, CosmicConfigError } from '../error.js';
 
 describe('error', () => {
   describe(CosmicConfigError.name, () => {
