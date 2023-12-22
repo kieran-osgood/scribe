@@ -14,7 +14,7 @@ describe('DefaultCommand', () => {
       it('[Then] creates two files', async () => {
         const cwd = createMinimalProject({
           git: { init: true, dirty: false },
-          fixtures: { templateFiles: true, configFile: true, base: true },
+          fixtures: { templateFiles: true, configFile: true },
         });
         const configPath = path.join(cwd, configFlag);
 
@@ -76,7 +76,7 @@ describe('DefaultCommand', () => {
       it('[Then] creates two files', async () => {
         const cwd = createMinimalProject({
           git: { init: true, dirty: false },
-          fixtures: { templateFiles: true, configFile: true, base: true },
+          fixtures: { templateFiles: true, configFile: true },
         });
         const configPath = path.join(cwd, configFlag);
 
@@ -127,7 +127,7 @@ describe('DefaultCommand', () => {
       it('[Then] creates two files', async () => {
         const cwd = createMinimalProject({
           git: { init: true, dirty: false },
-          fixtures: { templateFiles: true, configFile: true, base: true },
+          fixtures: { templateFiles: true, configFile: true },
         });
         const configPath = path.join(cwd, configFlag);
 
@@ -180,7 +180,7 @@ describe('DefaultCommand', () => {
       it('[Then] creates two files', async () => {
         const cwd = createMinimalProject({
           git: { init: true, dirty: false },
-          fixtures: { templateFiles: true, configFile: true, base: true },
+          fixtures: { templateFiles: true, configFile: true },
         });
         const configPath = path.join(cwd, configFlag);
 
@@ -227,7 +227,7 @@ describe('DefaultCommand', () => {
       it('[Then] user answers `y`, creates two files', async () => {
         const cwd = createMinimalProject({
           git: { init: true, dirty: true },
-          fixtures: { configFile: true, base: true, templateFiles: true },
+          fixtures: { configFile: true, templateFiles: true },
         });
         const configPath = path.join(cwd, configFlag);
 
@@ -280,7 +280,7 @@ describe('DefaultCommand', () => {
       it('[Then] user answers `n`, cli aborts without writing file', async () => {
         const cwd = createMinimalProject({
           git: { init: true, dirty: true },
-          fixtures: { configFile: true, base: true, templateFiles: true },
+          fixtures: { configFile: true, templateFiles: true },
         });
         const configPath = path.join(cwd, configFlag);
 
@@ -320,7 +320,7 @@ describe('DefaultCommand', () => {
       it('[Then] user answers y, creates two files', async () => {
         const cwd = createMinimalProject({
           git: { init: false, dirty: false },
-          fixtures: { configFile: true, base: true, templateFiles: true },
+          fixtures: { configFile: true, templateFiles: true },
         });
         const configPath = path.join(cwd, configFlag);
 
@@ -361,7 +361,7 @@ describe('DefaultCommand', () => {
       it('[Then] user answers `n`, cli aborts without writing file', async () => {
         const cwd = createMinimalProject({
           git: { init: false, dirty: false },
-          fixtures: { configFile: true, base: true, templateFiles: true },
+          fixtures: { configFile: true, templateFiles: true },
         });
         const configPath = path.join(cwd, configFlag);
         return Effect.gen(function* ($) {

@@ -46,8 +46,6 @@ bun i -D @kieran-osgood/scribe
 ### Initialise Config file
 ```shell
 scribe init
-# or
-cat 'node_modules/@kieran-osgood/scribe/base.ts' > scribe.config.ts
 ```
 
 ## Getting Started
