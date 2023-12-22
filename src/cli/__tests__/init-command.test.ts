@@ -3,16 +3,17 @@ import fs from 'fs';
 import path from 'path';
 
 import packageJson from '../../../package.json';
+import { readConfig } from '../../common/config/index.js';
 import * as Cli from '../cli.js';
 import { createMinimalProject, runEffect } from './fixtures.js';
 import * as MockConsole from './mock-console.js';
 import * as MockTerminal from './mock-terminal.js';
 
 describe('[Given] Git Clean', () => {
-  it('[When] user accepts [Then] create file', async () => {
+  it('[When] user accepts [Then] create schema compatible file', async () => {
     const cwd = createMinimalProject({
       git: { dirty: false, init: true },
-      fixtures: { configFile: false, templateFiles: false, base: true },
+      fixtures: { configFile: false, templateFiles: false },
     });
 
     return Effect.gen(function* ($) {
@@ -38,8 +39,15 @@ describe('[Given] Git Clean', () => {
             "📁 file://${cwd}/scribe.config.ts",
           ]
         `);
-      const config = fs.readFileSync(path.join(cwd, `scribe.config.ts`));
-      expect(String(config)).toMatchSnapshot();
+      const configPath = path.join(cwd, `scribe.config.ts`);
+      const configTxt = fs.readFileSync(configPath).toString();
+      expect(configTxt).toMatchSnapshot();
+
+      const result = yield* $(readConfig(configPath));
+      expect(result).toEqual({
+        options: { rootOutDir: '.', templatesDirectories: ['.'] },
+        templates: {},
+      });
     }).pipe(runEffect(cwd));
   });
 
@@ -78,7 +86,7 @@ describe('[Given] Git dirty', () => {
     it('[When] user accepts [Then] create file', async () => {
       const cwd = createMinimalProject({
         git: { dirty: true, init: true },
-        fixtures: { configFile: false, templateFiles: false, base: true },
+        fixtures: { configFile: false, templateFiles: false },
       });
 
       return Effect.gen(function* ($) {
@@ -117,7 +125,7 @@ describe('[Given] Git dirty', () => {
     it('[When] user declines [Then] abort without writing', async () => {
       const cwd = createMinimalProject({
         git: { dirty: true, init: true },
-        fixtures: { configFile: false, templateFiles: false, base: true },
+        fixtures: { configFile: false, templateFiles: false },
       });
 
       return Effect.gen(function* ($) {
