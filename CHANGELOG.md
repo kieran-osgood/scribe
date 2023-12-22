@@ -1,5 +1,11 @@
 # @kieran-osgood/scribe
 
+## 0.4.1
+
+### Patch Changes
+
+- b704d7f: fix issue with init finding public/base.ts
+
 ## 0.4.0
 
 ### Minor Changes
