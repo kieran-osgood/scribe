@@ -16,5 +16,6 @@ export default defineConfig({
     },
     allowOnly: true,
   },
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
   plugins: [tsconfigPaths()],
 });
