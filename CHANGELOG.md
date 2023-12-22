@@ -1,5 +1,18 @@
 # @kieran-osgood/scribe
 
+## 0.4.0
+
+### Minor Changes
+
+- dcad77b: Adds prompt to continue (dangerously) when git worktree is dirty
+
+### Patch Changes
+
+- dcad77b: fixes implicit coercion of exitCode on success
+- dcad77b: Fixes error where CLI continues after selecting no for non-git workspaces
+- dcad77b: Improve formatting of stdout to be more rich
+- dcad77b: fix postinstall script failing installs for users
+
 ## 0.3.1
 
 ### Patch Changes
