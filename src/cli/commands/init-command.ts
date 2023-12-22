@@ -6,7 +6,7 @@ import { FS, Git, Process } from '@scribe/services';
 import { Effect, pipe } from 'effect';
 import path from 'path';
 
-import { WARNINGS } from '../../common/constants.js';
+import { BASE_CONFIG, WARNINGS } from '../../common/constants.js';
 
 const createConfigPath = (_process: Process.Process) =>
   path.join(_process.cwd(), 'scribe.config.ts');
@@ -39,14 +39,10 @@ const checkConfigWritePathEmpty = () => {
 };
 
 const copyBaseScribeConfigToPath = () =>
-  Effect.gen(function* ($) {
-    const _process = yield* $(Process.Process);
-    const configTxt = yield* $(
-      FS.readFile(path.join(_process.cwd(), 'public/base.ts')),
-    );
-    const configPath = createConfigPath(_process);
-    return yield* $(FS.writeFile(configPath, configTxt.toString(), null));
-  });
+  Process.Process.pipe(
+    Effect.map(createConfigPath),
+    Effect.flatMap(_ => FS.writeFile(_, BASE_CONFIG, null)),
+  );
 
 const createFileExistsError = () =>
   Process.Process.pipe(
@@ -87,10 +83,10 @@ export const ScribeInit = Command.make('init', {}, () =>
         }),
       }),
     ),
-    //  Print: Not in git repository?
-    // prompt: Continue?
     // TODO: test this
-    Effect.catchTag('GitStatusError', () => togglePrompt()),
+    Effect.catchTag('GitStatusError', error =>
+      Console.logWarn(error.toString()).pipe(Effect.flatMap(togglePrompt)),
+    ),
 
     // Effect.flatMap(togglePrompt),
     Effect.flatMap(

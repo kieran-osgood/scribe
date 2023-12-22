@@ -112,7 +112,13 @@ export const ScribeDefault = Command.make(
           Effect.tap(() => Console.log(`Output files:\n${_}\n`)),
         ),
       ),
+
       Effect.catchTag('QuitException', () => Effect.unit),
+
+      Effect.catchTags({
+        CosmicConfigError: Console.logError,
+        ConfigParseError: Console.logError,
+      }),
     ),
 );
 

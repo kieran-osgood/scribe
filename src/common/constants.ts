@@ -18,3 +18,14 @@ export const SYMBOLS = {
   error: '💥',
   directory: '📁',
 };
+
+export const BASE_CONFIG = `import { ScribeConfig } from '@kieran-osgood/scribe';
+
+export default {
+  options: {
+    rootOutDir: '.',
+    templatesDirectories: ['.'],
+  },
+  templates: {},
+} satisfies ScribeConfig;
+`;

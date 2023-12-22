@@ -49,7 +49,6 @@ type CreateMinimalProjectOptions = {
   fixtures?: {
     configFile: boolean;
     templateFiles: boolean;
-    base: boolean;
   };
 };
 
@@ -57,7 +56,6 @@ const defaultMinimalProjectOptions = {
   fixtures: {
     configFile: true,
     templateFiles: true,
-    base: true,
   },
   git: { init: true, dirty: false },
 } satisfies CreateMinimalProjectOptions;
@@ -77,14 +75,6 @@ export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
     copyFileToPath({
       readPath: path.join(realFixturesPath, 'scribe.config.ts'),
       writePath: path.join(tmpPath, 'scribe.config.ts'),
-    });
-  }
-
-  if (options.fixtures.base) {
-    fs.mkdirSync(path.join(tmpPath, 'public'), { recursive: true });
-    copyFileToPath({
-      readPath: path.join('public', 'base.ts'),
-      writePath: path.join(tmpPath, 'public', `base.ts`),
     });
   }
 
