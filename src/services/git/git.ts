@@ -14,7 +14,10 @@ export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
   Effect.try({
     try: () => simpleGit(options),
     // TODO: remove assertion
-    catch: error => new SimpleGitError({ error: error as GitConstructError }),
+    catch: error => {
+      console.log(error instanceof GitConstructError);
+      return new SimpleGitError({ error: error as GitConstructError });
+    },
   });
 
 export const status = (options?: TaskOptions) => {

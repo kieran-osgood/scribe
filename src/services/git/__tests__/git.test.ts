@@ -1,9 +1,9 @@
 import { Process } from '@scribe/services';
-import { Effect, pipe } from 'effect';
-import { SimpleGitTaskCallback, StatusResult, TaskOptions } from 'simple-git';
+import { Effect } from 'effect';
 import { beforeEach, vi } from 'vitest';
 
-import GitStatusError from '../error.js';
+import { createMinimalProject } from '../../../cli/__tests__/fixtures.js';
+import GitStatusError, { SimpleGitError } from '../error.js';
 import { isWorkingTreeClean } from '../git.js';
 
 const mockConsoleLog = vi.fn();
@@ -32,105 +32,70 @@ afterEach(() => {
 afterAll(() => {
   vi.unstubAllGlobals();
 });
-type StatusOptions = TaskOptions;
-type StatusCallback = SimpleGitTaskCallback<Partial<StatusResult>>;
 
-describe('Git', async () => {
-  const { GitError } = await vi.importActual<SimpleGitModule>('simple-git');
-
-  describe('checkWorkingTreeClean', () => {
-    // describe('When dir is git repo', function() {
-    //
-    // });
-
-    // describe('When dir is *not* git repo', function() {
-    //
-    // });
-
-    // TODO: handle accepting or rejecting continue on dirty
-    it.skip('The callback has an error', async () =>
-      pipe(
-        Effect.gen(function* ($) {
-          mockStatusImplementation.mockImplementation(
-            (_options: StatusOptions, cb: StatusCallback) => {
-              cb(new GitError(), { isClean: () => true });
-            },
-          );
-          const result = yield* $(isWorkingTreeClean(), Effect.flip);
-          expect(result).toBeInstanceOf(GitStatusError);
-          // expect(mockConsoleLog).toBeCalledTimes(1);
-          // expect(mockConsoleLog).toBeCalledWith('unknown cause');
-
-          // expect(result.isClean()).toBe(true);
-          // mockConsoleLog.mockRestore();
-        }),
-        Effect.provideService(Process.Process, Process.ProcessMock),
+describe('Git', () => {
+  describe('[Given] checkWorkingTreeClean()', () => {
+    it('[When] simple-git created on non-existent directory [Then] return error', async () => {
+      return Effect.gen(function* ($) {
+        const result = yield* $(isWorkingTreeClean(), Effect.flip);
+        expect(result).toBeInstanceOf(SimpleGitError);
+      }).pipe(
+        Effect.provideService(
+          Process.Process,
+          Process.make('/non-existent-directory'),
+        ),
         Effect.runPromise,
-      ));
-
-    describe('The callback has no error', () => {
-      it.skip('The status.isClean() is true', async () =>
-        pipe(
-          Effect.gen(function* ($) {
-            mockStatusImplementation.mockImplementation(
-              (_options: StatusOptions, cb: StatusCallback) => {
-                cb(null, { isClean: () => true });
-              },
-            );
-            const result = yield* $(isWorkingTreeClean());
-            expect(result).toBe(true);
-          }),
-          Effect.provideService(Process.Process, Process.ProcessMock),
-          Effect.runPromise,
-        ));
-
-      // TODO: handle accepting or rejecting continue on dirty
-      it.skip('The status.isClean is false', async () =>
-        pipe(
-          Effect.gen(function* ($) {
-            mockStatusImplementation.mockImplementation(
-              (_options: StatusOptions, cb: StatusCallback) => {
-                cb(null, { isClean: () => false });
-              },
-            );
-            const result = yield* $(isWorkingTreeClean(), Effect.flip);
-            expect(result).toBeInstanceOf(GitStatusError);
-            // expect(mockConsoleLog).toBeCalledTimes(1);
-            // expect(mockConsoleLog).toBeCalledWith(
-            //   '⚠️ Working directory not clean'
-            // );
-
-            // expect(result.isClean()).toBe(false);
-            // mockConsoleLog.mockRestore();
-          }),
-          Effect.provideService(Process.Process, Process.ProcessMock),
-          Effect.runPromise,
-        ));
+      );
     });
 
-    // Not sure how to test abort signal?
-    it.skip('The AbortController.abort() is called', async () =>
-      pipe(
-        Effect.gen(function* ($) {
-          mockStatusImplementation.mockImplementation(
-            (_options: StatusOptions, cb: StatusCallback) => {
-              cb(null, { isClean: () => true });
-            },
-          );
-          const abortController = new AbortController();
-          abortController.abort();
-          const result = yield* $(isWorkingTreeClean([]));
-          expect(result).toBe(true);
-        }),
-        Effect.provideService(Process.Process, Process.ProcessMock),
-        Effect.runPromise,
-      ));
+    describe('[Given] Within a git repository', () => {
+      it('[When] .isClean() === true [Then] return true', async () => {
+        const cwd = createMinimalProject({
+          git: { init: true, dirty: false },
+        });
 
-    describe('When returning GitStatusError ', () => {
-      describe('When asking user to continue', () => {
-        it.todo('Y');
-        it.todo('N');
+        return Effect.gen(function* ($) {
+          const result = yield* $(isWorkingTreeClean());
+          expect(result).toBe(true);
+        }).pipe(
+          Effect.provideService(Process.Process, Process.make(cwd)),
+          Effect.runPromise,
+        );
       });
+
+      // TODO: handle accepting or rejecting continue on dirty
+      it('[When] .isClean() === false [Then] return false', async () => {
+        const cwd = createMinimalProject({
+          git: { init: true, dirty: true },
+        });
+
+        return Effect.gen(function* ($) {
+          const result = yield* $(isWorkingTreeClean());
+          expect(result).toBe(false);
+        }).pipe(
+          Effect.provideService(Process.Process, Process.make(cwd)),
+          Effect.runPromise,
+        );
+      });
+    });
+
+    it('[When] No Git repository [Then] returns GitStatusError', async () => {
+      const cwd = createMinimalProject({
+        git: { init: false, dirty: false },
+      });
+
+      return Effect.gen(function* ($) {
+        const result = yield* $(isWorkingTreeClean(), Effect.flip);
+        expect(result).toBeInstanceOf(GitStatusError);
+        expect((result as GitStatusError).error?.message)
+          .toMatchInlineSnapshot(`
+            "fatal: not a git repository (or any of the parent directories): .git
+            "
+          `);
+      }).pipe(
+        Effect.provideService(Process.Process, Process.make(cwd)),
+        Effect.runPromise,
+      );
     });
   });
 });

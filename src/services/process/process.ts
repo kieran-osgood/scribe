@@ -13,13 +13,6 @@ export const ProcessLive = {
   exit: (code: number | undefined) => process.exit(code),
 } satisfies Process;
 
-export const ProcessMock = {
-  cwd: () => '/mockdir',
-  exit: (code: number | undefined): never => {
-    throw new Error(`Exiting ${code ?? ''}`);
-  },
-} satisfies Process;
-
 export const makeProcessMock = (cwd: string): Process => ({
   cwd: () => cwd,
   exit: (code: number | undefined): never => {
@@ -27,13 +20,13 @@ export const makeProcessMock = (cwd: string): Process => ({
   },
 });
 
-export const make = (cwd: string | undefined) => {
+export const make = (cwd?: string) => {
   if (typeof cwd === 'string') {
     return Process.of(makeProcessMock(cwd));
   }
 
   if (process.env.NODE_ENV === 'test') {
-    return Process.of(ProcessMock);
+    return Process.of(makeProcessMock('/mockdir'));
   }
 
   return Process.of(ProcessLive);
