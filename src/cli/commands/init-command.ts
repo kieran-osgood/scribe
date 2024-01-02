@@ -2,12 +2,11 @@ import '@effect/platform/Terminal';
 
 import { Command } from '@effect/cli';
 import { Console } from '@scribe/adapters';
+import * as Constants from '@scribe/constants';
+import { Prompts } from '@scribe/prompts';
 import { FS, Git, Process } from '@scribe/services';
 import { Effect, pipe } from 'effect';
 import path from 'path';
-
-import { BASE_CONFIG, WARNINGS } from '../../common/constants.js';
-import * as Prompts from '../../common/prompts/index.js';
 
 export const ScribeInit = Command.make('init', {}, () =>
   pipe(
@@ -21,7 +20,9 @@ export const ScribeInit = Command.make('init', {}, () =>
       Effect.if({
         onTrue: Effect.succeed(true),
         onFalse: Effect.gen(function* ($) {
-          yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
+          yield* $(
+            Console.logWarn(Constants.WARNINGS.gitWorkingDirectoryDirty),
+          );
           return yield* $(Prompts.continueWarning);
         }),
       }),
@@ -104,7 +105,7 @@ const checkConfigWritePathEmpty = () =>
 const copyBaseScribeConfigToPath = () =>
   Process.Process.pipe(
     Effect.map(createConfigPath),
-    Effect.flatMap(path => FS.writeFile(path, BASE_CONFIG, null)),
+    Effect.flatMap(path => FS.writeFile(path, Constants.BASE_CONFIG, null)),
   );
 
 const createFileExistsError = () =>

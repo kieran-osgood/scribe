@@ -1,12 +1,11 @@
 import { Command, Options } from '@effect/cli';
-import { QuitException } from '@effect/platform/Terminal';
 import { Console } from '@scribe/adapters';
 import * as Config from '@scribe/config';
+import { Prompts } from '@scribe/prompts';
 import { FS, Git } from '@scribe/services';
 import { Data, Effect, flow, Option as O, pipe, ReadonlyArray } from 'effect';
 
 import { WARNINGS } from '../../common/constants.js';
-import * as Prompts from '../../common/prompts/index.js';
 import { writeTemplates } from '../../common/templates/index.js';
 
 const _name = Options.text('name').pipe(
@@ -40,14 +39,6 @@ const _cwd = Options.text('cwd').pipe(
 //   verbose = Option.Boolean('--verbose', false, {
 //     description: 'More verbose logging and error stack traces',
 //   });
-const continueOrQuit = () =>
-  pipe(
-    Prompts.continueWarning,
-    Effect.if({
-      onTrue: Effect.unit,
-      onFalse: Effect.fail(new QuitException()),
-    }),
-  );
 
 export const ScribeDefault = Command.make(
   'scribe',
@@ -61,12 +52,12 @@ export const ScribeDefault = Command.make(
           onTrue: Effect.unit,
           onFalse: Effect.gen(function* ($) {
             yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
-            return yield* $(continueOrQuit());
+            return yield* $(Prompts.continueOrQuit());
           }),
         }),
       ),
 
-      Effect.catchTag('GitStatusError', () => continueOrQuit()),
+      Effect.catchTag('GitStatusError', () => Prompts.continueOrQuit()),
 
       Effect.flatMap(() =>
         Effect.gen(function* ($) {

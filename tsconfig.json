@@ -35,6 +35,12 @@
       ],
       "@scribe/services": [
         "src/services/index.js"
+      ],
+      "@scribe/prompts": [
+        "src/common/prompts/index.js"
+      ],
+      "@scribe/constants": [
+        "src/common/constants.js"
       ]
     },
     "lib": [

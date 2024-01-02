@@ -1,7 +1,8 @@
 import { Prompt } from '@effect/cli';
-import { Effect } from 'effect';
+import { QuitException } from '@effect/platform/Terminal';
+import { Effect, pipe } from 'effect';
 
-export const fileName = Prompt.text({
+const fileName = Prompt.text({
   message: 'Name:',
   validate: s =>
     /^([A-Za-z\-_\d])+$/.test(s)
@@ -11,13 +12,13 @@ export const fileName = Prompt.text({
         ),
 });
 
-export const continueWarning = Prompt.toggle({
+const continueWarning = Prompt.toggle({
   message: 'Continue?',
   active: 'yes',
   inactive: 'no',
 });
 
-export const templates = (s: string[]) =>
+const templates = (s: string[]) =>
   Prompt.select({
     message: 'Template:',
     choices: s.map(_ => ({
@@ -27,3 +28,19 @@ export const templates = (s: string[]) =>
       // description: 'This is some description of a template',
     })),
   });
+
+const continueOrQuit = () =>
+  pipe(
+    Prompts.continueWarning,
+    Effect.if({
+      onTrue: Effect.unit,
+      onFalse: Effect.fail(new QuitException()),
+    }),
+  );
+
+export const Prompts = {
+  templates,
+  continueWarning,
+  continueOrQuit,
+  fileName,
+};
