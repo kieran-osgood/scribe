@@ -1,12 +1,13 @@
 import { Command } from '@effect/cli';
 
 import packageJson from '../../package.json';
-import { ScribeDefault } from './commands/default-command.js';
-import { ScribeInit } from './commands/index.js';
+import * as Commands from './commands/index.js';
 
-const command = ScribeDefault.pipe(Command.withSubcommands([ScribeInit]));
+const _command = Commands.Default.pipe(
+  Command.withSubcommands([Commands.Init]),
+);
 
-export const run = Command.run(command, {
+export const run = Command.run(_command, {
   name: 'Scribe',
   version: packageJson.version,
 });

@@ -46,7 +46,7 @@ const _verbose = Options.boolean('verbose').pipe(
   Options.withDefault(false),
 );
 
-export const ScribeDefault = Command.make(
+export const Default = Command.make(
   'scribe',
   {
     configPath: _config,

@@ -175,7 +175,7 @@ it('[Given] --help flag [Then] print help information', async () => {
       [
         "Scribe
 
-        Scribe ${packageJson.version}
+      Scribe ${packageJson.version}
 
       USAGE
 
