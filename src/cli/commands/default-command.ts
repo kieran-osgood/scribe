@@ -6,8 +6,8 @@ import { FS, Git } from '@scribe/services';
 import { Data, Effect, flow, Option as O, pipe, ReadonlyArray } from 'effect';
 
 import { WARNINGS } from '../../common/constants.js';
+import * as Prompts from '../../common/prompts/index.js';
 import { writeTemplates } from '../../common/templates/index.js';
-import * as Prompts from '../prompts/index.js';
 
 const _name = Options.text('name').pipe(
   Options.withAlias('n'),

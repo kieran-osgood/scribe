@@ -1,70 +1,13 @@
 import '@effect/platform/Terminal';
 
-import { Command, Prompt } from '@effect/cli';
+import { Command } from '@effect/cli';
 import { Console } from '@scribe/adapters';
 import { FS, Git, Process } from '@scribe/services';
 import { Effect, pipe } from 'effect';
 import path from 'path';
 
 import { BASE_CONFIG, WARNINGS } from '../../common/constants.js';
-
-const createConfigPath = (_process: Process.Process) =>
-  path.join(_process.cwd(), 'scribe.config.ts');
-
-const checkConfigWritePathEmpty = () => {
-  return Process.Process.pipe(
-    Effect.flatMap(_process =>
-      pipe(
-        createConfigPath(_process),
-        FS.isFileOrDirectory,
-        Effect.if({
-          onTrue: createFileExistsError(),
-          onFalse: Effect.unit,
-        }),
-        Effect.catchTag('@scribe/core/fs/StatError', error => {
-          /**
-           * ENOENT indicates the path is clear, and we can safely write there
-           */
-          if (error.error.code === 'ENOENT') {
-            return Effect.unit;
-          }
-
-          // TODO: add ignore file exists
-          // TODO: test case that hits this?
-          return Effect.fail(error);
-        }),
-      ),
-    ),
-  );
-};
-
-const copyBaseScribeConfigToPath = () =>
-  Process.Process.pipe(
-    Effect.map(createConfigPath),
-    Effect.flatMap(_ => FS.writeFile(_, BASE_CONFIG, null)),
-  );
-
-const createFileExistsError = () =>
-  Process.Process.pipe(
-    Effect.flatMap(_process =>
-      Effect.fail(
-        new FS.FileExistsError({
-          error: new FS.AccessError({
-            error: new Error(`${createConfigPath(_process)} already exists.`),
-            path: createConfigPath(_process),
-            mode: 0,
-          }),
-        }),
-      ),
-    ),
-  );
-
-const togglePrompt = () =>
-  Prompt.toggle({
-    message: 'Continue?',
-    active: 'yes',
-    inactive: 'no',
-  });
+import * as Prompts from '../../common/prompts/index.js';
 
 export const ScribeInit = Command.make('init', {}, () =>
   pipe(
@@ -79,16 +22,17 @@ export const ScribeInit = Command.make('init', {}, () =>
         onTrue: Effect.succeed(true),
         onFalse: Effect.gen(function* ($) {
           yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
-          return yield* $(togglePrompt());
+          return yield* $(Prompts.continueWarning);
         }),
       }),
     ),
     // TODO: test this
     Effect.catchTag('GitStatusError', error =>
-      Console.logWarn(error.toString()).pipe(Effect.flatMap(togglePrompt)),
+      Console.logWarn(error.toString()).pipe(
+        Effect.flatMap(() => Prompts.continueWarning),
+      ),
     ),
 
-    // Effect.flatMap(togglePrompt),
     Effect.flatMap(
       Effect.if({
         onTrue: pipe(
@@ -127,3 +71,53 @@ export const ScribeInit = Command.make('init', {}, () =>
     Effect.catchTag('QuitException', () => Effect.unit),
   ),
 );
+
+const createConfigPath = (_process: Process.Process) =>
+  path.join(_process.cwd(), 'scribe.config.ts');
+
+const checkConfigWritePathEmpty = () =>
+  Process.Process.pipe(
+    Effect.flatMap(_process =>
+      pipe(
+        createConfigPath(_process),
+        FS.isFileOrDirectory,
+        Effect.if({
+          onTrue: createFileExistsError(),
+          onFalse: Effect.unit,
+        }),
+        Effect.catchTag('@scribe/core/fs/StatError', error => {
+          /**
+           * ENOENT indicates the path is clear, and we can safely write there
+           */
+          if (error.error.code === 'ENOENT') {
+            return Effect.unit;
+          }
+
+          // TODO: add ignore file exists
+          // TODO: test case that hits this?
+          return Effect.fail(error);
+        }),
+      ),
+    ),
+  );
+
+const copyBaseScribeConfigToPath = () =>
+  Process.Process.pipe(
+    Effect.map(createConfigPath),
+    Effect.flatMap(path => FS.writeFile(path, BASE_CONFIG, null)),
+  );
+
+const createFileExistsError = () =>
+  Process.Process.pipe(
+    Effect.flatMap(_process =>
+      Effect.fail(
+        new FS.FileExistsError({
+          error: new FS.AccessError({
+            error: new Error(`${createConfigPath(_process)} already exists.`),
+            path: createConfigPath(_process),
+            mode: 0,
+          }),
+        }),
+      ),
+    ),
+  );
