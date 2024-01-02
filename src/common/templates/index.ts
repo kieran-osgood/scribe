@@ -2,6 +2,7 @@ import { TemplateFile } from '@scribe/adapters';
 import * as Config from '@scribe/config';
 import { FS, Process } from '@scribe/services';
 import {
+  Data,
   Effect,
   Option as O,
   pipe,
@@ -11,7 +12,6 @@ import {
 import path from 'path';
 import { render } from 'template-file';
 
-import { GetTemplateError } from '../../cli/commands/default-command.js';
 import { Template } from '../config/index.js';
 
 export type Ctx = {
@@ -20,6 +20,10 @@ export type Ctx = {
   config: Effect.Effect.Success<ReturnType<(typeof Config)['readConfig']>>;
   templates: string[];
 };
+
+export class GetTemplateError extends Data.TaggedClass('GetTemplateError')<{
+  readonly cause?: string;
+}> {}
 
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   return Effect.gen(function* ($) {

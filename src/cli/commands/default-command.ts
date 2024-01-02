@@ -3,7 +3,15 @@ import { Console } from '@scribe/adapters';
 import * as Config from '@scribe/config';
 import { Prompts } from '@scribe/prompts';
 import { FS, Git } from '@scribe/services';
-import { Data, Effect, flow, Option as O, pipe, ReadonlyArray } from 'effect';
+import {
+  Effect,
+  flow,
+  Logger,
+  LogLevel,
+  Option,
+  pipe,
+  ReadonlyArray,
+} from 'effect';
 
 import { WARNINGS } from '../../common/constants.js';
 import { writeTemplates } from '../../common/templates/index.js';
@@ -27,23 +35,27 @@ const _config = Options.text('config').pipe(
   Options.withDescription('Path to the config (default: scribe.config.ts)'),
   Options.withDefault('scribe.config.ts'),
 );
+
 const _cwd = Options.text('cwd').pipe(
   Options.withDescription('Override the cwd (default: process.cwd()'),
   Options.withDefault(process.cwd()),
 );
 
-//   test = Option.Boolean('--test', false, { hidden: true });
-
-//   cwd = Option.String('--cwd', '', { hidden: true });
-
-//   verbose = Option.Boolean('--verbose', false, {
-//     description: 'More verbose logging and error stack traces',
-//   });
+const _verbose = Options.boolean('verbose').pipe(
+  Options.withDescription('Sets LogLevel to All (default: false)'),
+  Options.withDefault(false),
+);
 
 export const ScribeDefault = Command.make(
   'scribe',
-  { configPath: _config, name: _name, template: _template, cwd: _cwd },
-  ({ configPath, name, template }) =>
+  {
+    configPath: _config,
+    name: _name,
+    template: _template,
+    cwd: _cwd,
+    verbose: _verbose,
+  },
+  ({ configPath, name, template, verbose }) =>
     pipe(
       Git.isWorkingTreeClean(),
       // TODO: add ignore git
@@ -68,7 +80,8 @@ export const ScribeDefault = Command.make(
 
           const _template = yield* $(
             template,
-            O.match({
+            // TODO: orElse
+            Option.match({
               onSome: Effect.succeed,
               onNone: () => Prompts.templates(templates),
             }),
@@ -76,7 +89,10 @@ export const ScribeDefault = Command.make(
 
           const _name = yield* $(
             name,
-            O.match({ onSome: Effect.succeed, onNone: () => Prompts.fileName }),
+            Option.match({
+              onSome: Effect.succeed,
+              onNone: () => Prompts.fileName,
+            }),
           );
 
           const config = yield* $(Config.readConfig(_configPath));
@@ -110,9 +126,12 @@ export const ScribeDefault = Command.make(
         CosmicConfigError: Console.logError,
         ConfigParseError: Console.logError,
       }),
+      Logger.withMinimumLogLevel(
+        verbose
+          ? LogLevel.All
+          : process.env.NODE_ENV === 'production'
+            ? LogLevel.Info
+            : LogLevel.All,
+      ),
     ),
 );
-
-export class GetTemplateError extends Data.TaggedClass('GetTemplateError')<{
-  readonly cause?: string;
-}> {}

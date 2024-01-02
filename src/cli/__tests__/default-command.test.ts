@@ -404,7 +404,7 @@ describe('DefaultCommand', () => {
 
         USAGE
 
-        $ scribe [(-c, --config text)] [(-n, --name text)] [(-t, --template text)] [--cwd text]
+        $ scribe [(-c, --config text)] [(-n, --name text)] [(-t, --template text)] [--cwd text] [[--verbose]]
 
         OPTIONS
 
@@ -437,6 +437,16 @@ describe('DefaultCommand', () => {
           A user-defined piece of text.
 
           Override the cwd (default: process.cwd()
+
+          This setting is optional.
+
+        --verbose
+
+          A true or false value.
+
+          Sets LogLevel to All (default: false)
+
+          This setting is optional.
 
           This setting is optional.
 
@@ -474,7 +484,7 @@ describe('DefaultCommand', () => {
 
         COMMANDS
 
-          - init  
+          - init [[--verbose]]  
         ",
         ]
       `);

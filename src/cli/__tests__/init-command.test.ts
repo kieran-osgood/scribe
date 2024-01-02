@@ -172,50 +172,60 @@ it('[Given] --help flag [Then] print help information', async () => {
 
     const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
     expect(lines).toMatchInlineSnapshot(`
-        [
-          "Scribe
+      [
+        "Scribe
 
         Scribe ${packageJson.version}
 
-        USAGE
+      USAGE
 
-        $ init
+      $ init [[--verbose]]
 
-        OPTIONS
+      OPTIONS
 
-        --completions sh | bash | fish | zsh
+      --verbose
 
-          One of the following: sh, bash, fish, zsh
+        A true or false value.
 
-          Generate a completion script for a specific shell
+        Sets LogLevel to All (default: false)
 
-          This setting is optional.
+        This setting is optional.
 
-        (-h, --help)
+        This setting is optional.
 
-          A true or false value.
+      --completions sh | bash | fish | zsh
 
-          Show the help documentation for a command
+        One of the following: sh, bash, fish, zsh
 
-          This setting is optional.
+        Generate a completion script for a specific shell
 
-        --wizard
+        This setting is optional.
 
-          A true or false value.
+      (-h, --help)
 
-          Start wizard mode for a command
+        A true or false value.
 
-          This setting is optional.
+        Show the help documentation for a command
 
-        --version
+        This setting is optional.
 
-          A true or false value.
+      --wizard
 
-          Show the version of the application
+        A true or false value.
 
-          This setting is optional.
-        ",
-        ]
-      `);
+        Start wizard mode for a command
+
+        This setting is optional.
+
+      --version
+
+        A true or false value.
+
+        Show the version of the application
+
+        This setting is optional.
+      ",
+      ]
+    `);
   }).pipe(runEffect(cwd));
 });

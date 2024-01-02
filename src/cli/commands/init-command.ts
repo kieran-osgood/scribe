@@ -1,76 +1,91 @@
 import '@effect/platform/Terminal';
 
-import { Command } from '@effect/cli';
+import { Command, Options } from '@effect/cli';
 import { Console } from '@scribe/adapters';
 import * as Constants from '@scribe/constants';
 import { Prompts } from '@scribe/prompts';
 import { FS, Git, Process } from '@scribe/services';
-import { Effect, pipe } from 'effect';
+import { Effect, Logger, LogLevel, pipe } from 'effect';
 import path from 'path';
 
-export const ScribeInit = Command.make('init', {}, () =>
-  pipe(
-    Console.logHeader(`Init`),
-    Effect.tap(() =>
-      Console.logGroup('info', 'Git')('Checking working tree clean'),
-    ),
-    Effect.flatMap(() => Git.isWorkingTreeClean()),
+const _verbose = Options.boolean('verbose').pipe(
+  Options.withDescription('Sets LogLevel to All (default: false)'),
+  Options.withDefault(false),
+);
 
-    Effect.flatMap(
-      Effect.if({
-        onTrue: Effect.succeed(true),
-        onFalse: Effect.gen(function* ($) {
-          yield* $(
-            Console.logWarn(Constants.WARNINGS.gitWorkingDirectoryDirty),
-          );
-          return yield* $(Prompts.continueWarning);
+export const ScribeInit = Command.make(
+  'init',
+  { verbose: _verbose },
+  ({ verbose }) =>
+    pipe(
+      Console.logHeader(`Init`),
+      Effect.tap(() =>
+        Console.logGroup('info', 'Git')('Checking working tree clean'),
+      ),
+      Effect.flatMap(() => Git.isWorkingTreeClean()),
+
+      Effect.flatMap(
+        Effect.if({
+          onTrue: Effect.succeed(true),
+          onFalse: Effect.gen(function* ($) {
+            yield* $(
+              Console.logWarn(Constants.WARNINGS.gitWorkingDirectoryDirty),
+            );
+            return yield* $(Prompts.continueWarning);
+          }),
         }),
-      }),
-    ),
-    // TODO: test this
-    Effect.catchTag('GitStatusError', error =>
-      Console.logWarn(error.toString()).pipe(
-        Effect.flatMap(() => Prompts.continueWarning),
       ),
-    ),
-
-    Effect.flatMap(
-      Effect.if({
-        onTrue: pipe(
-          Console.logGroup('info', 'Config')('Checking write path clear'),
-          Effect.flatMap(() => checkConfigWritePathEmpty()),
-          Effect.tap(() => Console.logInfo('Writing...')),
-          Effect.flatMap(copyBaseScribeConfigToPath),
+      // TODO: test this
+      Effect.catchTag('GitStatusError', error =>
+        Console.logWarn(error.toString()).pipe(
+          Effect.flatMap(() => Prompts.continueWarning),
         ),
-        onFalse: Effect.unit,
-      }),
-    ),
+      ),
 
-    Effect.catchTag('@scribe/core/fs/FileExistsError', error =>
-      pipe(
-        Console.logError(`Failed to create config. Path not empty.`),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        Effect.tap(() => Console.logFile(error.error.path.toString())),
+      Effect.flatMap(
+        Effect.if({
+          onTrue: pipe(
+            Console.logGroup('info', 'Config')('Checking write path clear'),
+            Effect.flatMap(() => checkConfigWritePathEmpty()),
+            Effect.tap(() => Console.logInfo('Writing...')),
+            Effect.flatMap(copyBaseScribeConfigToPath),
+          ),
+          onFalse: Effect.unit,
+        }),
+      ),
+
+      Effect.catchTag('@scribe/core/fs/FileExistsError', error =>
+        pipe(
+          Console.logError(`Failed to create config. Path not empty.`),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+          Effect.tap(() => Console.logFile(error.error.path.toString())),
+        ),
+      ),
+
+      Effect.flatMap(fileDescriptor => {
+        if (fileDescriptor) {
+          return Console.logGroup(`success`, 'Success')().pipe(
+            Effect.tap(() =>
+              Console.logSuccess(
+                'Scribe init complete. Edit the config to begin templating.',
+              ),
+            ),
+            // eslint-disable-next-line @typescript-eslint/no-base-to-string
+            Effect.tap(() => Console.logFile(fileDescriptor.toString())),
+          );
+        }
+
+        return Effect.unit;
+      }),
+      Effect.catchTag('QuitException', () => Effect.unit),
+      Logger.withMinimumLogLevel(
+        verbose
+          ? LogLevel.All
+          : process.env.NODE_ENV === 'production'
+            ? LogLevel.Info
+            : LogLevel.All,
       ),
     ),
-
-    Effect.flatMap(fileDescriptor => {
-      if (fileDescriptor) {
-        return Console.logGroup(`success`, 'Success')().pipe(
-          Effect.tap(() =>
-            Console.logSuccess(
-              'Scribe init complete. Edit the config to begin templating.',
-            ),
-          ),
-          // eslint-disable-next-line @typescript-eslint/no-base-to-string
-          Effect.tap(() => Console.logFile(fileDescriptor.toString())),
-        );
-      }
-
-      return Effect.unit;
-    }),
-    Effect.catchTag('QuitException', () => Effect.unit),
-  ),
 );
 
 const createConfigPath = (_process: Process.Process) =>
