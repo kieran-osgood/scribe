@@ -6,7 +6,7 @@ import { FS, Git } from '@scribe/services';
 import { Data, Effect, flow, Option as O, pipe, ReadonlyArray } from 'effect';
 
 import { WARNINGS } from '../../common/constants.js';
-import { writeAllTemplates } from '../../common/templates/index.js';
+import { writeTemplates } from '../../common/templates/index.js';
 import * as Prompts from '../prompts/index.js';
 
 const _name = Options.text('name').pipe(
@@ -99,7 +99,7 @@ export const ScribeDefault = Command.make(
         }),
       ),
 
-      Effect.flatMap(writeAllTemplates),
+      Effect.flatMap(writeTemplates),
       Effect.map(
         flow(
           ReadonlyArray.map(s => `- ${String(s)}`),

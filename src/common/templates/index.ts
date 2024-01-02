@@ -23,16 +23,14 @@ export type Ctx = {
 
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   return Effect.gen(function* ($) {
-    const {
-      output: { templateFileKey },
-    } = ctx;
     // TODO: should report if templatesDirectories isn't a dir?
-    const templateDirs = ctx.config.options?.templatesDirectories ?? [''];
-    const cwd = (yield* $(Process.Process)).cwd();
+    const _process = yield* $(Process.Process);
 
     return pipe(
-      templateDirs,
-      ReadonlyArray.map(_ => path.join(cwd, _, `${templateFileKey}.scribe`)),
+      ctx.config.options?.templatesDirectories ?? [''],
+      ReadonlyArray.map(_ =>
+        path.join(_process.cwd(), _, `${ctx.output.templateFileKey}.scribe`),
+      ),
     );
   });
 }
@@ -54,7 +52,7 @@ export function constructTemplate(ctx: ConstructTemplateCtx) {
     Effect.map(
       // TODO: ...ctx.variables
       ReadonlyArray.map(
-        _ => ({ fileContents: _, ...ctx } satisfies WriteTemplateCtx),
+        _ => ({ fileContents: _, ...ctx }) satisfies WriteTemplateCtx,
       ),
     ),
   );
@@ -68,29 +66,29 @@ export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
     const _process = yield* $(Process.Process);
     const fileName = render(_.output.output.fileName, { Name: _.name });
-
-    const relativeFilePaths = path.join(_.output.output.directory, fileName);
-
-    const absoluteFilePath = path.join(_process.cwd(), relativeFilePaths);
+    const absoluteFilePath = path.join(
+      _process.cwd(),
+      _.output.output.directory,
+      fileName,
+    );
 
     return yield* $(
       FS.writeFileWithDir(absoluteFilePath, _.fileContents, null),
     );
   });
 
-export const writeAllTemplates = (ctx: {
+export const writeTemplates = (ctx: {
   name: string;
   template: string;
   config: Effect.Effect.Success<ReturnType<(typeof Config)['readConfig']>>;
   templates: string[];
 }) =>
   pipe(
-    ReadonlyRecord.get(ctx.template)(ctx.config.templates),
+    ctx.config.templates,
+    ReadonlyRecord.get(ctx.template),
     O.getOrThrowWith(() =>
       Effect.fail(
-        new GetTemplateError({
-          cause: `Template Missing: ${ctx.template}`,
-        }),
+        new GetTemplateError({ cause: `Template Missing: ${ctx.template}` }),
       ),
     ),
     _ => _.outputs,
