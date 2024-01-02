@@ -1,2 +1,2 @@
-export * from './default-command.js';
-export * from './init-command.js';
+export * from './generate.js';
+export * from './initialize.js';
