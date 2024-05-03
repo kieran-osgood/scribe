@@ -3,8 +3,8 @@ import { Effect } from 'effect';
 
 export const file = (s: string) => `file://${s}`;
 
-export const center = (str: string) => {
-  return Effect.gen(function* ($) {
+export const center = (str: string) =>
+  Effect.gen(function* ($) {
     const process = yield* $(Process.Process);
     const max = process.stdout.columns;
 
@@ -13,6 +13,5 @@ export const center = (str: string) => {
 
     return str.padStart(padStart, ' ').padEnd(padEnd, ' ');
   });
-};
 
 export const spacer = (s: string) => ` ${s} `;
