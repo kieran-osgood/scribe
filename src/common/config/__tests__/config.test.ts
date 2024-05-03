@@ -2,7 +2,7 @@ import { Effect, pipe } from 'effect';
 
 import {
   checkForTemplates,
-  extractConfig,
+  mapCosmicConfig,
   readConfig,
   readUserTemplateOptions,
 } from '../config.js';
@@ -110,7 +110,7 @@ describe('config', function () {
       pipe(
         Effect.gen(function* ($) {
           const result = yield* $(
-            extractConfig({
+            mapCosmicConfig({
               isEmpty: false,
               config: 'abc',
               filepath: '',
@@ -125,7 +125,7 @@ describe('config', function () {
       pipe(
         Effect.gen(function* ($) {
           const result = yield* $(
-            extractConfig({
+            mapCosmicConfig({
               isEmpty: true,
               config: {},
               filepath: '',
@@ -140,7 +140,7 @@ describe('config', function () {
     it('should return CosmicConfigError if CosmicConfigResult was null', async () =>
       pipe(
         Effect.gen(function* ($) {
-          const result = yield* $(extractConfig(null), Effect.flip);
+          const result = yield* $(mapCosmicConfig(null), Effect.flip);
           expect(result).toBeInstanceOf(CosmicConfigError);
         }),
         Effect.runPromise,

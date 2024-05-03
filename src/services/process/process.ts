@@ -1,26 +1,28 @@
 import { Context, Effect } from 'effect';
 import * as Layer from 'effect/Layer';
 
-export type Process = {
+export interface Process {
   cwd: () => string;
   exit: (code: number) => never;
-};
+}
 
 export const Process = Context.Tag<Process>();
-
-export const ProcessLive = {
+export const ProcessLive: Process = {
   cwd: () => process.cwd(),
   exit: (code: number | undefined) => process.exit(code),
-} satisfies Process;
+};
+export const ProcessMock: Process = makeProcessMock('/mockdir');
 
-export const makeProcessMock = (cwd: string): Process => ({
-  cwd: () => cwd,
-  exit: (code: number | undefined): never => {
-    throw new Error(`Exiting ${code ?? ''}`);
-  },
-});
+export function makeProcessMock(cwd: string): Process {
+  return {
+    cwd: () => cwd,
+    exit: (code: number | undefined): never => {
+      throw new Error(`Exiting ${code ?? ''}`);
+    },
+  };
+}
 
-export const make = (cwd?: string) => {
+export const getMock = (cwd?: string) => {
   if (typeof cwd === 'string') {
     return Process.of(makeProcessMock(cwd));
   }
@@ -32,6 +34,5 @@ export const make = (cwd?: string) => {
   return Process.of(ProcessLive);
 };
 
-export const layer = (cwd?: string) => {
-  return Layer.scoped(Process, Effect.succeed(make(cwd)));
-};
+export const layer = (cwd?: string) =>
+  Layer.scoped(Process, Effect.succeed(getMock(cwd)));

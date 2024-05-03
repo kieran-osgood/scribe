@@ -8,11 +8,7 @@ import { ConfigParseError, CosmicConfigError } from './error.js';
 import { ScribeConfig } from './schema.js';
 
 export const getCosmicExplorer = () =>
-  cosmiconfig(PackageJson.name, {
-    loaders: {
-      '.ts': TypeScriptLoader(),
-    },
-  });
+  cosmiconfig(PackageJson.name, { loaders: { '.ts': TypeScriptLoader() } });
 
 export const readConfig = (path: string) =>
   pipe(
@@ -20,10 +16,10 @@ export const readConfig = (path: string) =>
       try:
         // TODO: if path - load, !path - search
         async () => getCosmicExplorer().load(path),
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      catch: _ => new CosmicConfigError({ error: `[read config failed] ${_}` }),
+      catch: _ =>
+        new CosmicConfigError({ error: `[read config failed] ${String(_)}` }),
     }),
-    Effect.flatMap(extractConfig),
+    Effect.flatMap(mapCosmicConfig),
     Effect.flatMap(Schema.parse(ScribeConfig)),
     Effect.catchTag('ParseError', parseError =>
       Effect.fail(new ConfigParseError({ parseError, path })),
@@ -56,7 +52,7 @@ export const readUserTemplateOptions = flow(
 const isCosmicConfigResultSuccess = (_: CosmiconfigResult) =>
   _ !== null && _.isEmpty !== true;
 
-export const extractConfig = (_: CosmiconfigResult) =>
+export const mapCosmicConfig = (_: CosmiconfigResult) =>
   Effect.if({
     onTrue: Effect.succeed(_?.config as unknown),
     onFalse: Effect.fail(new CosmicConfigError({ error: 'Empty Config' })),

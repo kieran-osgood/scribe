@@ -1,8 +1,8 @@
 import { Process } from '@scribe/services';
-import { Effect, pipe } from 'effect';
+import { Effect } from 'effect';
 import {
   GitConstructError,
-  simpleGit,
+  simpleGit as createSimpleGit,
   SimpleGitOptions,
   StatusResult,
   TaskOptions,
@@ -10,35 +10,32 @@ import {
 
 import GitStatusError, { SimpleGitError } from './error.js';
 
-export const createSimpleGit = (options: Partial<SimpleGitOptions>) =>
+export const create = (options: Partial<SimpleGitOptions>) =>
   Effect.try({
-    try: () => simpleGit(options),
-    // TODO: remove assertion
+    try: () => createSimpleGit(options),
     catch: error => {
-      console.log(error instanceof GitConstructError);
-      return new SimpleGitError({ error: error as GitConstructError });
+      if (error instanceof GitConstructError) {
+        return new SimpleGitError({ error });
+      }
+
+      return new SimpleGitError({ error: new Error('Unknown Git Error') });
     },
   });
 
-export const status = (options?: TaskOptions) => {
-  return Process.Process.pipe(
-    Effect.flatMap(_ => createSimpleGit({ baseDir: _.cwd() })),
+export const status = (options?: TaskOptions) =>
+  Process.Process.pipe(
+    Effect.flatMap(_ => create({ baseDir: _.cwd() })),
     Effect.flatMap(_ =>
       Effect.async<never, GitStatusError, StatusResult>(resume => {
         void _.status(options, (error, status) => {
           if (error) {
             resume(Effect.fail(new GitStatusError({ status, error })));
-          } else {
-            resume(Effect.succeed(status));
-          }
+            return;
+          } else resume(Effect.succeed(status));
         });
       }),
     ),
   );
-};
 
 export const isWorkingTreeClean = (options?: TaskOptions) =>
-  pipe(
-    status(options),
-    Effect.map(_ => _.isClean()),
-  );
+  status(options).pipe(Effect.map(_ => _.isClean()));

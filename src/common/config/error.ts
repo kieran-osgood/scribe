@@ -2,6 +2,7 @@ import { TreeFormatter } from '@effect/schema';
 import { ParseError } from '@effect/schema/ParseResult';
 import { Data } from 'effect';
 
+// Cosmic Config loading errors
 export class CosmicConfigError extends Data.TaggedClass('CosmicConfigError')<{
   readonly error:
     | `[read config failed] ${string}`
@@ -14,6 +15,7 @@ export class CosmicConfigError extends Data.TaggedClass('CosmicConfigError')<{
   }
 }
 
+// Parsing with Schema
 export class ConfigParseError extends Data.TaggedClass('ConfigParseError')<{
   readonly parseError: ParseError;
   readonly path: string;

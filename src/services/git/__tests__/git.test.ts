@@ -42,7 +42,7 @@ describe('Git', () => {
       }).pipe(
         Effect.provideService(
           Process.Process,
-          Process.make('/non-existent-directory'),
+          Process.getMock('/non-existent-directory'),
         ),
         Effect.runPromise,
       );
@@ -58,7 +58,7 @@ describe('Git', () => {
           const result = yield* $(isWorkingTreeClean());
           expect(result).toBe(true);
         }).pipe(
-          Effect.provideService(Process.Process, Process.make(cwd)),
+          Effect.provideService(Process.Process, Process.getMock(cwd)),
           Effect.runPromise,
         );
       });
@@ -73,7 +73,7 @@ describe('Git', () => {
           const result = yield* $(isWorkingTreeClean());
           expect(result).toBe(false);
         }).pipe(
-          Effect.provideService(Process.Process, Process.make(cwd)),
+          Effect.provideService(Process.Process, Process.getMock(cwd)),
           Effect.runPromise,
         );
       });
@@ -93,7 +93,7 @@ describe('Git', () => {
             "
           `);
       }).pipe(
-        Effect.provideService(Process.Process, Process.make(cwd)),
+        Effect.provideService(Process.Process, Process.getMock(cwd)),
         Effect.runPromise,
       );
     });

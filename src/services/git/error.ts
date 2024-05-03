@@ -31,7 +31,7 @@ export class DirtyGitConfirmError extends Data.TaggedClass(
 }> {}
 
 export class SimpleGitError extends Data.TaggedClass('SimpleGitError')<{
-  readonly error: GitConstructError;
+  readonly error: GitConstructError | Error;
 }> {
   override toString() {
     return this.error.message;
