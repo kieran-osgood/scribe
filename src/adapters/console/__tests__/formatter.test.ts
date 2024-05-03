@@ -1,3 +1,6 @@
+import { Process } from '@scribe/services';
+import { Context, Effect } from 'effect';
+import { makeProcessMock } from 'src/services/process/process.js';
 import { test } from 'vitest';
 
 import { center, file, spacer } from '../formatter.js';
@@ -16,18 +19,33 @@ describe('Formatter', () => {
   });
 
   describe('center()', () => {
-    process.stdout.columns = 10;
+    const createRuntime = (
+      effect: Effect.Effect<Process.Process, never, string>,
+    ) =>
+      effect.pipe(
+        Effect.provideService(Process.Process, makeProcessMock('/mockdir')),
+      );
 
     test('empty string', () => {
-      const result = center('');
-      expect(result).toHaveLength(10);
-      expect(result).toBe('          ');
+      const program = createRuntime(center(''));
+
+      const result = Effect.runSync(program);
+
+      expect(result).toHaveLength(69);
+      expect(result).toBe(
+        '                                                                     ',
+      );
     });
 
     test('any string', () => {
-      const result = center('abc');
-      expect(result).toHaveLength(9);
-      expect(result).toBe('   abc   ');
+      const program = createRuntime(center('abc'));
+
+      const result = Effect.runSync(program);
+
+      expect(result).toHaveLength(68);
+      expect(result).toBe(
+        '                                 abc                                ',
+      );
     });
   });
 

@@ -72,7 +72,10 @@ export const logSuccess = (...s: string[]) =>
 export const logFile = (s: string) =>
   Console.log(`${SYMBOLS.directory} ${file(s)}`);
 
-export const logHeader = flow(center, black, bgBlue, Console.log);
+export const logHeader = flow(
+  center,
+  Effect.map(flow(black, bgBlue, Console.log)),
+);
 
 type LogLevel = 'debug' | 'log' | 'info' | 'warn' | 'error' | 'success';
 const logBgColors = {

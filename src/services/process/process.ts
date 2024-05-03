@@ -4,12 +4,19 @@ import * as Layer from 'effect/Layer';
 export interface Process {
   cwd: () => string;
   exit: (code: number) => never;
+  stdout: {
+    /** @type {require('node:tty')['WriteStream']['columns} columns */
+    columns: number;
+  };
 }
 
 export const Process = Context.Tag<Process>();
 export const ProcessLive: Process = {
   cwd: () => process.cwd(),
   exit: (code: number | undefined) => process.exit(code),
+  stdout: {
+    columns: process.stdout.columns,
+  },
 };
 export const ProcessMock: Process = makeProcessMock('/mockdir');
 
@@ -18,6 +25,9 @@ export function makeProcessMock(cwd: string): Process {
     cwd: () => cwd,
     exit: (code: number | undefined): never => {
       throw new Error(`Exiting ${code ?? ''}`);
+    },
+    stdout: {
+      columns: 69,
     },
   };
 }

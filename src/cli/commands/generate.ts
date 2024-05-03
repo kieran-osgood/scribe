@@ -114,8 +114,7 @@ export const Generate = Command.make(
         ),
       ),
       Effect.flatMap(_ =>
-        pipe(
-          Console.logSuccess('Success'),
+        Console.logSuccess('Success').pipe(
           Effect.tap(() => Console.log(`Output files:\n${_}\n`)),
         ),
       ),

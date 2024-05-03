@@ -63,19 +63,19 @@ export const Initialize = Command.make(
       ),
 
       Effect.flatMap(fileDescriptor => {
-        if (fileDescriptor) {
-          return Console.logGroup(`success`, 'Success')().pipe(
-            Effect.tap(() =>
-              Console.logSuccess(
-                'Scribe init complete. Edit the config to begin templating.',
-              ),
-            ),
-            // eslint-disable-next-line @typescript-eslint/no-base-to-string
-            Effect.tap(() => Console.logFile(fileDescriptor.toString())),
-          );
+        if (!fileDescriptor) {
+          return Effect.unit;
         }
 
-        return Effect.unit;
+        return Console.logGroup(`success`, 'Success')().pipe(
+          Effect.tap(() =>
+            Console.logSuccess(
+              'Scribe init complete. Edit the config to begin templating.',
+            ),
+          ),
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
+          Effect.tap(() => Console.logFile(fileDescriptor.toString())),
+        );
       }),
       Effect.catchTag('QuitException', () => Effect.unit),
       Logger.withMinimumLogLevel(
