@@ -1,5 +1,5 @@
 import { Process } from '@scribe/services';
-import { Context, Effect } from 'effect';
+import { Effect } from 'effect';
 import { makeProcessMock } from 'src/services/process/process.js';
 import { test } from 'vitest';
 
