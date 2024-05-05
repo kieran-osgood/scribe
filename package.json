@@ -40,14 +40,14 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@effect/cli": "^0.27.0",
-    "@effect/platform": "^0.39.0",
-    "@effect/platform-node": "^0.39.0",
-    "@effect/schema": "^0.56.0",
+    "@effect/cli": "^0.36.17",
+    "@effect/platform": "^0.52.2",
+    "@effect/platform-node": "^0.48.3",
+    "@effect/schema": "^0.66.14",
     "colorette": "^2.0.20",
     "cosmiconfig": "^9.0.0",
     "cosmiconfig-typescript-loader": "^5.0.0",
-    "effect": "2.0.0-next.62",
+    "effect": "3.1.2",
     "simple-git": "^3.21.0",
     "template-file": "^6.0.1"
   },
@@ -78,7 +78,7 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "tsup": "^8.0.1",
-    "typescript": "^5.3.3",
+    "typescript": "5.5.0-beta",
     "vite": "^5.0.10",
     "vite-node": "^1.1.0",
     "vite-tsconfig-paths": "^4.2.2",

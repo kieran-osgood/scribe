@@ -26,13 +26,15 @@ export const Initialize = Command.make(
 
       Effect.flatMap(
         Effect.if({
-          onTrue: Effect.succeed(true),
-          onFalse: Effect.gen(function* ($) {
-            yield* $(
-              Console.logWarn(Constants.WARNINGS.gitWorkingDirectoryDirty),
-            );
-            return yield* $(Prompts.continueWarning);
-          }),
+          onTrue: () => Effect.succeed(true),
+          onFalse: () =>
+            Effect.gen(function* () {
+              yield* Console.logWarn(
+                Constants.WARNINGS.gitWorkingDirectoryDirty,
+              );
+
+              return yield* Prompts.continueWarning;
+            }),
         }),
       ),
       // TODO: test this
@@ -44,13 +46,14 @@ export const Initialize = Command.make(
 
       Effect.flatMap(
         Effect.if({
-          onTrue: pipe(
-            Console.logGroup('info', 'Config')('Checking write path clear'),
-            Effect.flatMap(() => checkConfigWritePathEmpty()),
-            Effect.tap(() => Console.logInfo('Writing...')),
-            Effect.flatMap(copyBaseScribeConfigToPath),
-          ),
-          onFalse: Effect.unit,
+          onTrue: () =>
+            pipe(
+              Console.logGroup('info', 'Config')('Checking write path clear'),
+              Effect.flatMap(() => checkConfigWritePathEmpty()),
+              Effect.tap(() => Console.logInfo('Writing...')),
+              Effect.flatMap(copyBaseScribeConfigToPath),
+            ),
+          onFalse: () => Effect.void,
         }),
       ),
 
@@ -64,7 +67,7 @@ export const Initialize = Command.make(
 
       Effect.flatMap(fileDescriptor => {
         if (!fileDescriptor) {
-          return Effect.unit;
+          return Effect.void;
         }
 
         return Console.logGroup(`success`, 'Success')().pipe(
@@ -77,7 +80,7 @@ export const Initialize = Command.make(
           Effect.tap(() => Console.logFile(fileDescriptor.toString())),
         );
       }),
-      Effect.catchTag('QuitException', () => Effect.unit),
+      Effect.catchTag('QuitException', () => Effect.void),
       Logger.withMinimumLogLevel(
         verbose
           ? LogLevel.All
@@ -88,7 +91,7 @@ export const Initialize = Command.make(
     ),
 );
 
-const createConfigPath = (_process: Process.Process) =>
+const createConfigPath = (_process: Process.IProcess) =>
   path.join(_process.cwd(), 'scribe.config.ts');
 
 const checkConfigWritePathEmpty = () =>
@@ -98,15 +101,15 @@ const checkConfigWritePathEmpty = () =>
         createConfigPath(_process),
         FS.isFileOrDirectory,
         Effect.if({
-          onTrue: createFileExistsError(),
-          onFalse: Effect.unit,
+          onTrue: () => createFileExistsError(),
+          onFalse: () => Effect.void,
         }),
         Effect.catchTag('@scribe/core/fs/StatError', error => {
           /**
            * ENOENT indicates the path is clear, and we can safely write there
            */
           if (error.error.code === 'ENOENT') {
-            return Effect.unit;
+            return Effect.void;
           }
 
           // TODO: add ignore file exists

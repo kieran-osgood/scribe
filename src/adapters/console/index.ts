@@ -10,18 +10,19 @@ import {
   red,
   yellow,
 } from 'colorette';
-import { Console, Effect, flow, LogLevel, pipe } from 'effect';
+import { Console as EffectConsole, Effect, flow, LogLevel, pipe } from 'effect';
 import * as Context from 'effect/Context';
 
 import { SYMBOLS } from '../../common/constants.js';
 import { center, file, spacer } from './formatter.js';
 
-export const ConsoleTag = Context.Tag<Console.Console, Console.Console>(
-  'effect/Console',
-);
+export class ConsoleTag extends Context.Tag('effect/Console')<
+  ConsoleTag,
+  EffectConsole.Console
+>() {}
 
 export const consoleLayer = ConsoleTag.of({
-  [Console.TypeId]: Console.TypeId,
+  [EffectConsole.TypeId]: EffectConsole.TypeId,
   debug: (...args: string[]) =>
     Effect.sync(() => {
       console.debug(cyan(String(args.join())));
@@ -43,38 +44,38 @@ export const consoleLayer = ConsoleTag.of({
       console.error(`${SYMBOLS.error} ${red(String(args.join()))}`);
     }),
   unsafe: globalThis.console,
-  assert: () => Effect.unit,
-  clear: Effect.unit,
-  count: () => Effect.unit,
-  countReset: () => Effect.unit,
-  dir: () => Effect.unit,
-  dirxml: () => Effect.unit,
-  group: () => Effect.unit,
-  groupEnd: Effect.unit,
-  table: () => Effect.unit,
-  time: () => Effect.unit,
-  timeEnd: () => Effect.unit,
-  timeLog: () => Effect.unit,
-  trace: () => Effect.unit,
+  assert: () => Effect.void,
+  clear: Effect.void,
+  count: () => Effect.void,
+  countReset: () => Effect.void,
+  dir: () => Effect.void,
+  dirxml: () => Effect.void,
+  group: () => Effect.void,
+  groupEnd: Effect.void,
+  table: () => Effect.void,
+  time: () => Effect.void,
+  timeEnd: () => Effect.void,
+  timeLog: () => Effect.void,
+  trace: () => Effect.void,
 });
 
 // Core - styling handled via {@logger}
-export const log = Console.log;
-export const logDebug = Console.debug;
-export const logInfo = Console.info;
-export const logWarn = Console.warn;
-export const logError = Console.error;
+export const log = EffectConsole.log;
+export const logDebug = EffectConsole.debug;
+export const logInfo = EffectConsole.info;
+export const logWarn = EffectConsole.warn;
+export const logError = EffectConsole.error;
 
 // Custom implementations
 export const logSuccess = (...s: string[]) =>
-  Console.log(`${SYMBOLS.success}  ${green(s.join())}`);
+  EffectConsole.log(`${SYMBOLS.success}  ${green(s.join())}`);
 
 export const logFile = (s: string) =>
-  Console.log(`${SYMBOLS.directory} ${file(s)}`);
+  EffectConsole.log(`${SYMBOLS.directory} ${file(s)}`);
 
 export const logHeader = flow(
   center,
-  Effect.map(flow(black, bgBlue, Console.log)),
+  Effect.map(flow(black, bgBlue, EffectConsole.log)),
 );
 
 type LogLevel = 'debug' | 'log' | 'info' | 'warn' | 'error' | 'success';
@@ -89,6 +90,6 @@ const logBgColors = {
 
 export const logGroup = (logLevel: LogLevel, g: string) => (s?: string) =>
   pipe(
-    Console.log(logBgColors[logLevel](spacer(g))),
-    Effect.tap(() => (s ? Console.log(s) : Effect.unit)),
+    EffectConsole.log(logBgColors[logLevel](spacer(g))),
+    Effect.tap(() => (s ? EffectConsole.log(s) : Effect.void)),
   );

@@ -1,4 +1,4 @@
-import { Effect, Fiber, ReadonlyArray } from 'effect';
+import { Array as ReadonlyArray, Effect, Fiber } from 'effect';
 import fs from 'fs';
 import path from 'path';
 
@@ -16,16 +16,16 @@ describe('[Given] Git Clean', () => {
       fixtures: { configFile: false, templateFiles: false },
     });
 
-    return Effect.gen(function* ($) {
+    const result = Effect.gen(function* () {
       const args = ReadonlyArray.make('init');
-      const fiber = yield* $(Effect.fork(Cli.run(args)));
+      const fiber = yield* Effect.fork(Cli.run(args));
 
-      yield* $(MockTerminal.inputKey('left'));
-      yield* $(MockTerminal.inputKey('enter'));
+      yield* MockTerminal.inputKey('left');
+      yield* MockTerminal.inputKey('enter');
 
-      yield* $(Fiber.join(fiber));
+      yield* Fiber.join(fiber);
 
-      const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+      const lines = yield* MockConsole.getLines({ stripAnsi: true });
       expect(lines).toMatchInlineSnapshot(`
           [
             "Init",
@@ -43,28 +43,29 @@ describe('[Given] Git Clean', () => {
       const configTxt = fs.readFileSync(configPath).toString();
       expect(configTxt).toMatchSnapshot();
 
-      const result = yield* $(readConfig(configPath));
+      const result = yield* readConfig(configPath);
       expect(result).toEqual({
         options: { rootOutDir: '.', templatesDirectories: ['.'] },
         templates: {},
       });
     }).pipe(runEffect(cwd));
+    return result;
   });
 
   it('[When] filepath full [then] print failure', async () => {
     const cwd = createMinimalProject();
 
-    return Effect.gen(function* ($) {
+    return Effect.gen(function* () {
       const config = fs.readFileSync(`${cwd}/scribe.config.ts`);
       const args = ReadonlyArray.make('init');
-      const fiber = yield* $(Effect.fork(Cli.run(args)));
+      const fiber = yield* Effect.fork(Cli.run(args));
 
-      yield* $(MockTerminal.inputKey('left'));
-      yield* $(MockTerminal.inputKey('enter'));
+      yield* MockTerminal.inputKey('left');
+      yield* MockTerminal.inputKey('enter');
 
-      yield* $(Fiber.join(fiber));
+      yield* Fiber.join(fiber);
 
-      const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+      const lines = yield* MockConsole.getLines({ stripAnsi: true });
       expect(lines).toMatchInlineSnapshot(`
           [
             "Init",
@@ -89,16 +90,16 @@ describe('[Given] Git dirty', () => {
         fixtures: { configFile: false, templateFiles: false },
       });
 
-      return Effect.gen(function* ($) {
+      return Effect.gen(function* () {
         const args = ReadonlyArray.make('init');
-        const fiber = yield* $(Effect.fork(Cli.run(args)));
+        const fiber = yield* Effect.fork(Cli.run(args));
 
-        yield* $(MockTerminal.inputKey('left'));
-        yield* $(MockTerminal.inputKey('enter'));
+        yield* MockTerminal.inputKey('left');
+        yield* MockTerminal.inputKey('enter');
 
-        yield* $(Fiber.join(fiber));
+        yield* Fiber.join(fiber);
 
-        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        const lines = yield* MockConsole.getLines({ stripAnsi: true });
         expect(lines).toMatchInlineSnapshot(`
       [
         "Init",
@@ -128,15 +129,15 @@ describe('[Given] Git dirty', () => {
         fixtures: { configFile: false, templateFiles: false },
       });
 
-      return Effect.gen(function* ($) {
+      return Effect.gen(function* () {
         const args = ReadonlyArray.make('init');
-        const fiber = yield* $(Effect.fork(Cli.run(args)));
+        const fiber = yield* Effect.fork(Cli.run(args));
 
-        yield* $(MockTerminal.inputKey('enter'));
+        yield* MockTerminal.inputKey('enter');
 
-        yield* $(Fiber.join(fiber));
+        yield* Fiber.join(fiber);
 
-        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        const lines = yield* MockConsole.getLines({ stripAnsi: true });
         expect(lines).toMatchInlineSnapshot(`
             [
               "Init",
@@ -164,13 +165,13 @@ describe('[Given] Git dirty', () => {
 it('[Given] --help flag [Then] print help information', async () => {
   const cwd = createMinimalProject();
 
-  return Effect.gen(function* ($) {
+  return Effect.gen(function* () {
     const args = ReadonlyArray.make('init', '--help');
-    const fiber = yield* $(Effect.fork(Cli.run(args)));
+    const fiber = yield* Effect.fork(Cli.run(args));
 
-    yield* $(Fiber.join(fiber));
+    yield* Fiber.join(fiber);
 
-    const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+    const lines = yield* MockConsole.getLines({ stripAnsi: true });
     expect(lines).toMatchInlineSnapshot(`
       [
         "Scribe

@@ -1,5 +1,5 @@
 import { CliApp } from '@effect/cli';
-import { FileSystem, Path } from '@effect/platform-node';
+import { NodeFileSystem, NodePath } from '@effect/platform-node';
 import { FS } from '@scribe/services';
 import * as child_process from 'child_process';
 import { Console, Effect, Layer } from 'effect';
@@ -14,33 +14,30 @@ import * as MockTerminal from './mock-terminal.js';
 export const cliPath = path.join(process.cwd(), 'dist', 'index.js');
 export const configFlag = path.join('scribe.config.ts');
 
-export const MainLive = (cwd: string) =>
-  Effect.gen(function* (_) {
-    const _console = yield* _(MockConsole.make);
+const MainLive = (cwd: string) =>
+  Effect.gen(function* () {
+    const console = yield* MockConsole.make;
     return Layer.mergeAll(
-      Console.setConsole(_console),
-      FileSystem.layer,
-      FS.layer(false),
+      Console.setConsole(console),
       MockTerminal.layer,
+      NodePath.layer,
+      NodeFileSystem.layer,
+      FS.layer(false),
       Process.layer(cwd),
-      Path.layer,
     );
   }).pipe(Layer.unwrapEffect);
 
 export const runEffect =
   (cwd: string) =>
   async <E, A>(
-    self: Effect.Effect<
-      CliApp.CliApp.Environment | FS.FS | Process.Process,
-      E,
-      A
-    >,
+    self: Effect.Effect<A, E, CliApp.CliApp.Environment | Process.Process>,
   ): Promise<A> =>
     Effect.provide(self, MainLive(cwd)).pipe(
       // TODO: test different loglevels
       // Logger.withMinimumLogLevel(LogLevel.All),
       Effect.runPromise,
     );
+
 type CreateMinimalProjectOptions = {
   git?: {
     init: boolean;

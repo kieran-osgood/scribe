@@ -1,46 +1,47 @@
-import * as S from '@effect/schema/Schema';
+import { Schema as S } from '@effect/schema';
 
-const Template = S.struct({
-  templateFileKey: S.string,
-  output: S.struct({
-    directory: S.string,
-    fileName: S.string,
+const Template = S.Struct({
+  templateFileKey: S.String,
+  output: S.Struct({
+    directory: S.String,
+    fileName: S.String,
   }),
 });
 
-export type Template = S.Schema.To<typeof Template>;
+export type Template = S.Schema.Type<typeof Template>;
 
-const TemplateSettings = S.struct({
+const TemplateSettings = S.Struct({
   output: S.optional(
-    S.struct({
-      directory: S.optional(S.string),
+    S.Struct({
+      directory: S.optional(S.String),
     }),
   ),
-  outputs: S.array(Template),
+  outputs: S.Array(Template),
 });
 
-export type TemplateSettings = S.Schema.To<typeof TemplateSettings>;
+export type TemplateSettings = S.Schema.Type<typeof TemplateSettings>;
 
-export const ScribeConfig = S.struct({
+export const ScribeConfig = S.Struct({
   /**
    * Global settings that apply to all template options
    * Overridable within templates
    */
   options: S.optional(
-    S.struct({
+    S.Struct({
       /**
        * Sets the root for pathing on relative paths
        */
-      rootOutDir: S.string,
+      rootOutDir: S.String,
       /**
        * Directories to discover `*.scribe` files
        */
-      templatesDirectories: S.array(S.string),
+      templatesDirectories: S.Array(S.String),
     }),
   ),
   /**
    * List of templates for the CLI to render
    */
-  templates: S.record(S.string, TemplateSettings),
+  templates: S.Record(S.String, TemplateSettings),
 });
-export type ScribeConfig = S.Schema.To<typeof ScribeConfig>;
+
+export type ScribeConfig = S.Schema.Type<typeof ScribeConfig>;

@@ -1,7 +1,7 @@
 import { Schema } from '@effect/schema';
 import { cosmiconfig, CosmiconfigResult } from 'cosmiconfig';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
-import { Effect, flow, pipe, ReadonlyArray, Tuple } from 'effect';
+import { Array as ReadonlyArray, Effect, flow, pipe, Tuple } from 'effect';
 
 import PackageJson from '../../../package.json';
 import { ConfigParseError, CosmicConfigError } from './error.js';
@@ -20,7 +20,8 @@ export const readConfig = (path: string) =>
         new CosmicConfigError({ error: `[read config failed] ${String(_)}` }),
     }),
     Effect.flatMap(mapCosmicConfig),
-    Effect.flatMap(Schema.parse(ScribeConfig)),
+    Effect.flatMap(_ => Schema.decodeUnknown(ScribeConfig)(_)),
+
     Effect.catchTag('ParseError', parseError =>
       Effect.fail(new ConfigParseError({ parseError, path })),
     ),
@@ -28,10 +29,11 @@ export const readConfig = (path: string) =>
 
 export const checkForTemplates = (_: string[]) =>
   Effect.if({
-    onTrue: Effect.succeed(_),
-    onFalse: Effect.fail(
-      new CosmicConfigError({ error: 'No template options found' }),
-    ),
+    onTrue: () => Effect.succeed(_),
+    onFalse: () =>
+      Effect.fail(
+        new CosmicConfigError({ error: 'No template options found' }),
+      ),
   })(ReadonlyArray.isNonEmptyArray(_));
 
 /**
@@ -54,6 +56,7 @@ const isCosmicConfigResultSuccess = (_: CosmiconfigResult) =>
 
 export const mapCosmicConfig = (_: CosmiconfigResult) =>
   Effect.if({
-    onTrue: Effect.succeed(_?.config as unknown),
-    onFalse: Effect.fail(new CosmicConfigError({ error: 'Empty Config' })),
+    onTrue: () => Effect.succeed(_?.config as unknown),
+    onFalse: () =>
+      Effect.fail(new CosmicConfigError({ error: 'Empty Config' })),
   })(isCosmicConfigResultSuccess(_));

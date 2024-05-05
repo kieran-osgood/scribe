@@ -2,12 +2,12 @@ import { TemplateFile } from '@scribe/adapters';
 import * as Config from '@scribe/config';
 import { FS, Process } from '@scribe/services';
 import {
+  Array as ReadonlyArray,
   Data,
   Effect,
   Option as O,
   pipe,
-  ReadonlyArray,
-  ReadonlyRecord,
+  Record as ReadonlyRecord,
 } from 'effect';
 import path from 'path';
 import { render } from 'template-file';

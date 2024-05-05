@@ -22,7 +22,7 @@ describe('Config', () => {
       },
     };
 
-    const result = Effect.runSync(S.parse(ScribeConfig)(config));
+    const result = Effect.runSync(S.decodeUnknown(ScribeConfig)(config));
     expect(result).toMatchInlineSnapshot(`
         {
           "options": {
@@ -49,7 +49,9 @@ describe('Config', () => {
   });
 
   it('throws with invalid config', () => {
-    const result = Effect.runSync(pipe(S.parse(ScribeConfig)({}), Effect.flip));
+    const result = Effect.runSync(
+      pipe(S.decodeUnknown(ScribeConfig)({}), Effect.flip),
+    );
     expect(String(result)).toMatchInlineSnapshot(`
       "error(s) found
       └─ ["templates"]

@@ -4,13 +4,13 @@ import * as Config from '@scribe/config';
 import { Prompts } from '@scribe/prompts';
 import { FS, Git } from '@scribe/services';
 import {
+  Array as ReadonlyArray,
   Effect,
   flow,
   Logger,
   LogLevel,
   Option,
   pipe,
-  ReadonlyArray,
 } from 'effect';
 
 import { WARNINGS } from '../../common/constants.js';
@@ -59,27 +59,25 @@ export const Generate = Command.make(
     pipe(
       Git.isWorkingTreeClean(),
       // TODO: add ignore git
-      Effect.flatMap(
-        Effect.if({
-          onTrue: Effect.unit,
-          onFalse: Effect.gen(function* ($) {
-            yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
-            return yield* $(Prompts.continueOrQuit());
-          }),
+      Effect.flatMap(_ =>
+        Effect.if(_, {
+          onTrue: () => Effect.void,
+          onFalse: () =>
+            Effect.gen(function* () {
+              yield* Console.logWarn(WARNINGS.gitWorkingDirectoryDirty);
+              return yield* Prompts.continueOrQuit();
+            }),
         }),
       ),
 
       Effect.catchTag('GitStatusError', () => Prompts.continueOrQuit()),
 
       Effect.flatMap(() =>
-        Effect.gen(function* ($) {
-          const _configPath = yield* $(FS.createConfigPathAbsolute(configPath));
-          const templates = yield* $(
-            Config.readUserTemplateOptions(_configPath),
-          );
+        Effect.gen(function* () {
+          const _configPath = yield* FS.createConfigPathAbsolute(configPath);
+          const templates = yield* Config.readUserTemplateOptions(_configPath);
 
-          const _template = yield* $(
-            template,
+          const _template = yield* template.pipe(
             // TODO: orElse
             Option.match({
               onSome: Effect.succeed,
@@ -87,15 +85,14 @@ export const Generate = Command.make(
             }),
           );
 
-          const _name = yield* $(
-            name,
+          const _name = yield* name.pipe(
             Option.match({
               onSome: Effect.succeed,
               onNone: () => Prompts.fileName,
             }),
           );
 
-          const config = yield* $(Config.readConfig(_configPath));
+          const config = yield* Config.readConfig(_configPath);
 
           return {
             name: _name,
@@ -119,7 +116,7 @@ export const Generate = Command.make(
         ),
       ),
 
-      Effect.catchTag('QuitException', () => Effect.unit),
+      Effect.catchTag('QuitException', () => Effect.void),
 
       Effect.catchTags({
         CosmicConfigError: Console.logError,

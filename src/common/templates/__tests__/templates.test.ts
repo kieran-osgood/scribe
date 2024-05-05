@@ -1,5 +1,5 @@
 import { FS, Process } from '@scribe/services';
-import { Effect, pipe, ReadonlyArray as RA } from 'effect';
+import { Array as RA, Effect, pipe } from 'effect';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import path from 'path';
@@ -77,16 +77,16 @@ const templateOutput = {
 };
 
 describe('writeTemplate', () => {
-  it('should write file', async () =>
-    pipe(
-      Effect.gen(function* ($) {
+  it('should write file', async () => {
+    return pipe(
+      Effect.gen(function* () {
         const ctx = {
           fileContents,
           output: templateOutput,
           ..._ctx,
         } satisfies WriteTemplateCtx;
-        const result = yield* $(writeTemplate(ctx));
-        const _process = yield* $(Process.Process);
+        const result = yield* writeTemplate(ctx);
+        const _process = yield* Process.Process;
         expect(result).toBe(
           path.join(
             _process.cwd(),
@@ -94,8 +94,9 @@ describe('writeTemplate', () => {
           ),
         );
 
-        const readResult = yield* $(
-          FS.readFile('src/common/test-fixtures/config/login.ts', null),
+        const readResult = yield* FS.readFile(
+          'src/common/test-fixtures/config/login.ts',
+          null,
         );
         expect(String(readResult)).toBe(fileContents);
       }),
@@ -103,13 +104,14 @@ describe('writeTemplate', () => {
       // TODO: ProcessLive in use?
       Effect.provideService(Process.Process, Process.ProcessLive),
       Effect.runPromise,
-    ));
+    );
+  });
 });
 
 describe('constructTemplate', () => {
-  it('should return fileContents formatted with variables', async () =>
-    pipe(
-      Effect.gen(function* ($) {
+  it('should return fileContents formatted with variables', async () => {
+    const result = pipe(
+      Effect.gen(function* () {
         const ctx = {
           output: {
             templateFileKey: 'screen',
@@ -121,19 +123,13 @@ describe('constructTemplate', () => {
           ..._ctx,
         } satisfies ConstructTemplateCtx;
 
-        yield* $(
-          FS.writeFileWithDir(
-            path.join(
-              process.cwd(),
-              './src/common/test-fixtures/screen.scribe',
-            ),
-            screenFileContents,
-            null,
-          ),
+        yield* FS.writeFileWithDir(
+          path.join(process.cwd(), './src/common/test-fixtures/screen.scribe'),
+          screenFileContents,
+          null,
         );
 
-        const result = yield* $(
-          constructTemplate(ctx),
+        const result = yield* constructTemplate(ctx).pipe(
           Effect.map(RA.map(_ => _.fileContents)),
         );
 
@@ -150,7 +146,9 @@ describe('constructTemplate', () => {
       Effect.provideService(FS.FS, FS.FSMock),
       Effect.provideService(Process.Process, Process.ProcessLive),
       Effect.runPromise,
-    ));
+    );
+    return result;
+  });
 
   it('should check process root dir for templates', async () =>
     pipe(
