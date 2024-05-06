@@ -147,42 +147,6 @@ export const isDirectory = (
     Effect.map(_ => _.isDirectory()),
   );
 
-// export const open = (
-//   path: PathLike,
-//   flags: OpenMode | undefined,
-//   mode: Mode | undefined | null
-// ): Effect.Effect<FS, OpenError, number> =>
-//   pipe(
-//     FS,
-//     Effect.flatMap(fs =>
-//       Effect.async<FS, OpenError, number>(resume =>
-//         fs.open(path, flags, mode, (error, fd) => {
-//           if (error) {
-//             resume(Effect.fail(new OpenError({ path, flags, mode, error })));
-//           } else {
-//             resume(Effect.succeed(fd));
-//           }
-//         })
-//       )
-//     )
-//   );
-
-// export const close = (fd: number): Effect.Effect<FS, CloseError, number> =>
-//   pipe(
-//     FS,
-//     Effect.flatMap(fs =>
-//       Effect.async<FS, CloseError, number>(resume =>
-//         fs.close(fd, error => {
-//           if (error) {
-//             resume(Effect.fail(new CloseError({ error, fd })));
-//           } else {
-//             resume(Effect.succeed(fd));
-//           }
-//         })
-//       )
-//     )
-//   );
-
 export const createConfigPathAbsolute = (filePath: string) =>
   Effect.gen(function* ($) {
     const process = yield* $(Process.Process);
