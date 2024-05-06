@@ -26,7 +26,6 @@ describe('[Given] Git Clean', () => {
       yield* $(Fiber.join(fiber));
 
       const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-      console.log(lines);
       expect(lines).toMatchInlineSnapshot(`
         [
           "                                Init                               ",
