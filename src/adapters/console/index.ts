@@ -74,7 +74,7 @@ export const logFile = (s: string) =>
 
 export const logHeader = flow(
   center,
-  Effect.map(flow(black, bgBlue, Console.log)),
+  Effect.flatMap(flow(black, bgBlue, Console.log)),
 );
 
 type LogLevel = 'debug' | 'log' | 'info' | 'warn' | 'error' | 'success';

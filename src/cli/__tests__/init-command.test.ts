@@ -26,19 +26,20 @@ describe('[Given] Git Clean', () => {
       yield* $(Fiber.join(fiber));
 
       const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+      console.log(lines);
       expect(lines).toMatchInlineSnapshot(`
-          [
-            "Init",
-            " Git ",
-            "Checking working tree clean",
-            " Config ",
-            "Checking write path clear",
-            "Writing...",
-            " Success ",
-            "✅  Scribe init complete. Edit the config to begin templating.",
-            "📁 file://${cwd}/scribe.config.ts",
-          ]
-        `);
+        [
+          "                                Init                               ",
+          " Git ",
+          "Checking working tree clean",
+          " Config ",
+          "Checking write path clear",
+          "Writing...",
+          " Success ",
+          "✅  Scribe init complete. Edit the config to begin templating.",
+          "📁 file://${cwd}/scribe.config.ts",
+        ]
+      `);
       const configPath = path.join(cwd, `scribe.config.ts`);
       const configTxt = fs.readFileSync(configPath).toString();
       expect(configTxt).toMatchSnapshot();
@@ -67,7 +68,7 @@ describe('[Given] Git Clean', () => {
       const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
       expect(lines).toMatchInlineSnapshot(`
           [
-            "Init",
+            "                                Init                               ",
             " Git ",
             "Checking working tree clean",
             " Config ",
@@ -101,7 +102,7 @@ describe('[Given] Git dirty', () => {
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
       [
-        "Init",
+        "                                Init                               ",
         " Git ",
         "Checking working tree clean",
         "Git working tree dirty - proceed with caution.
@@ -139,7 +140,7 @@ describe('[Given] Git dirty', () => {
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
             [
-              "Init",
+              "                                Init                               ",
               " Git ",
               "Checking working tree clean",
               "Git working tree dirty - proceed with caution.
