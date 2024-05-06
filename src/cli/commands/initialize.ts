@@ -104,18 +104,18 @@ const checkConfigWritePathEmpty = () =>
           onTrue: () => createFileExistsError(),
           onFalse: () => Effect.void,
         }),
-        Effect.catchTag('@scribe/core/fs/StatError', error => {
-          /**
-           * ENOENT indicates the path is clear, and we can safely write there
-           */
-          if (error.error.code === 'ENOENT') {
-            return Effect.void;
-          }
-
-          // TODO: add ignore file exists
-          // TODO: test case that hits this?
-          return Effect.fail(error);
-        }),
+        // Effect.catchTag('BadArgument', error => {
+        //   /**
+        //    * ENOENT indicates the path is clear, and we can safely write there
+        //    */
+        //   if (error.error.code === 'ENOENT') {
+        //     return Effect.void;
+        //   }
+        //
+        //   // TODO: add ignore file exists
+        //   // TODO: test case that hits this?
+        //   return Effect.fail(error);
+        // }),
       ),
     ),
   );
@@ -123,7 +123,12 @@ const checkConfigWritePathEmpty = () =>
 const copyBaseScribeConfigToPath = () =>
   Process.Process.pipe(
     Effect.map(createConfigPath),
-    Effect.flatMap(path => FS.writeFile(path, Constants.BASE_CONFIG, null)),
+    Effect.flatMap(path =>
+      pipe(
+        FS.FS,
+        Effect.flatMap(fs => fs.writeFileString(path, Constants.BASE_CONFIG)),
+      ),
+    ),
   );
 
 const createFileExistsError = () =>

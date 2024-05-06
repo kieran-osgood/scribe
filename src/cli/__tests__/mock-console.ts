@@ -28,16 +28,22 @@ const pattern = new RegExp(
   'g',
 );
 
-const stripAnsi = (str: string) => str.replace(pattern, '');
+const stripAnsi = (str: string) => {
+  //console.log({ str });
+  return String(str).replace(pattern, '');
+};
 
 export const make = Effect.gen(function* () {
   const lines = yield* Ref.make(ReadonlyArray.empty<string>());
 
   const getLines: IMockConsole['getLines'] = (params = {}) =>
     Ref.get(lines).pipe(
-      Effect.map(lines =>
-        params.stripAnsi ?? false ? ReadonlyArray.map(lines, stripAnsi) : lines,
-      ),
+      Effect.map(lines => {
+        console.log({ lines });
+        return params.stripAnsi ?? false
+          ? ReadonlyArray.map(lines, stripAnsi)
+          : lines;
+      }),
     );
 
   const log: IMockConsole['log'] = (...args) => {

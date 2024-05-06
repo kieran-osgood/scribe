@@ -16,7 +16,7 @@ describe('[Given] Git Clean', () => {
       fixtures: { configFile: false, templateFiles: false },
     });
 
-    const result = Effect.gen(function* () {
+    return Effect.gen(function* () {
       const args = ReadonlyArray.make('init');
       const fiber = yield* Effect.fork(Cli.run(args));
 
@@ -49,7 +49,6 @@ describe('[Given] Git Clean', () => {
         templates: {},
       });
     }).pipe(runEffect(cwd));
-    return result;
   });
 
   it('[When] filepath full [then] print failure', async () => {

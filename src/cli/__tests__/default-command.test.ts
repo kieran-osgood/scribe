@@ -18,7 +18,7 @@ describe('DefaultCommand', () => {
         });
         const configPath = path.join(cwd, configFlag);
 
-        return Effect.gen(function* () {
+        await Effect.gen(function* () {
           const args = Array.make(`--config=${configPath}`);
           const fiber = yield* Effect.fork(Cli.run(args));
 

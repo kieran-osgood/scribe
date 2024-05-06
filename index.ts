@@ -4,12 +4,12 @@ import { NodeRuntime } from '@effect/platform-node';
 import * as NodeContext from '@effect/platform-node/NodeContext';
 import { Console as ConsoleAdapter } from '@scribe/adapters';
 import * as Cli from '@scribe/cli';
-import { FS, Process } from '@scribe/services';
+import { Process } from '@scribe/services';
 import { Console, Effect, Layer } from 'effect';
 
 export { type ScribeConfig } from '@scribe/config';
 
-Effect.suspend(() => Cli.run(process.argv.slice(2))).pipe(
+Effect.suspend(() => Cli.run(process.argv)).pipe(
   Console.withConsole(ConsoleAdapter.consoleLayer),
   Effect.provide(
     Layer.mergeAll(
@@ -18,5 +18,6 @@ Effect.suspend(() => Cli.run(process.argv.slice(2))).pipe(
       Process.layer(),
     ),
   ),
+  // @ts-expect-error temp
   NodeRuntime.runMain,
 );

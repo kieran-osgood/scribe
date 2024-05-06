@@ -21,8 +21,8 @@ const MainLive = (cwd: string) =>
       Console.setConsole(console),
       MockTerminal.layer,
       NodePath.layer,
-      NodeFileSystem.layer,
-      FS.layer(false),
+      // NodeFileSystem.layer,
+      FS.layer(true),
       Process.layer(cwd),
     );
   }).pipe(Layer.unwrapEffect);
