@@ -1,4 +1,4 @@
-import { Effect, Fiber, ReadonlyArray } from 'effect';
+import { Array, Effect, Fiber } from 'effect';
 import fs from 'fs';
 import path from 'path';
 
@@ -17,7 +17,7 @@ describe('[Given] Git Clean', () => {
     });
 
     return Effect.gen(function* ($) {
-      const args = ReadonlyArray.make('', '', 'init');
+      const args = Array.make('', '', 'init');
       const fiber = yield* $(Effect.fork(Cli.run(args)));
 
       yield* $(MockTerminal.inputKey('left'));
@@ -56,7 +56,7 @@ describe('[Given] Git Clean', () => {
 
     return Effect.gen(function* ($) {
       const config = fs.readFileSync(`${cwd}/scribe.config.ts`);
-      const args = ReadonlyArray.make('', '', 'init');
+      const args = Array.make('', '', 'init');
       const fiber = yield* $(Effect.fork(Cli.run(args)));
 
       yield* $(MockTerminal.inputKey('left'));
@@ -90,7 +90,7 @@ describe('[Given] Git dirty', () => {
       });
 
       return Effect.gen(function* ($) {
-        const args = ReadonlyArray.make('', '', 'init');
+        const args = Array.make('', '', 'init');
         const fiber = yield* $(Effect.fork(Cli.run(args)));
 
         yield* $(MockTerminal.inputKey('left'));
@@ -129,7 +129,7 @@ describe('[Given] Git dirty', () => {
       });
 
       return Effect.gen(function* ($) {
-        const args = ReadonlyArray.make('', '', 'init');
+        const args = Array.make('', '', 'init');
         const fiber = yield* $(Effect.fork(Cli.run(args)));
 
         yield* $(MockTerminal.inputKey('enter'));
@@ -165,7 +165,7 @@ it('[Given] --help flag [Then] print help information', async () => {
   const cwd = createMinimalProject();
 
   return Effect.gen(function* ($) {
-    const args = ReadonlyArray.make('', '', 'init', '--help');
+    const args = Array.make('', '', 'init', '--help');
     const fiber = yield* $(Effect.fork(Cli.run(args)));
 
     yield* $(Fiber.join(fiber));

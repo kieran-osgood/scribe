@@ -6,7 +6,7 @@ import { TemplateFileError } from './error.js';
 export const render = (
   template: string,
   data: TF.Data,
-): Effect.Effect<never, TemplateFileError, string> => {
+): Effect.Effect<string, TemplateFileError> => {
   return Effect.try({
     try: () => TF.render(template, data),
     catch: error => new TemplateFileError({ error }),

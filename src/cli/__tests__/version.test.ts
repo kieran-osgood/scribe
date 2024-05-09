@@ -1,5 +1,5 @@
 import * as Cli from '@scribe/cli';
-import { Effect, Fiber, ReadonlyArray } from 'effect';
+import { Array, Effect, Fiber } from 'effect';
 import { describe } from 'vitest';
 
 import packageJson from '../../../package.json';
@@ -9,7 +9,7 @@ import * as MockConsole from './mock-console.js';
 describe('VersionCommand', () => {
   it('[Given] --version flag [Then] print version from package.json', async () => {
     return Effect.gen(function* ($) {
-      const args = ReadonlyArray.make('', '', '--version');
+      const args = Array.make('', '', '--version');
       const fiber = yield* $(Effect.fork(Cli.run(args)));
 
       yield* $(Fiber.join(fiber));

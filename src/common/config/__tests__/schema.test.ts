@@ -53,7 +53,7 @@ describe('Config', () => {
       S.decodeUnknown(ScribeConfig)({}).pipe(Effect.flip),
     );
     expect(String(result)).toMatchInlineSnapshot(`
-      "{ options?: { rootOutDir: string; templatesDirectories: ReadonlyArray<string> } | undefined; templates: { [x: string]: { output?: { directory?: undefined | string } | undefined; outputs: ReadonlyArray<{ templateFileKey: string; output: { directory: string; fileName: string } }> } } }
+      "{ options?: { rootOutDir: string; templatesDirectories: ReadonlyArray<string> } | undefined; templates: { [x: string]: { output?: { directory?: string | undefined } | undefined; outputs: ReadonlyArray<{ templateFileKey: string; output: { directory: string; fileName: string } }> } } }
       └─ ["templates"]
          └─ is missing"
     `);

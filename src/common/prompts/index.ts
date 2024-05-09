@@ -33,8 +33,8 @@ const continueOrQuit = () =>
   pipe(
     Prompts.continueWarning,
     Effect.if({
-      onTrue: Effect.unit,
-      onFalse: Effect.fail(new QuitException()),
+      onTrue: () => Effect.void,
+      onFalse: () => Effect.fail(new QuitException()),
     }),
   );
 

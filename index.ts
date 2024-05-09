@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
+import { NodeRuntime } from '@effect/platform-node';
 import * as NodeContext from '@effect/platform-node/NodeContext';
-import * as Runtime from '@effect/platform-node/Runtime';
 import { Console as ConsoleAdapter } from '@scribe/adapters';
 import * as Cli from '@scribe/cli';
 import { FS, Process } from '@scribe/services';
@@ -18,5 +18,5 @@ Effect.suspend(() => Cli.run(process.argv)).pipe(
       Process.layer(),
     ),
   ),
-  Runtime.runMain,
+  NodeRuntime.runMain,
 );

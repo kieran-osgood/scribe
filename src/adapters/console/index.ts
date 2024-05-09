@@ -16,7 +16,7 @@ import * as Context from 'effect/Context';
 import { SYMBOLS } from '../../common/constants.js';
 import { center, file, spacer } from './formatter.js';
 
-export const ConsoleTag = Context.Tag<Console.Console, Console.Console>(
+export const ConsoleTag = Context.GenericTag<Console.Console, Console.Console>(
   'effect/Console',
 );
 
@@ -43,19 +43,19 @@ export const consoleLayer = ConsoleTag.of({
       console.error(`${SYMBOLS.error} ${red(String(args.join()))}`);
     }),
   unsafe: globalThis.console,
-  assert: () => Effect.unit,
-  clear: Effect.unit,
-  count: () => Effect.unit,
-  countReset: () => Effect.unit,
-  dir: () => Effect.unit,
-  dirxml: () => Effect.unit,
-  group: () => Effect.unit,
-  groupEnd: Effect.unit,
-  table: () => Effect.unit,
-  time: () => Effect.unit,
-  timeEnd: () => Effect.unit,
-  timeLog: () => Effect.unit,
-  trace: () => Effect.unit,
+  assert: () => Effect.void,
+  clear: Effect.void,
+  count: () => Effect.void,
+  countReset: () => Effect.void,
+  dir: () => Effect.void,
+  dirxml: () => Effect.void,
+  group: () => Effect.void,
+  groupEnd: Effect.void,
+  table: () => Effect.void,
+  time: () => Effect.void,
+  timeEnd: () => Effect.void,
+  timeLog: () => Effect.void,
+  trace: () => Effect.void,
 });
 
 // Core - styling handled via {@logger}
@@ -90,5 +90,5 @@ const logBgColors = {
 export const logGroup = (logLevel: LogLevel, g: string) => (s?: string) =>
   pipe(
     Console.log(logBgColors[logLevel](spacer(g))),
-    Effect.tap(() => (s ? Console.log(s) : Effect.unit)),
+    Effect.tap(() => (s ? Console.log(s) : Effect.void)),
   );

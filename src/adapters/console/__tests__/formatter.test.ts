@@ -20,7 +20,7 @@ describe('Formatter', () => {
 
   describe('center()', () => {
     const createRuntime = (
-      effect: Effect.Effect<Process.Process, never, string>,
+      effect: Effect.Effect<string, never, Process.Process>,
     ) =>
       effect.pipe(
         Effect.provideService(Process.Process, makeProcessMock('/mockdir')),

@@ -1,5 +1,5 @@
 import { FS, Process } from '@scribe/services';
-import { Effect, pipe, ReadonlyArray as RA } from 'effect';
+import { Array, Effect, pipe } from 'effect';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import path from 'path';
@@ -134,7 +134,7 @@ describe('constructTemplate', () => {
 
         const result = yield* $(
           constructTemplate(ctx),
-          Effect.map(RA.map(_ => _.fileContents)),
+          Effect.map(Array.map(_ => _.fileContents)),
         );
 
         expect(result).toMatchInlineSnapshot(`
@@ -174,7 +174,7 @@ describe('constructTemplate', () => {
 
         const result = yield* $(
           constructTemplate(ctx),
-          Effect.map(RA.map(_ => _.fileContents)),
+          Effect.map(Array.map(_ => _.fileContents)),
         );
 
         expect(result).toMatchInlineSnapshot(`

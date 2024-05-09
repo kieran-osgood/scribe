@@ -1,7 +1,7 @@
+import * as Array from 'effect/Array';
 import * as Console from 'effect/Console';
 import * as Context from 'effect/Context';
 import * as Effect from 'effect/Effect';
-import * as ReadonlyArray from 'effect/ReadonlyArray';
 import * as Ref from 'effect/Ref';
 
 export interface MockConsole extends Console.Console {
@@ -9,10 +9,10 @@ export interface MockConsole extends Console.Console {
     params?: Partial<{
       readonly stripAnsi: boolean;
     }>,
-  ) => Effect.Effect<never, never, readonly string[]>;
+  ) => Effect.Effect<readonly string[]>;
 }
 
-export const MockConsole = Context.Tag<Console.Console, MockConsole>(
+export const MockConsole = Context.GenericTag<Console.Console, MockConsole>(
   'effect/Console',
 );
 const pattern = new RegExp(
@@ -28,34 +28,34 @@ const stripAnsi = (str: string) => {
 };
 
 export const make = Effect.gen(function* (_) {
-  const lines = yield* _(Ref.make(ReadonlyArray.empty<string>()));
+  const lines = yield* _(Ref.make(Array.empty<string>()));
 
   const getLines: MockConsole['getLines'] = (params = { stripAnsi: false }) =>
     Ref.get(lines).pipe(
       Effect.map(lines =>
-        params.stripAnsi ? ReadonlyArray.map(lines, stripAnsi) : lines,
+        params.stripAnsi ? Array.map(lines, stripAnsi) : lines,
       ),
     );
 
   const debug: MockConsole['debug'] = (...args) => {
     console.log('debug');
-    return Ref.update(lines, ReadonlyArray.appendAll(args));
+    return Ref.update(lines, Array.appendAll(args));
   };
 
   const log: MockConsole['log'] = (...args) => {
-    return Ref.update(lines, ReadonlyArray.appendAll(args));
+    return Ref.update(lines, Array.appendAll(args));
   };
 
   const info: MockConsole['info'] = (...args) => {
-    return Ref.update(lines, ReadonlyArray.appendAll(args));
+    return Ref.update(lines, Array.appendAll(args));
   };
 
   const warn: MockConsole['warn'] = (...args) => {
-    return Ref.update(lines, ReadonlyArray.appendAll(args));
+    return Ref.update(lines, Array.appendAll(args));
   };
 
   const error: MockConsole['error'] = (...args) => {
-    return Ref.update(lines, ReadonlyArray.appendAll(args));
+    return Ref.update(lines, Array.appendAll(args));
   };
 
   return MockConsole.of({
@@ -67,19 +67,19 @@ export const make = Effect.gen(function* (_) {
     error,
     debug,
     unsafe: globalThis.console,
-    assert: () => Effect.unit,
-    clear: Effect.unit,
-    count: () => Effect.unit,
-    countReset: () => Effect.unit,
-    dir: () => Effect.unit,
-    dirxml: () => Effect.unit,
-    group: () => Effect.unit,
-    groupEnd: Effect.unit,
-    table: () => Effect.unit,
-    time: () => Effect.unit,
-    timeEnd: () => Effect.unit,
-    timeLog: () => Effect.unit,
-    trace: () => Effect.unit,
+    assert: () => Effect.void,
+    clear: Effect.void,
+    count: () => Effect.void,
+    countReset: () => Effect.void,
+    dir: () => Effect.void,
+    dirxml: () => Effect.void,
+    group: () => Effect.void,
+    groupEnd: Effect.void,
+    table: () => Effect.void,
+    time: () => Effect.void,
+    timeEnd: () => Effect.void,
+    timeLog: () => Effect.void,
+    trace: () => Effect.void,
   });
 });
 
@@ -87,5 +87,5 @@ export const getLines = (
   params?: Partial<{
     readonly stripAnsi?: boolean;
   }>,
-): Effect.Effect<never, never, readonly string[]> =>
+): Effect.Effect<readonly string[]> =>
   Effect.consoleWith(console => (console as MockConsole).getLines(params));

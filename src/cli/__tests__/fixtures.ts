@@ -1,5 +1,5 @@
 import { CliApp } from '@effect/cli';
-import { FileSystem, Path } from '@effect/platform-node';
+import { NodeFileSystem, NodePath } from '@effect/platform-node';
 import { FS } from '@scribe/services';
 import * as child_process from 'child_process';
 import { Console, Effect, Layer, Logger, LogLevel } from 'effect';
@@ -15,25 +15,25 @@ export const cliPath = path.join(process.cwd(), 'dist', 'index.js');
 export const configFlag = path.join('scribe.config.ts');
 
 export const MainLive = (cwd: string) =>
-  Effect.gen(function* (_) {
-    const _console = yield* _(MockConsole.make);
+  Effect.gen(function* ($) {
+    const _console = yield* $(MockConsole.make);
     return Layer.mergeAll(
-      FileSystem.layer,
+      NodeFileSystem.layer,
       FS.layer(false),
       MockTerminal.layer,
       Process.layer(cwd),
-      Path.layer,
+      NodePath.layer,
       Console.setConsole(_console),
     );
   }).pipe(Layer.unwrapEffect);
 
 export const runEffect =
   (cwd: string) =>
-  async <E, A>(
+  async <A, E>(
     self: Effect.Effect<
-      CliApp.CliApp.Environment | FS.FS | Process.Process,
+      A,
       E,
-      A
+      CliApp.CliApp.Environment | FS.FS | Process.Process
     >,
   ): Promise<A> =>
     Effect.provide(self, MainLive(cwd)).pipe(

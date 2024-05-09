@@ -1,14 +1,9 @@
+import { Schema } from '@effect/schema';
 import { TemplateFile } from '@scribe/adapters';
 import * as Config from '@scribe/config';
+import { ScribeConfig } from '@scribe/config';
 import { FS, Process } from '@scribe/services';
-import {
-  Data,
-  Effect,
-  Option as O,
-  pipe,
-  ReadonlyArray,
-  ReadonlyRecord,
-} from 'effect';
+import { Array, Data, Effect, Option as O, pipe, Record } from 'effect';
 import path from 'path';
 import { render } from 'template-file';
 
@@ -32,7 +27,7 @@ function createAbsFilePaths(ctx: ConstructTemplateCtx) {
 
     return pipe(
       ctx.config.options?.templatesDirectories ?? [''],
-      ReadonlyArray.map(_ =>
+      Array.map(_ =>
         path.join(_process.cwd(), _, `${ctx.output.templateFileKey}.scribe`),
       ),
     );
@@ -44,20 +39,16 @@ export type ConstructTemplateCtx = Ctx & { output: Template };
 export function constructTemplate(ctx: ConstructTemplateCtx) {
   return pipe(
     createAbsFilePaths(ctx),
-    Effect.map(
-      ReadonlyArray.map(_ => pipe(FS.readFile(_, null), Effect.map(String))),
-    ),
+    Effect.map(Array.map(_ => pipe(FS.readFile(_, null), Effect.map(String)))),
     Effect.flatMap(Effect.all),
     Effect.map(
       // TODO: spread in ctx.input.variables
-      ReadonlyArray.map(_ => TemplateFile.render(_, { Name: ctx.name })),
+      Array.map(_ => TemplateFile.render(_, { Name: ctx.name })),
     ),
     Effect.flatMap(Effect.all),
     Effect.map(
       // TODO: ...ctx.variables
-      ReadonlyArray.map(
-        _ => ({ fileContents: _, ...ctx }) satisfies WriteTemplateCtx,
-      ),
+      Array.map(_ => ({ fileContents: _, ...ctx }) satisfies WriteTemplateCtx),
     ),
   );
 }
@@ -84,24 +75,25 @@ export const writeTemplate = (_: WriteTemplateCtx) =>
 export const writeTemplates = (ctx: {
   name: string;
   template: string;
-  config: Effect.Effect.Success<ReturnType<(typeof Config)['readConfig']>>;
+  config: Schema.Schema.Type<typeof ScribeConfig>;
   templates: string[];
 }) =>
   pipe(
     ctx.config.templates,
-    ReadonlyRecord.get(ctx.template),
+    Record.get(ctx.template),
     O.getOrThrowWith(() =>
       Effect.fail(
         new GetTemplateError({ cause: `Template Missing: ${ctx.template}` }),
       ),
     ),
     _ => _.outputs,
-    ReadonlyArray.map(output =>
+    Array.map(output =>
       constructTemplate({ output, ...ctx }).pipe(
-        Effect.map(ReadonlyArray.map(writeTemplate)),
+        Effect.map(Array.map(writeTemplate)),
         Effect.flatMap(Effect.all),
       ),
     ),
     Effect.all,
-    Effect.map(ReadonlyArray.flatten),
+    Effect.map(Array.flatten),
+    id => id,
   );
