@@ -9,7 +9,7 @@ import { Console, Effect, Layer } from 'effect';
 
 export { type ScribeConfig } from '@scribe/config';
 
-Effect.suspend(() => Cli.run(process.argv.slice(2))).pipe(
+Effect.suspend(() => Cli.run(process.argv)).pipe(
   Console.withConsole(ConsoleAdapter.consoleLayer),
   Effect.provide(
     Layer.mergeAll(

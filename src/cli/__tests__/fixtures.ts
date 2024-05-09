@@ -2,7 +2,7 @@ import { CliApp } from '@effect/cli';
 import { FileSystem, Path } from '@effect/platform-node';
 import { FS } from '@scribe/services';
 import * as child_process from 'child_process';
-import { Console, Effect, Layer } from 'effect';
+import { Console, Effect, Layer, Logger, LogLevel } from 'effect';
 import * as fs from 'fs';
 import path from 'path';
 import * as tempy from 'tempy';
@@ -18,12 +18,12 @@ export const MainLive = (cwd: string) =>
   Effect.gen(function* (_) {
     const _console = yield* _(MockConsole.make);
     return Layer.mergeAll(
-      Console.setConsole(_console),
       FileSystem.layer,
       FS.layer(false),
       MockTerminal.layer,
       Process.layer(cwd),
       Path.layer,
+      Console.setConsole(_console),
     );
   }).pipe(Layer.unwrapEffect);
 
@@ -38,7 +38,7 @@ export const runEffect =
   ): Promise<A> =>
     Effect.provide(self, MainLive(cwd)).pipe(
       // TODO: test different loglevels
-      // Logger.withMinimumLogLevel(LogLevel.All),
+      Logger.withMinimumLogLevel(LogLevel.All),
       Effect.runPromise,
     );
 type CreateMinimalProjectOptions = {

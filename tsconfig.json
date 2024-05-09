@@ -12,48 +12,23 @@
     "moduleResolution": "NodeNext",
     "noEmit": true,
     "paths": {
-      "@scribe/adapters": [
-        "src/adapters/index.js"
-      ],
-      "@scribe/config": [
-        "src/common/config/index.js"
-      ],
-      "@scribe/reader": [
-        "src/reader/index.js"
-      ],
-      "@scribe/git": [
-        "src/git/index.js"
-      ],
-      "@scribe/commands": [
-        "src/commands/index.js"
-      ],
-      "@scribe/fs": [
-        "src/common/fs/index.js"
-      ],
-      "@scribe/cli": [
-        "src/cli/cli.js"
-      ],
-      "@scribe/services": [
-        "src/services/index.js"
-      ],
-      "@scribe/prompts": [
-        "src/common/prompts/index.js"
-      ],
-      "@scribe/constants": [
-        "src/common/constants.js"
-      ]
+      "@scribe/adapters": ["src/adapters/index.js"],
+      "@scribe/config": ["src/common/config/index.js"],
+      "@scribe/reader": ["src/reader/index.js"],
+      "@scribe/git": ["src/git/index.js"],
+      "@scribe/commands": ["src/commands/index.js"],
+      "@scribe/fs": ["src/common/fs/index.js"],
+      "@scribe/cli": ["src/cli/cli.js"],
+      "@scribe/services": ["src/services/index.js"],
+      "@scribe/prompts": ["src/common/prompts/index.js"],
+      "@scribe/constants": ["src/common/constants.js"]
     },
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "baseUrl": ".",
     "target": "ES2022",
     "esModuleInterop": true,
     // Eases ESM support
-    "types": [
-      "node",
-      "vitest/globals"
-    ],
+    "types": ["node", "vitest/globals"],
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "plugins": [
@@ -78,16 +53,9 @@
     "index.ts",
     "tsup.config.ts"
   ],
-  "exclude": [
-    "examples",
-    "public",
-    "dist",
-    "scribe.config.ts"
-  ],
+  "exclude": ["examples", "public", "dist", "scribe.config.ts"],
   "ts-node": {
     "swc": true,
-    "require": [
-      "tsconfig-paths/register"
-    ]
+    "require": ["tsconfig-paths/register"]
   }
 }

@@ -23,7 +23,6 @@ export const Initialize = Command.make(
         Console.logGroup('info', 'Git')('Checking working tree clean'),
       ),
       Effect.flatMap(() => Git.isWorkingTreeClean()),
-
       Effect.flatMap(
         Effect.if({
           onTrue: Effect.succeed(true),

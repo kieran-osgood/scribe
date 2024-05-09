@@ -21,7 +21,8 @@ export class ConfigParseError extends Data.TaggedClass('ConfigParseError')<{
   readonly path: string;
 }> {
   override toString() {
+    console.log(this.parseError);
     return `⚠️ Config parsing error: '${this.path}' 
- ${TreeFormatter.formatErrors(this.parseError.errors)}`;
+ ${TreeFormatter.formatIssue(this.parseError.error)}`;
   }
 }

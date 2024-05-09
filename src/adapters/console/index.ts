@@ -28,6 +28,7 @@ export const consoleLayer = ConsoleTag.of({
     }),
   log: (...args: string[]) =>
     Effect.sync(() => {
+      console.log('helllooo');
       console.log(String(args.join()));
     }),
   info: (...args: string[]) =>

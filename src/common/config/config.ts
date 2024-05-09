@@ -20,7 +20,7 @@ export const readConfig = (path: string) =>
         new CosmicConfigError({ error: `[read config failed] ${String(_)}` }),
     }),
     Effect.flatMap(mapCosmicConfig),
-    Effect.flatMap(Schema.parse(ScribeConfig)),
+    Effect.flatMap(Schema.decodeUnknown(ScribeConfig)),
     Effect.catchTag('ParseError', parseError =>
       Effect.fail(new ConfigParseError({ parseError, path })),
     ),

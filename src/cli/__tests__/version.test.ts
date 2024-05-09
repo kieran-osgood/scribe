@@ -9,7 +9,7 @@ import * as MockConsole from './mock-console.js';
 describe('VersionCommand', () => {
   it('[Given] --version flag [Then] print version from package.json', async () => {
     return Effect.gen(function* ($) {
-      const args = ReadonlyArray.make('--version');
+      const args = ReadonlyArray.make('', '', '--version');
       const fiber = yield* $(Effect.fork(Cli.run(args)));
 
       yield* $(Fiber.join(fiber));

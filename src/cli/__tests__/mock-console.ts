@@ -23,17 +23,24 @@ const pattern = new RegExp(
   'g',
 );
 
-const stripAnsi = (str: string) => str.replace(pattern, '');
+const stripAnsi = (str: string) => {
+  return String(str).replace(pattern, '');
+};
 
 export const make = Effect.gen(function* (_) {
   const lines = yield* _(Ref.make(ReadonlyArray.empty<string>()));
 
-  const getLines: MockConsole['getLines'] = (params = {}) =>
+  const getLines: MockConsole['getLines'] = (params = { stripAnsi: false }) =>
     Ref.get(lines).pipe(
       Effect.map(lines =>
-        params.stripAnsi ?? false ? ReadonlyArray.map(lines, stripAnsi) : lines,
+        params.stripAnsi ? ReadonlyArray.map(lines, stripAnsi) : lines,
       ),
     );
+
+  const debug: MockConsole['debug'] = (...args) => {
+    console.log('debug');
+    return Ref.update(lines, ReadonlyArray.appendAll(args));
+  };
 
   const log: MockConsole['log'] = (...args) => {
     return Ref.update(lines, ReadonlyArray.appendAll(args));
@@ -58,12 +65,12 @@ export const make = Effect.gen(function* (_) {
     info,
     warn,
     error,
+    debug,
     unsafe: globalThis.console,
     assert: () => Effect.unit,
     clear: Effect.unit,
     count: () => Effect.unit,
     countReset: () => Effect.unit,
-    debug: () => Effect.unit,
     dir: () => Effect.unit,
     dirxml: () => Effect.unit,
     group: () => Effect.unit,

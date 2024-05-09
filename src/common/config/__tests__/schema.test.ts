@@ -1,5 +1,5 @@
-import { Schema as S } from '@effect/schema';
-import { Effect, pipe } from 'effect';
+import * as S from '@effect/schema/Schema';
+import { Effect } from 'effect';
 
 import { ScribeConfig } from '../schema.js';
 
@@ -22,7 +22,7 @@ describe('Config', () => {
       },
     };
 
-    const result = Effect.runSync(S.parse(ScribeConfig)(config));
+    const result = Effect.runSync(S.decodeUnknown(ScribeConfig)(config));
     expect(result).toMatchInlineSnapshot(`
         {
           "options": {
@@ -49,9 +49,11 @@ describe('Config', () => {
   });
 
   it('throws with invalid config', () => {
-    const result = Effect.runSync(pipe(S.parse(ScribeConfig)({}), Effect.flip));
+    const result = Effect.runSync(
+      S.decodeUnknown(ScribeConfig)({}).pipe(Effect.flip),
+    );
     expect(String(result)).toMatchInlineSnapshot(`
-      "error(s) found
+      "{ options?: { rootOutDir: string; templatesDirectories: ReadonlyArray<string> } | undefined; templates: { [x: string]: { output?: { directory?: undefined | string } | undefined; outputs: ReadonlyArray<{ templateFileKey: string; output: { directory: string; fileName: string } }> } } }
       └─ ["templates"]
          └─ is missing"
     `);

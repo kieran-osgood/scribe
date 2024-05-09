@@ -20,7 +20,7 @@ describe('DefaultCommand', () => {
 
         return Effect.gen(function* ($) {
           const fiber = yield* $(
-            Effect.fork(Cli.run([`--config=${configPath}`])),
+            Effect.fork(Cli.run(['', '', `--config=${configPath}`])),
           );
 
           yield* $(MockTerminal.inputKey('down'));
@@ -31,6 +31,7 @@ describe('DefaultCommand', () => {
           yield* $(Fiber.join(fiber));
 
           const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+
           expect(lines).toMatchInlineSnapshot(`
             [
               "? Template: › 
@@ -82,14 +83,14 @@ describe('DefaultCommand', () => {
 
         return Effect.gen(function* ($) {
           const fiber = yield* $(
-            Effect.fork(Cli.run([`--config=${configPath}`, '--name=Login'])),
+            Effect.fork(
+              Cli.run(['', '', `--config=${configPath}`, '--name=Login']),
+            ),
           );
 
           yield* $(MockTerminal.inputKey('down'));
           yield* $(MockTerminal.inputKey('enter'));
-
           yield* $(Fiber.join(fiber));
-
           const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
           expect(lines).toMatchInlineSnapshot(`
             [
@@ -134,7 +135,7 @@ describe('DefaultCommand', () => {
         return Effect.gen(function* ($) {
           const fiber = yield* $(
             Effect.fork(
-              Cli.run([`--config=${configPath}`, '--template=screen']),
+              Cli.run(['', '', `--config=${configPath}`, '--template=screen']),
             ),
           );
 
@@ -188,6 +189,8 @@ describe('DefaultCommand', () => {
           const fiber = yield* $(
             Effect.fork(
               Cli.run([
+                '',
+                '',
                 `--config=${configPath}`,
                 '--name=Login',
                 '--template=screen',
@@ -235,6 +238,8 @@ describe('DefaultCommand', () => {
           const fiber = yield* $(
             Effect.fork(
               Cli.run([
+                '',
+                '',
                 `--config=${configPath}`,
                 '--name=Login',
                 '--template=screen',
@@ -288,6 +293,8 @@ describe('DefaultCommand', () => {
           const fiber = yield* $(
             Effect.fork(
               Cli.run([
+                '',
+                '',
                 `--config=${configPath}`,
                 '--name=Login',
                 '--template=screen',
@@ -328,6 +335,8 @@ describe('DefaultCommand', () => {
           const fiber = yield* $(
             Effect.fork(
               Cli.run([
+                '',
+                '',
                 `--config=${configPath}`,
                 '--name=Login',
                 '--template=screen',
@@ -368,6 +377,8 @@ describe('DefaultCommand', () => {
           const fiber = yield* $(
             Effect.fork(
               Cli.run([
+                '',
+                '',
                 `--config=${configPath}`,
                 '--name=Login',
                 '--template=screen',
@@ -393,7 +404,7 @@ describe('DefaultCommand', () => {
     const cwd = createMinimalProject();
 
     return Effect.gen(function* ($) {
-      const fiber = yield* $(Effect.fork(Cli.run(['--help'])));
+      const fiber = yield* $(Effect.fork(Cli.run(['', '', '--help'])));
       yield* $(Fiber.join(fiber));
       const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
       expect(lines).toMatchInlineSnapshot(`
@@ -404,7 +415,7 @@ describe('DefaultCommand', () => {
 
         USAGE
 
-        $ scribe [(-c, --config text)] [(-n, --name text)] [(-t, --template text)] [--cwd text] [[--verbose]]
+        $ scribe [(-c, --config text)] [(-n, --name text)] [(-t, --template text)] [--cwd text] [--verbose]
 
         OPTIONS
 
@@ -484,7 +495,7 @@ describe('DefaultCommand', () => {
 
         COMMANDS
 
-          - init [[--verbose]]  
+          - init [--verbose]  
         ",
         ]
       `);

@@ -17,7 +17,7 @@ describe('[Given] Git Clean', () => {
     });
 
     return Effect.gen(function* ($) {
-      const args = ReadonlyArray.make('init');
+      const args = ReadonlyArray.make('', '', 'init');
       const fiber = yield* $(Effect.fork(Cli.run(args)));
 
       yield* $(MockTerminal.inputKey('left'));
@@ -56,7 +56,7 @@ describe('[Given] Git Clean', () => {
 
     return Effect.gen(function* ($) {
       const config = fs.readFileSync(`${cwd}/scribe.config.ts`);
-      const args = ReadonlyArray.make('init');
+      const args = ReadonlyArray.make('', '', 'init');
       const fiber = yield* $(Effect.fork(Cli.run(args)));
 
       yield* $(MockTerminal.inputKey('left'));
@@ -90,7 +90,7 @@ describe('[Given] Git dirty', () => {
       });
 
       return Effect.gen(function* ($) {
-        const args = ReadonlyArray.make('init');
+        const args = ReadonlyArray.make('', '', 'init');
         const fiber = yield* $(Effect.fork(Cli.run(args)));
 
         yield* $(MockTerminal.inputKey('left'));
@@ -100,25 +100,25 @@ describe('[Given] Git dirty', () => {
 
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
-      [
-        "                                Init                               ",
-        " Git ",
-        "Checking working tree clean",
-        "Git working tree dirty - proceed with caution.
-      Recommendation: commit all changes before proceeding.",
-        "? Continue? › yes / no",
-        "? Continue? › yes / no",
-        "✔ Continue? … yes / no
-      ",
-        "",
-        " Config ",
-        "Checking write path clear",
-        "Writing...",
-        " Success ",
-        "✅  Scribe init complete. Edit the config to begin templating.",
-        "📁 file://${cwd}/scribe.config.ts",
-      ]
-    `);
+          [
+            "                                Init                               ",
+            " Git ",
+            "Checking working tree clean",
+            "Git working tree dirty - proceed with caution.
+          Recommendation: commit all changes before proceeding.",
+            "? Continue? › yes / no",
+            "? Continue? › yes / no",
+            "✔ Continue? … yes / no
+          ",
+            "",
+            " Config ",
+            "Checking write path clear",
+            "Writing...",
+            " Success ",
+            "✅  Scribe init complete. Edit the config to begin templating.",
+            "📁 file://${cwd}/scribe.config.ts",
+          ]
+        `);
       }).pipe(runEffect(cwd));
     });
 
@@ -129,7 +129,7 @@ describe('[Given] Git dirty', () => {
       });
 
       return Effect.gen(function* ($) {
-        const args = ReadonlyArray.make('init');
+        const args = ReadonlyArray.make('', '', 'init');
         const fiber = yield* $(Effect.fork(Cli.run(args)));
 
         yield* $(MockTerminal.inputKey('enter'));
@@ -165,7 +165,7 @@ it('[Given] --help flag [Then] print help information', async () => {
   const cwd = createMinimalProject();
 
   return Effect.gen(function* ($) {
-    const args = ReadonlyArray.make('init', '--help');
+    const args = ReadonlyArray.make('', '', 'init', '--help');
     const fiber = yield* $(Effect.fork(Cli.run(args)));
 
     yield* $(Fiber.join(fiber));
@@ -179,7 +179,7 @@ it('[Given] --help flag [Then] print help information', async () => {
 
       USAGE
 
-      $ init [[--verbose]]
+      $ init [--verbose]
 
       OPTIONS
 
