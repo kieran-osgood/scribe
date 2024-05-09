@@ -10,7 +10,7 @@ export interface Process {
   };
 }
 
-export const Process = Context.Tag<Process>();
+export const Process = Context.GenericTag<Process>('Process');
 export const ProcessLive: Process = {
   cwd: () => process.cwd(),
   exit: (code: number | undefined) => process.exit(code),

@@ -1,6 +1,6 @@
 import { TreeFormatter } from '@effect/schema';
 import { ParseError } from '@effect/schema/ParseResult';
-import { Data } from 'effect';
+import { Data, Effect } from 'effect';
 
 // Cosmic Config loading errors
 export class CosmicConfigError extends Data.TaggedClass('CosmicConfigError')<{
@@ -21,8 +21,8 @@ export class ConfigParseError extends Data.TaggedClass('ConfigParseError')<{
   readonly path: string;
 }> {
   override toString() {
-    console.log(this.parseError);
+    const s = Effect.runSync(TreeFormatter.formatIssue(this.parseError.error));
     return `⚠️ Config parsing error: '${this.path}' 
- ${TreeFormatter.formatIssue(this.parseError.error)}`;
+ ${s}`;
   }
 }

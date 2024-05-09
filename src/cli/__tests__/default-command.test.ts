@@ -315,6 +315,7 @@ describe('DefaultCommand', () => {
               "✔ Continue? … yes / no
             ",
               "",
+              "Exiting...",
             ]
           `);
         }).pipe(runEffect(cwd));
@@ -392,9 +393,15 @@ describe('DefaultCommand', () => {
 
           const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
 
-          expect(lines).toMatchInlineSnapshot(
-            '[\n  "? Continue? › yes / no",\n  "✔ Continue? … yes / no\n",\n  "",\n]',
-          );
+          expect(lines).toMatchInlineSnapshot(`
+            [
+              "? Continue? › yes / no",
+              "✔ Continue? … yes / no
+            ",
+              "",
+              "Exiting...",
+            ]
+          `);
         }).pipe(runEffect(cwd));
       });
     });

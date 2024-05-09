@@ -1,22 +1,22 @@
 import * as Terminal from '@effect/platform/Terminal';
+import * as Array from 'effect/Array';
 import * as Console from 'effect/Console';
 import * as Context from 'effect/Context';
 import * as Effect from 'effect/Effect';
 import * as Layer from 'effect/Layer';
 import * as Option from 'effect/Option';
 import * as Queue from 'effect/Queue';
-import * as ReadonlyArray from 'effect/ReadonlyArray';
 
 // =============================================================================
 // Models
 // =============================================================================
 
 export interface MockTerminal extends Terminal.Terminal {
-  readonly inputText: (text: string) => Effect.Effect<never, never, void>;
+  readonly inputText: (text: string) => Effect.Effect<void>;
   readonly inputKey: (
     key: string,
     modifiers?: Partial<MockTerminal.Modifiers>,
-  ) => Effect.Effect<never, never, void>;
+  ) => Effect.Effect<void>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -32,7 +32,7 @@ export declare namespace MockTerminal {
 // Context
 // =============================================================================
 
-export const MockTerminal = Context.Tag<Terminal.Terminal, MockTerminal>(
+export const MockTerminal = Context.GenericTag<Terminal.Terminal, MockTerminal>(
   '@effect/platform/Terminal',
 );
 
@@ -49,8 +49,8 @@ export const make = Effect.gen(function* (_) {
   );
 
   const inputText: MockTerminal['inputText'] = (text: string) => {
-    const inputs = ReadonlyArray.map(text.split(''), key => toUserInput(key));
-    return Queue.offerAll(queue, inputs).pipe(Effect.asUnit);
+    const inputs = Array.map(text.split(''), key => toUserInput(key));
+    return Queue.offerAll(queue, inputs).pipe(Effect.asVoid);
   };
 
   const inputKey: MockTerminal['inputKey'] = (
@@ -58,7 +58,7 @@ export const make = Effect.gen(function* (_) {
     modifiers?: Partial<MockTerminal.Modifiers>,
   ) => {
     const input = toUserInput(key, modifiers);
-    return Queue.offer(queue, input).pipe(Effect.asUnit);
+    return Queue.offer(queue, input).pipe(Effect.asVoid);
   };
 
   const display: MockTerminal['display'] = input => Console.log(input);

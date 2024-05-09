@@ -1,17 +1,11 @@
 import { Command, Options } from '@effect/cli';
+import { Schema } from '@effect/schema';
 import { Console } from '@scribe/adapters';
 import * as Config from '@scribe/config';
+import { ScribeConfig } from '@scribe/config';
 import { Prompts } from '@scribe/prompts';
 import { FS, Git } from '@scribe/services';
-import {
-  Effect,
-  flow,
-  Logger,
-  LogLevel,
-  Option,
-  pipe,
-  ReadonlyArray,
-} from 'effect';
+import { Array, Effect, flow, Logger, LogLevel, Option, pipe } from 'effect';
 
 import { WARNINGS } from '../../common/constants.js';
 import { writeTemplates } from '../../common/templates/index.js';
@@ -46,6 +40,12 @@ const _verbose = Options.boolean('verbose').pipe(
   Options.withDefault(false),
 );
 
+type ConfigContext = {
+  readonly name: string;
+  readonly template: string;
+  readonly config: Schema.Schema.Type<typeof ScribeConfig>;
+  readonly templates: string[];
+};
 export const Generate = Command.make(
   'scribe',
   {
@@ -61,16 +61,16 @@ export const Generate = Command.make(
       // TODO: add ignore git
       Effect.flatMap(
         Effect.if({
-          onTrue: Effect.unit,
-          onFalse: Effect.gen(function* ($) {
-            yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
-            return yield* $(Prompts.continueOrQuit());
-          }),
+          onTrue: () => Effect.void,
+          onFalse: () =>
+            Effect.gen(function* ($) {
+              yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
+              return yield* $(Prompts.continueOrQuit());
+            }),
         }),
       ),
 
       Effect.catchTag('GitStatusError', () => Prompts.continueOrQuit()),
-
       Effect.flatMap(() =>
         Effect.gen(function* ($) {
           const _configPath = yield* $(FS.createConfigPathAbsolute(configPath));
@@ -102,15 +102,16 @@ export const Generate = Command.make(
             template: _template,
             config,
             templates,
-          } as const;
+          } as ConfigContext;
         }),
       ),
 
       Effect.flatMap(writeTemplates),
+
       Effect.map(
         flow(
-          ReadonlyArray.map(s => `- ${String(s)}`),
-          ReadonlyArray.join('\n'),
+          Array.map(s => `- ${String(s)}`),
+          Array.join('\n'),
         ),
       ),
       Effect.flatMap(_ =>
@@ -119,11 +120,10 @@ export const Generate = Command.make(
         ),
       ),
 
-      Effect.catchTag('QuitException', () => Effect.unit),
-
       Effect.catchTags({
         CosmicConfigError: Console.logError,
         ConfigParseError: Console.logError,
+        QuitException: () => Console.log('Exiting...'),
       }),
       Logger.withMinimumLogLevel(
         verbose

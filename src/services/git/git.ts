@@ -26,7 +26,7 @@ export const status = (options?: TaskOptions) =>
   Process.Process.pipe(
     Effect.flatMap(_ => create({ baseDir: _.cwd() })),
     Effect.flatMap(_ =>
-      Effect.async<never, GitStatusError, StatusResult>(resume => {
+      Effect.async<StatusResult, GitStatusError>(resume => {
         void _.status(options, (error, status) => {
           if (error) {
             resume(Effect.fail(new GitStatusError({ status, error })));
