@@ -4,10 +4,10 @@ import path from 'path';
 
 import packageJson from '../../../package.json';
 import { readConfig } from '../../common/config/index.js';
+import { createMinimalProject, runEffect } from '../../test/fixtures.js';
+import * as MockConsole from '../../test/mock-console.js';
+import * as MockTerminal from '../../test/mock-terminal.js';
 import * as Cli from '../cli.js';
-import { createMinimalProject, runEffect } from './fixtures.js';
-import * as MockConsole from './mock-console.js';
-import * as MockTerminal from './mock-terminal.js';
 
 describe('[Given] Git Clean', () => {
   it('[When] user accepts [Then] create schema compatible file', async () => {
