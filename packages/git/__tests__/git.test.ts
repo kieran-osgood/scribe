@@ -87,11 +87,14 @@ describe('Git', () => {
       return Effect.gen(function* ($) {
         const result = yield* $(isWorkingTreeClean(), Effect.flip);
         expect(result).toBeInstanceOf(GitStatusError);
-        expect((result as GitStatusError).error?.message)
-          .toMatchInlineSnapshot(`
-            "fatal: not a git repository (or any of the parent directories): .git
-            "
-          `);
+
+        console.log({ cwd });
+        console.log('message', result.error?.message);
+
+        expect(result.error?.message)
+          .toMatchInlineSnapshot(
+            "fatal: not a git repository (or any of the parent directories): .git"
+          );
       }).pipe(
         Effect.provideService(Process.Process, Process.getMock(cwd)),
         Effect.runPromise,
