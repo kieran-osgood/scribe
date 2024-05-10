@@ -1,17 +1,17 @@
-import * as FS from '@scribe/fs';
-import * as Process from '@scribe/process';
 import { Array, Effect, pipe } from 'effect';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import path from 'path';
 
+import * as FS from '../../fs/index.js';
+import * as Process from '../../process/index.js';
 import {
   constructTemplate,
   ConstructTemplateCtx,
   Ctx,
   writeTemplate,
   WriteTemplateCtx,
-} from '../index.js';
+} from '../template-file.js';
 
 beforeEach(() => {
   vi.restoreAllMocks();

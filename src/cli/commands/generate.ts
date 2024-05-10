@@ -4,11 +4,11 @@ import * as Config from '@scribe/config';
 import * as Console from '@scribe/console';
 import * as FS from '@scribe/fs';
 import * as Git from '@scribe/git';
+import { TemplateFile } from '@scribe/renderer';
 import { Prompts } from '@scribe/ui';
 import { Array, Effect, flow, Logger, LogLevel, Option, pipe } from 'effect';
 
-import { WARNINGS } from '../../common/constants.js';
-import { writeTemplates } from '../../common/templates/index.js';
+import { WARNINGS } from '../../../packages/constants.js';
 
 const _name = Options.text('name').pipe(
   Options.withAlias('n'),
@@ -106,7 +106,7 @@ export const Generate = Command.make(
         }),
       ),
 
-      Effect.flatMap(writeTemplates),
+      Effect.flatMap(TemplateFile.writeTemplates),
 
       Effect.map(
         flow(
