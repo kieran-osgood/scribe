@@ -22,11 +22,11 @@
     "typescript"
   ],
   "scripts": {
-    "start": "ts-node index.ts",
+    "start": "ts-node packages/cli/index.ts",
     "test": "vitest",
     "lint": "eslint .",
     "tsc": "tsc",
-    "build": "tsup index.ts",
+    "build": "tsup packages/cli/index.ts",
     "ci": "run-s ci:*",
     "ci:build": "pnpm run build",
     "ci:typecheck": "pnpm run tsc",

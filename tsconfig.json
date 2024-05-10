@@ -12,7 +12,6 @@
     "moduleResolution": "NodeNext",
     "noEmit": true,
     "paths": {
-      // "@scribe/common": ["packages/_common/index.js"],
       "@scribe/cli": ["packages/cli/index.js"],
       "@scribe/config": ["packages/config/index.js"],
       "@scribe/console": ["packages/console/index.js"],
@@ -51,7 +50,7 @@
     "src",
     "e2e",
     "vite.config.ts",
-    "index.ts",
+    "packages/cli/index.ts",
     "types",
     "tsup.config.ts",
     "test"

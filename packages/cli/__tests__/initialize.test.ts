@@ -7,7 +7,7 @@ import * as MockConsole from '../../../test/mock-console.js';
 import * as MockTerminal from '../../../test/mock-terminal.js';
 import { createMinimalProject, runEffect } from '../../../test/utils.js';
 import { readConfig } from '../../config/index.js';
-import * as Cli from '../index.js';
+import * as Cli from '../cli.js';
 
 describe('[Given] Git Clean', () => {
   it('[When] user accepts [Then] create schema compatible file', async () => {

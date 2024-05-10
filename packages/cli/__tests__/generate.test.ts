@@ -10,7 +10,7 @@ import {
   createMinimalProject,
   runEffect,
 } from '../../../test/utils.js';
-import * as Cli from '../index.js';
+import * as Cli from '../cli.js';
 
 describe('DefaultCommand', () => {
   describe('[Given] Git clean', () => {

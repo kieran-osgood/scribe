@@ -1,13 +1,24 @@
-import { Command } from '@effect/cli';
+#!/usr/bin/env node
 
-import packageJson from '../../package.json';
-import * as Commands from './commands/index.js';
+import { NodeRuntime } from '@effect/platform-node';
+import * as NodeContext from '@effect/platform-node/NodeContext';
+import { Console, Effect, Layer } from 'effect';
 
-const _command = Commands.Generate.pipe(
-  Command.withSubcommands([Commands.Initialize]),
+import * as ScribeConsole from '../console/index.js';
+import * as FS from '../fs/index.js';
+import * as Process from '../process/index.js';
+import * as Cli from './cli.js';
+
+export { type ScribeConfig } from '../config/index.js';
+
+Effect.suspend(() => Cli.run(process.argv)).pipe(
+  Console.withConsole(ScribeConsole.consoleLayer),
+  Effect.provide(
+    Layer.mergeAll(
+      NodeContext.layer, //
+      FS.layer(),
+      Process.layer(),
+    ),
+  ),
+  NodeRuntime.runMain,
 );
-
-export const run = Command.run(_command, {
-  name: 'Scribe',
-  version: packageJson.version,
-});
