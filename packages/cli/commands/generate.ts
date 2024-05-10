@@ -1,14 +1,14 @@
 import { Command, Options } from '@effect/cli';
 import { Schema } from '@effect/schema';
-import * as Config from '@scribe/config';
-import * as Console from '@scribe/console';
-import * as FS from '@scribe/fs';
-import * as Git from '@scribe/git';
-import { TemplateFile } from '@scribe/renderer';
-import { Prompts } from '@scribe/ui';
 import { Array, Effect, flow, Logger, LogLevel, Option, pipe } from 'effect';
 
-import { WARNINGS } from '../../../packages/constants.js';
+import * as Config from '../../config/index.js';
+import * as Console from '../../console/index.js';
+import { WARNINGS } from '../../constants.js';
+import * as FS from '../../fs/index.js';
+import * as Git from '../../git/index.js';
+import { TemplateFile } from '../../renderer/index.js';
+import { Prompts } from '../../ui/index.js';
 
 const _name = Options.text('name').pipe(
   Options.withAlias('n'),

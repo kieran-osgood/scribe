@@ -2,7 +2,7 @@ import * as Process from '@scribe/process';
 import { Effect } from 'effect';
 import { beforeEach, vi } from 'vitest';
 
-import { createMinimalProject } from '../../../test/fixtures.js';
+import { createMinimalProject } from '../../../test/utils.js';
 import GitStatusError, { SimpleGitError } from '../error.js';
 import { isWorkingTreeClean } from '../git.js';
 

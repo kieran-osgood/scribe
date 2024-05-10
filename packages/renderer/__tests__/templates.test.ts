@@ -25,7 +25,7 @@ const screenFileContents = `describe('{{Name}}', function() {
 
 beforeEach(() => {
   vol.mkdirSync(process.cwd(), { recursive: true });
-  vol.mkdirSync(path.join(process.cwd(), './src/common/test-fixtures'), {
+  vol.mkdirSync(path.join(process.cwd(), './test/fixtures'), {
     recursive: true,
   });
 });
@@ -35,7 +35,7 @@ afterEach(() => {
 
 const mockConfig = {
   options: {
-    templatesDirectories: ['src/common/test-fixtures'],
+    templatesDirectories: ['test/fixtures'],
     rootOutDir: '',
   },
   templates: {
@@ -44,14 +44,14 @@ const mockConfig = {
         {
           templateFileKey: 'screen',
           output: {
-            directory: 'src/common/test-fixtures/config',
+            directory: 'test/fixtures',
             fileName: '{{Name}}.ts',
           },
         },
         {
           templateFileKey: 'screen.test',
           output: {
-            directory: 'src/common/test-fixtures/config',
+            directory: 'test/fixtures',
             fileName: '{{Name}}.test.ts',
           },
         },
@@ -73,7 +73,7 @@ const templateOutput = {
   templateFileKey: 'screen',
   output: {
     fileName: '{{Name}}.ts', // good-scribe
-    directory: 'src/common/test-fixtures/config',
+    directory: 'test/fixtures/config',
   },
 };
 
@@ -89,14 +89,11 @@ describe('writeTemplate', () => {
         const result = yield* $(writeTemplate(ctx));
         const _process = yield* $(Process.Process);
         expect(result).toBe(
-          path.join(
-            _process.cwd(),
-            '/src/common/test-fixtures/config/login.ts',
-          ),
+          path.join(_process.cwd(), '/test/fixtures/config/login.ts'),
         );
 
         const readResult = yield* $(
-          FS.readFile('src/common/test-fixtures/config/login.ts', null),
+          FS.readFile('test/fixtures/config/login.ts', null),
         );
         expect(String(readResult)).toBe(fileContents);
       }),
@@ -124,10 +121,7 @@ describe('constructTemplate', () => {
 
         yield* $(
           FS.writeFileWithDir(
-            path.join(
-              process.cwd(),
-              './src/common/test-fixtures/screen.scribe',
-            ),
+            path.join(process.cwd(), './test/fixtures/screen.scribe'),
             screenFileContents,
             null,
           ),

@@ -119,7 +119,7 @@ exports[`InitCommand > [Given] Git Clean > [When] filepath full [then] print fai
 const config = {
   options: {
     rootOutDir: '.',
-    templatesDirectories: ['./src/common/test-fixtures'],
+    templatesDirectories: ['./test/fixtures'],
   },
   templates: {
     component: {

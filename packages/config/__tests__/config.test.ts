@@ -21,7 +21,7 @@ describe('config', function () {
       pipe(
         Effect.gen(function* ($) {
           const result = yield* $(
-            readConfig('src/common/test-fixtures/config/good-scribe.config.ts'),
+            readConfig('test/fixtures/config/good-scribe.config.ts'),
           );
           expect(result).toMatchSnapshot();
         }),
@@ -32,9 +32,7 @@ describe('config', function () {
         pipe(
           Effect.gen(function* ($) {
             const result = yield* $(
-              readConfig(
-                'src/common/test-fixtures/config/bad-syntax-scribe.config.ts',
-              ),
+              readConfig('test/fixtures/config/bad-syntax-scribe.config.ts'),
               Effect.flip,
             );
             expect(result).toBeInstanceOf(ConfigParseError);
@@ -47,7 +45,7 @@ describe('config', function () {
           Effect.gen(function* ($) {
             const result = yield* $(
               readConfig(
-                'src/common/test-fixtures/config/missing-export-scribe.config.ts',
+                'test/fixtures/config/missing-export-scribe.config.ts',
               ),
               Effect.flip,
             );
@@ -94,7 +92,7 @@ describe('config', function () {
         Effect.gen(function* ($) {
           const result = yield* $(
             readUserTemplateOptions(
-              'src/common/test-fixtures/config/good-scribe.config.ts',
+              'test/fixtures/config/good-scribe.config.ts',
             ),
           );
           expect(result).toEqual(

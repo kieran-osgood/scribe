@@ -3,14 +3,14 @@ import fs from 'fs';
 import path from 'path';
 
 import packageJson from '../../../package.json';
+import * as MockConsole from '../../../test/mock-console.js';
+import * as MockTerminal from '../../../test/mock-terminal.js';
 import {
   configFlag,
   createMinimalProject,
   runEffect,
-} from '../../../test/fixtures.js';
-import * as MockConsole from '../../../test/mock-console.js';
-import * as MockTerminal from '../../../test/mock-terminal.js';
-import * as Cli from '../cli.js';
+} from '../../../test/utils.js';
+import * as Cli from '../index.js';
 
 describe('DefaultCommand', () => {
   describe('[Given] Git clean', () => {

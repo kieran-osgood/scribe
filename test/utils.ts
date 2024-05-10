@@ -62,12 +62,7 @@ const defaultMinimalProjectOptions = {
 
 export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
   const options = { ...defaultMinimalProjectOptions, ..._options };
-  const realFixturesPath = path.join(
-    process.cwd(),
-    'src',
-    'common',
-    'test-fixtures',
-  );
+  const realFixturesPath = path.join(process.cwd(), 'test', 'fixtures');
 
   const tmpPath = tempy.temporaryDirectory();
 
@@ -79,12 +74,7 @@ export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
   }
 
   if (options.fixtures.templateFiles) {
-    const tmpFixturesPath = path.join(
-      tmpPath,
-      'src',
-      'common',
-      'test-fixtures',
-    );
+    const tmpFixturesPath = path.join(tmpPath, 'test', 'fixtures');
     fs.mkdirSync(tmpFixturesPath, { recursive: true });
 
     copyFileToPath({

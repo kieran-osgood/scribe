@@ -1,10 +1,10 @@
-import * as Cli from '@scribe/cli';
 import { Array, Effect, Fiber } from 'effect';
 import { describe } from 'vitest';
 
 import packageJson from '../../../package.json';
-import { runEffect } from '../../../test/fixtures.js';
 import * as MockConsole from '../../../test/mock-console.js';
+import { runEffect } from '../../../test/utils.js';
+import * as Cli from '../index.js';
 
 describe('VersionCommand', () => {
   it('[Given] --version flag [Then] print version from package.json', async () => {

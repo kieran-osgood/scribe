@@ -3,7 +3,7 @@ import type { ScribeConfig } from '@scribe/config';
 const config = {
   options: {
     rootOutDir: '.',
-    templatesDirectories: ['./src/common/test-fixtures'],
+    templatesDirectories: ['./test/fixtures'],
   },
   templates: {
     component: {
