@@ -64,7 +64,8 @@
     "vite.config.ts",
     "index.ts",
     "types",
-    "tsup.config.ts"
+    "tsup.config.ts",
+    "test"
   ],
   "exclude": ["examples", "public", "dist", "scribe.config.ts"],
   "ts-node": {

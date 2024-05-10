@@ -7,9 +7,9 @@ import {
   configFlag,
   createMinimalProject,
   runEffect,
-} from '../../test/fixtures.js';
-import * as MockConsole from '../../test/mock-console.js';
-import * as MockTerminal from '../../test/mock-terminal.js';
+} from '../../../test/fixtures.js';
+import * as MockConsole from '../../../test/mock-console.js';
+import * as MockTerminal from '../../../test/mock-terminal.js';
 import * as Cli from '../cli.js';
 
 describe('DefaultCommand', () => {

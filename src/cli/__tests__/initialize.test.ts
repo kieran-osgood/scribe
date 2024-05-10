@@ -3,10 +3,10 @@ import fs from 'fs';
 import path from 'path';
 
 import packageJson from '../../../package.json';
+import { createMinimalProject, runEffect } from '../../../test/fixtures.js';
+import * as MockConsole from '../../../test/mock-console.js';
+import * as MockTerminal from '../../../test/mock-terminal.js';
 import { readConfig } from '../../common/config/index.js';
-import { createMinimalProject, runEffect } from '../../test/fixtures.js';
-import * as MockConsole from '../../test/mock-console.js';
-import * as MockTerminal from '../../test/mock-terminal.js';
 import * as Cli from '../cli.js';
 
 describe('[Given] Git Clean', () => {

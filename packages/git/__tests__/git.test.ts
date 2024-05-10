@@ -1,8 +1,8 @@
 import * as Process from '@scribe/process';
 import { Effect } from 'effect';
-import { createMinimalProject } from 'src/test/fixtures.js';
 import { beforeEach, vi } from 'vitest';
 
+import { createMinimalProject } from '../../../test/fixtures.js';
 import GitStatusError, { SimpleGitError } from '../error.js';
 import { isWorkingTreeClean } from '../git.js';
 
