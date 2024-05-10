@@ -12,6 +12,8 @@
     "moduleResolution": "NodeNext",
     "noEmit": true,
     "paths": {
+      "@scribe/console": ["packages/console/index.js"],
+      //
       "@scribe/adapters": ["src/adapters/index.js"],
       "@scribe/config": ["src/common/config/index.js"],
       "@scribe/reader": ["src/reader/index.js"],
@@ -47,10 +49,12 @@
   },
   "include": [
     ".eslintrc.js",
+    "packages",
     "src",
     "e2e",
     "vite.config.ts",
     "index.ts",
+    "types",
     "tsup.config.ts"
   ],
   "exclude": ["examples", "public", "dist", "scribe.config.ts"],

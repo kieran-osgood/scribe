@@ -1,8 +1,8 @@
-import { Process } from '@scribe/services';
 import { Effect } from 'effect';
-import { makeProcessMock } from 'src/services/process/process.js';
 import { test } from 'vitest';
 
+import { Process } from '../../../src/services/index.js';
+import { makeProcessMock } from '../../../src/services/process/process.js';
 import { center, file, spacer } from '../formatter.js';
 
 describe('Formatter', () => {

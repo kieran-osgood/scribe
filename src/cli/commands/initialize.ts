@@ -1,7 +1,7 @@
 import '@effect/platform/Terminal';
 
 import { Command, Options } from '@effect/cli';
-import { Console } from '@scribe/adapters';
+import * as Console from '@scribe/console';
 import * as Constants from '@scribe/constants';
 import { Prompts } from '@scribe/prompts';
 import { FS, Git, Process } from '@scribe/services';

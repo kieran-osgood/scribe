@@ -13,7 +13,7 @@ import {
 import { Console, Effect, flow, LogLevel, pipe } from 'effect';
 import * as Context from 'effect/Context';
 
-import { SYMBOLS } from '../../common/constants.js';
+import { SYMBOLS } from '../../src/common/constants.js';
 import { center, file, spacer } from './formatter.js';
 
 export const ConsoleTag = Context.GenericTag<Console.Console, Console.Console>(
@@ -58,6 +58,7 @@ export const consoleLayer = ConsoleTag.of({
   trace: () => Effect.void,
 });
 
+// TODO: remove these
 // Core - styling handled via {@logger}
 export const log = Console.log;
 export const logDebug = Console.debug;
