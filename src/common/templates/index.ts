@@ -1,9 +1,9 @@
 import { Schema } from '@effect/schema';
-import { TemplateFile } from '@scribe/adapters';
 import * as Config from '@scribe/config';
 import { ScribeConfig } from '@scribe/config';
 import * as FS from '@scribe/fs';
 import * as Process from '@scribe/process';
+import { TemplateFile } from '@scribe/renderer';
 import { Array, Data, Effect, Option as O, pipe, Record } from 'effect';
 import path from 'path';
 import { render } from 'template-file';

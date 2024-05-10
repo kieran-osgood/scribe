@@ -20,8 +20,8 @@
       "@scribe/fs": ["packages/fs/index.js"],
       "@scribe/git": ["packages/git/index.js"],
       "@scribe/process": ["packages/process/index.js"],
-      //"@scribe/renderer": ["packages/process/index.js"],
-      //"@scribe/ui": ["packages/process/index.js"],
+      "@scribe/renderer": ["packages/renderer/index.js"],
+      //"@scribe/ui": ["packages/ui/index.js"],
 
       //
       //

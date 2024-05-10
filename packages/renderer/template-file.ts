@@ -3,6 +3,7 @@ import * as TF from 'template-file';
 
 import { TemplateFileError } from './error.js';
 
+// TODO: Add tests
 export const render = (
   template: string,
   data: TF.Data,

@@ -1,8 +1,8 @@
 import { Command, Options } from '@effect/cli';
 import { Schema } from '@effect/schema';
-import { Console } from '@scribe/adapters';
 import * as Config from '@scribe/config';
 import { ScribeConfig } from '@scribe/config';
+import * as Console from '@scribe/console';
 import * as FS from '@scribe/fs';
 import * as Git from '@scribe/git';
 import { Prompts } from '@scribe/prompts';
