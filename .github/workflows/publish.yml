@@ -21,11 +21,14 @@ jobs:
       - name: Link @kieran-osgood/scribe -> scribe
         run: nix-shell --command "pnpm link ."
 
+      - name: Lint / TSC / Test
+        run: nix-shell --command "turbo build"
+
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: pnpm run release
+          publish: nix-shell --command "turbo publish"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
