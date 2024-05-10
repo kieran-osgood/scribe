@@ -22,10 +22,10 @@ jobs:
 
 
       - name: Test
-        run: nix-shell --command "turbo test --output-mode='full'"
+        run: nix-shell --command "turbo test --output-logs='full'"
 
       - name: Build
-        run: nix-shell --command "turbo build --output-mode='full'"
+        run: nix-shell --command "turbo build --output-logs='full'"
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v4
