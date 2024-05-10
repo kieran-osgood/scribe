@@ -95,6 +95,10 @@ export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
       cwd: tmpPath,
     } satisfies child_process.ExecSyncOptionsWithBufferEncoding;
 
+    child_process.execSync(
+      'git config --global init.defaultBranch main',
+      execOpts,
+    );
     child_process.execSync('git init', execOpts);
     child_process.execSync('git config user.name "kieran"', execOpts);
     child_process.execSync('git config user.email "ko@gmail.com"', execOpts);
