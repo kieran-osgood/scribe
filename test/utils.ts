@@ -78,11 +78,11 @@ export function createMinimalProject(_options?: CreateMinimalProjectOptions) {
     fs.mkdirSync(tmpFixturesPath, { recursive: true });
 
     copyFileToPath({
-      readPath: path.join(realFixturesPath, 'screen.scribe'),
-      writePath: path.join(tmpFixturesPath, `screen.scribe`),
+      readPath: path.join(realFixturesPath, 'templates', 'screen.scribe'),
+      writePath: path.join(tmpFixturesPath, 'screen.scribe'),
     });
     copyFileToPath({
-      readPath: path.join(realFixturesPath, 'screen.test.scribe'),
+      readPath: path.join(realFixturesPath, 'templates', 'screen.test.scribe'),
       writePath: path.join(tmpFixturesPath, 'screen.test.scribe'),
     });
   }
