@@ -8,9 +8,7 @@
     "tsc": {},
     "lint": {},
     "prettier": {},
-    "test": {
-      "inputs": ["test/*", "packages/*"]
-    },
+    "test": {},
     "build": {
       "outputs": ["dist/**"],
       "dependsOn": ["tsc", "lint", "prettier", "test"]
