@@ -3,9 +3,10 @@ import '@effect/platform/Terminal';
 import { Command, Options } from '@effect/cli';
 import * as Console from '@scribe/console';
 import * as Constants from '@scribe/constants';
+import * as FS from '@scribe/fs';
 import * as Git from '@scribe/git';
+import * as Process from '@scribe/process';
 import { Prompts } from '@scribe/prompts';
-import { FS, Process } from '@scribe/services';
 import { Effect, Logger, LogLevel, pipe } from 'effect';
 import path from 'path';
 

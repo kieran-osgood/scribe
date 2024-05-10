@@ -1,4 +1,4 @@
-import { Process } from '@scribe/services';
+import * as Process from '@scribe/process';
 import { Effect } from 'effect';
 import { createMinimalProject } from 'src/test/fixtures.js';
 import { beforeEach, vi } from 'vitest';

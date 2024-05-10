@@ -1,4 +1,4 @@
-import { Process } from '@scribe/services';
+import * as Process from '@scribe/process';
 import { Effect } from 'effect';
 import {
   GitConstructError,

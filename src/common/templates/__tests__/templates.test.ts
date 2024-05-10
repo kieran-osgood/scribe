@@ -1,4 +1,5 @@
-import { FS, Process } from '@scribe/services';
+import * as FS from '@scribe/fs';
+import * as Process from '@scribe/process';
 import { Array, Effect, pipe } from 'effect';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';

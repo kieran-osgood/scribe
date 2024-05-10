@@ -1,13 +1,13 @@
 import { CliApp } from '@effect/cli';
 import { NodeFileSystem, NodePath } from '@effect/platform-node';
-import { FS } from '@scribe/services';
+import * as FS from '@scribe/fs';
+import * as Process from '@scribe/process';
 import * as child_process from 'child_process';
 import { Console, Effect, Layer, Logger, LogLevel } from 'effect';
 import * as fs from 'fs';
 import path from 'path';
 import * as tempy from 'tempy';
 
-import * as Process from '../services/process/process.js';
 import * as MockConsole from '../test/mock-console.js';
 import * as MockTerminal from '../test/mock-terminal.js';
 

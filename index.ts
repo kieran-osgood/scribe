@@ -5,7 +5,7 @@ import * as NodeContext from '@effect/platform-node/NodeContext';
 import * as Cli from '@scribe/cli';
 import * as ScribeConsole from '@scribe/console';
 import * as FS from '@scribe/fs';
-import { Process } from '@scribe/services';
+import * as Process from '@scribe/process';
 import { Console, Effect, Layer } from 'effect';
 
 export { type ScribeConfig } from '@scribe/config';

@@ -1,6 +1,5 @@
+import * as Process from '@scribe/process';
 import { Effect } from 'effect';
-
-import { Process } from '../../src/services/index.js';
 
 export const file = (s: string) => `file://${s}`;
 

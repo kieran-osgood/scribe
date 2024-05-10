@@ -1,8 +1,7 @@
+import * as Process from '@scribe/process';
 import { Effect } from 'effect';
 import { test } from 'vitest';
 
-import { Process } from '../../../src/services/index.js';
-import { makeProcessMock } from '../../../src/services/process/process.js';
 import { center, file, spacer } from '../formatter.js';
 
 describe('Formatter', () => {
@@ -23,7 +22,10 @@ describe('Formatter', () => {
       effect: Effect.Effect<string, never, Process.Process>,
     ) =>
       effect.pipe(
-        Effect.provideService(Process.Process, makeProcessMock('/mockdir')),
+        Effect.provideService(
+          Process.Process,
+          Process.makeProcessMock('/mockdir'),
+        ),
       );
 
     test('empty string', () => {

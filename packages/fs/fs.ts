@@ -1,12 +1,12 @@
 import { Abortable } from 'node:events';
 
+import * as Process from '@scribe/process';
 import { Context, Effect, pipe } from 'effect';
 import * as Layer from 'effect/Layer';
 import * as NFS from 'fs';
 import * as memfs from 'memfs';
 import path from 'path';
 
-import * as Process from '../../src/services/process/process.js';
 import {
   MkDirError,
   ReadFileError,
