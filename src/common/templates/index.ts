@@ -1,14 +1,11 @@
 import { Schema } from '@effect/schema';
 import * as Config from '@scribe/config';
-import { ScribeConfig } from '@scribe/config';
 import * as FS from '@scribe/fs';
 import * as Process from '@scribe/process';
 import { TemplateFile } from '@scribe/renderer';
 import { Array, Data, Effect, Option as O, pipe, Record } from 'effect';
 import path from 'path';
 import { render } from 'template-file';
-
-import { Template } from '../config/index.js';
 
 export type Ctx = {
   name: string;
@@ -35,7 +32,7 @@ function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   });
 }
 
-export type ConstructTemplateCtx = Ctx & { output: Template };
+export type ConstructTemplateCtx = Ctx & { output: Config.Template };
 
 export function constructTemplate(ctx: ConstructTemplateCtx) {
   return pipe(
@@ -56,7 +53,7 @@ export function constructTemplate(ctx: ConstructTemplateCtx) {
 
 export type WriteTemplateCtx = Ctx & {
   fileContents: string;
-  output: Template;
+  output: Config.Template;
 };
 export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
@@ -76,7 +73,7 @@ export const writeTemplate = (_: WriteTemplateCtx) =>
 export const writeTemplates = (ctx: {
   name: string;
   template: string;
-  config: Schema.Schema.Type<typeof ScribeConfig>;
+  config: Schema.Schema.Type<typeof Config.ScribeConfig>;
   templates: string[];
 }) =>
   pipe(

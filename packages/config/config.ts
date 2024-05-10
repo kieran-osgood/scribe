@@ -3,7 +3,7 @@ import { cosmiconfig, CosmiconfigResult } from 'cosmiconfig';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
 import { Array, Effect, flow, pipe, Tuple } from 'effect';
 
-import PackageJson from '../../../package.json';
+import PackageJson from '../../package.json';
 import { ConfigParseError, CosmicConfigError } from './error.js';
 import { ScribeConfig } from './schema.js';
 

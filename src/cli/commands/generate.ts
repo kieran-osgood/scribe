@@ -1,7 +1,6 @@
 import { Command, Options } from '@effect/cli';
 import { Schema } from '@effect/schema';
 import * as Config from '@scribe/config';
-import { ScribeConfig } from '@scribe/config';
 import * as Console from '@scribe/console';
 import * as FS from '@scribe/fs';
 import * as Git from '@scribe/git';
@@ -44,7 +43,7 @@ const _verbose = Options.boolean('verbose').pipe(
 type ConfigContext = {
   readonly name: string;
   readonly template: string;
-  readonly config: Schema.Schema.Type<typeof ScribeConfig>;
+  readonly config: Schema.Schema.Type<typeof Config.ScribeConfig>;
   readonly templates: string[];
 };
 export const Generate = Command.make(

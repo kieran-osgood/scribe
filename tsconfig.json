@@ -14,8 +14,7 @@
     "paths": {
       // "@scribe/common": ["packages/_common/index.js"],
       // "@scribe/cli": ["packages/cli/index.js"],
-      // "@scribe/config": ["packages/config/index.js"],
-
+      "@scribe/config": ["packages/config/index.js"],
       "@scribe/console": ["packages/console/index.js"],
       "@scribe/fs": ["packages/fs/index.js"],
       "@scribe/git": ["packages/git/index.js"],
@@ -23,11 +22,6 @@
       "@scribe/renderer": ["packages/renderer/index.js"],
       //"@scribe/ui": ["packages/ui/index.js"],
 
-      //
-      //
-      //
-      "@scribe/adapters": ["src/adapters/index.js"],
-      "@scribe/config": ["src/common/config/index.js"],
       "@scribe/commands": ["src/commands/index.js"],
       "@scribe/cli": ["src/cli/cli.js"],
       "@scribe/services": ["src/services/index.js"],
