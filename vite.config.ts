@@ -7,15 +7,23 @@ export default defineConfig({
     outputFile: process.env.CI ? '.github/tests/run.xml' : '',
     reporters: [process.env.CI ? 'junit' : 'default'],
     watch: false,
-    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache', 'examples'],
+    exclude: [
+      'node_modules',
+      'dist',
+      '.idea',
+      '.git',
+      '.cache',
+      'examples',
+      'types',
+      'test',
+    ],
     coverage: {
       provider: 'istanbul',
       all: true,
-      include: ['index.ts', 'src'],
-      exclude: ['examples/*'],
+      include: ['packages'],
+      exclude: ['examples/*', 'types', 'test'],
     },
     allowOnly: true,
   },
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
   plugins: [tsconfigPaths()],
 });

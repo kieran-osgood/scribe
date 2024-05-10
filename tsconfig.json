@@ -12,16 +12,15 @@
     "moduleResolution": "NodeNext",
     "noEmit": true,
     "paths": {
-      "@scribe/adapters": ["src/adapters/index.js"],
-      "@scribe/config": ["src/common/config/index.js"],
-      "@scribe/reader": ["src/reader/index.js"],
-      "@scribe/git": ["src/git/index.js"],
-      "@scribe/commands": ["src/commands/index.js"],
-      "@scribe/fs": ["src/common/fs/index.js"],
-      "@scribe/cli": ["src/cli/cli.js"],
-      "@scribe/services": ["src/services/index.js"],
-      "@scribe/prompts": ["src/common/prompts/index.js"],
-      "@scribe/constants": ["src/common/constants.js"]
+      "@scribe/cli": ["packages/cli/index.js"],
+      "@scribe/config": ["packages/config/index.js"],
+      "@scribe/console": ["packages/console/index.js"],
+      "@scribe/fs": ["packages/fs/index.js"],
+      "@scribe/git": ["packages/git/index.js"],
+      "@scribe/process": ["packages/process/index.js"],
+      "@scribe/renderer": ["packages/renderer/index.js"],
+      "@scribe/ui": ["packages/ui/index.js"],
+      "@scribe/test": ["packages/test/*"]
     },
     "lib": ["ESNext"],
     "baseUrl": ".",
@@ -47,11 +46,14 @@
   },
   "include": [
     ".eslintrc.js",
+    "packages",
     "src",
     "e2e",
     "vite.config.ts",
-    "index.ts",
-    "tsup.config.ts"
+    "packages/cli/index.ts",
+    "types",
+    "tsup.config.ts",
+    "test"
   ],
   "exclude": ["examples", "public", "dist", "scribe.config.ts"],
   "ts-node": {

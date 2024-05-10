@@ -1,5 +1,6 @@
 # scribe
 
+
 Bootstrap your common files with [Mustache](https://github.com/mustache/mustache.github.com) templates.
 
 <div align='center'>
@@ -32,10 +33,19 @@ Bootstrap your common files with [Mustache](https://github.com/mustache/mustache
 
 ---
 
+- [scribe](#scribe)
+  - [Quick Start](#quick-start)
+    - [Install](#install)
+    - [Initialise Config file](#initialise-config-file)
+  - [Getting Started](#getting-started)
+    - [Example](#example)
+
 ## Quick Start
+
 We can handle setup via built in commands to bootstrap out the initial config, you'll need to edit it to add in some of your domains file requirements before your first run (see below, or [examples](https://github.com/kieran-osgood/scribe/tree/main/examples))
 
 ### Install
+
 ```shell
 npm i -D @kieran-osgood/scribe
 pnpm i -D @kieran-osgood/scribe
@@ -44,6 +54,7 @@ bun i -D @kieran-osgood/scribe
 ```
 
 ### Initialise Config file
+
 ```shell
 scribe init
 ```
@@ -56,7 +67,6 @@ As an example, if you're creating a React Component, you can output test files, 
 etc.
 
 ### Example
-
 
 Given a config and scribe files in the root of the repository (See [examples](https://github.com/kieran-osgood/scribe/tree/main/examples) for this setup)
 

@@ -3,9 +3,20 @@ import type { ScribeConfig } from '@scribe/config';
 const config = {
   options: {
     rootOutDir: '.',
-    templatesDirectories: ['./examples'],
+    templatesDirectories: ['./test/fixtures'],
   },
   templates: {
+    component: {
+      outputs: [
+        {
+          templateFileKey: 'component',
+          output: {
+            directory: 'examples/src/components',
+            fileName: '{{Name}}.ts',
+          },
+        },
+      ],
+    },
     screen: {
       outputs: [
         {
