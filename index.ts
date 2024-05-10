@@ -2,15 +2,16 @@
 
 import { NodeRuntime } from '@effect/platform-node';
 import * as NodeContext from '@effect/platform-node/NodeContext';
-import { Console as ConsoleAdapter } from '@scribe/adapters';
 import * as Cli from '@scribe/cli';
-import { FS, Process } from '@scribe/services';
+import * as ScribeConsole from '@scribe/console';
+import * as FS from '@scribe/fs';
+import { Process } from '@scribe/services';
 import { Console, Effect, Layer } from 'effect';
 
 export { type ScribeConfig } from '@scribe/config';
 
 Effect.suspend(() => Cli.run(process.argv)).pipe(
-  Console.withConsole(ConsoleAdapter.consoleLayer),
+  Console.withConsole(ScribeConsole.consoleLayer),
   Effect.provide(
     Layer.mergeAll(
       NodeContext.layer, //

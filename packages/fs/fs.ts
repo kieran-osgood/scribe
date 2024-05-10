@@ -6,7 +6,7 @@ import * as NFS from 'fs';
 import * as memfs from 'memfs';
 import path from 'path';
 
-import * as Process from '../process/process.js';
+import * as Process from '../../src/services/process/process.js';
 import {
   MkDirError,
   ReadFileError,

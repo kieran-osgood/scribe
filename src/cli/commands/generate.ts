@@ -3,8 +3,9 @@ import { Schema } from '@effect/schema';
 import { Console } from '@scribe/adapters';
 import * as Config from '@scribe/config';
 import { ScribeConfig } from '@scribe/config';
+import * as Git from '@scribe/git';
 import { Prompts } from '@scribe/prompts';
-import { FS, Git } from '@scribe/services';
+import { FS } from '@scribe/services';
 import { Array, Effect, flow, Logger, LogLevel, Option, pipe } from 'effect';
 
 import { WARNINGS } from '../../common/constants.js';
