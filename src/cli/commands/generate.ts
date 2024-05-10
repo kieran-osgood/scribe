@@ -4,7 +4,7 @@ import * as Config from '@scribe/config';
 import * as Console from '@scribe/console';
 import * as FS from '@scribe/fs';
 import * as Git from '@scribe/git';
-import { Prompts } from '@scribe/prompts';
+import { Prompts } from '@scribe/ui';
 import { Array, Effect, flow, Logger, LogLevel, Option, pipe } from 'effect';
 
 import { WARNINGS } from '../../common/constants.js';

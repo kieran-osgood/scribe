@@ -6,7 +6,7 @@ import * as Constants from '@scribe/constants';
 import * as FS from '@scribe/fs';
 import * as Git from '@scribe/git';
 import * as Process from '@scribe/process';
-import { Prompts } from '@scribe/prompts';
+import { Prompts } from '@scribe/ui';
 import { Effect, Logger, LogLevel, pipe } from 'effect';
 import path from 'path';
 
