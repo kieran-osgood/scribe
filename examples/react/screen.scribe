@@ -1,0 +1,14 @@
+import * as React from 'react';
+import {Text} from 'react-native';
+import {Screen} from './components';
+
+type {{Name}}Props = {}
+function {{Name}}Screen(props: {{Name}}Props) {
+  return (
+    <Screen>
+      <View>
+        <Text>{{Name}}</Text>
+      </View>
+    </Screen>
+  )
+}
