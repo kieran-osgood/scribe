@@ -142,3 +142,6 @@ html
 
 # Nix
 .direnv/*
+
+# TurboRepo
+.turbo

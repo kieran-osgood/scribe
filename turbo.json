@@ -1,0 +1,22 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "start": {
+      "cache": false,
+      "persistent": true
+    },
+    "tsc": {},
+    "lint": {},
+    "prettier": {},
+    "test": {
+      "inputs": ["test/*", "packages/*"]
+    },
+    "build": {
+      "outputs": ["dist/**"],
+      "dependsOn": ["tsc", "lint", "prettier", "test"]
+    },
+    "publish": {
+      "dependsOn": ["build"]
+    }
+  }
+}

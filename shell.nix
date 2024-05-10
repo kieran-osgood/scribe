@@ -5,6 +5,7 @@ pkgs.mkShell {
         nodejs_20
         neovim
         nodePackages.pnpm
+        turbo
     ];
 }
 
