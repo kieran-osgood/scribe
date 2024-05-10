@@ -139,3 +139,6 @@ tsconfig.vitest-temp.json
 html
 
 ./scribe.config.ts
+
+# Nix
+.direnv/*
