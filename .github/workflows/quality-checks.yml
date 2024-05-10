@@ -1,4 +1,4 @@
-name: CI
+name: Quality Checks
 on:
   push:
     branches:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: "Build / TSC / Lint / Test"
+    name: "Quality Checks"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,9 +19,6 @@ jobs:
 
       - name: Install Dependencies
         run: nix-shell --command "pnpm install --frozen-lockfile"
-
-      - name: Link @kieran-osgood/scribe -> scribe
-        run: nix-shell --command "pnpm link ."
 
       - name: Lint / TSC / Test
         run: nix-shell --command "turbo build"
