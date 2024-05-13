@@ -23,6 +23,9 @@ jobs:
       - name: Test
         run: nix-shell --run "turbo test --output-logs='full'"
 
+      - name: Git version
+        run: nix-shell --run "echo git -v"
+
       - name: Build
         run: nix-shell --run "turbo build --output-logs='full'"
 
