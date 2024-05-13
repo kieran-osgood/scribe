@@ -6,11 +6,6 @@ import { createMinimalProject } from '../../../test/utils.js';
 import GitStatusError, { SimpleGitError } from '../error.js';
 import { isWorkingTreeClean } from '../git.js';
 
-const mockConsoleLog = vi.fn();
-vi.stubGlobal('console', {
-  log: mockConsoleLog,
-});
-
 const mockStatusImplementation = vi.fn();
 
 type SimpleGitModule = typeof import('simple-git');
@@ -27,10 +22,6 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllEnvs();
-});
-
-afterAll(() => {
-  vi.unstubAllGlobals();
 });
 
 describe('Git', () => {
@@ -87,6 +78,13 @@ describe('Git', () => {
       return Effect.gen(function* ($) {
         const result = yield* $(isWorkingTreeClean(), Effect.flip);
         expect(result).toBeInstanceOf(GitStatusError);
+
+        expect(result.error?.message).toMatchInlineSnapshot(
+          `
+            "fatal: not a git repository (or any of the parent directories): .git
+            "
+          `
+        );
       }).pipe(
         Effect.provideService(Process.Process, Process.getMock(cwd)),
         Effect.runPromise,

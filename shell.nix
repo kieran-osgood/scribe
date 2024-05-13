@@ -6,6 +6,7 @@ pkgs.mkShell {
         neovim
         nodePackages.pnpm
         turbo
+        git
     ];
 }
 
