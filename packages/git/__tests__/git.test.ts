@@ -83,7 +83,7 @@ describe('Git', () => {
           `
             "fatal: not a git repository (or any of the parent directories): .git
             "
-          `
+          `,
         );
       }).pipe(
         Effect.provideService(Process.Process, Process.getMock(cwd)),

@@ -3,4 +3,4 @@
 
 pnpm run tsc
 pnpm run lint
-#pnpm run test
+pnpm run prettier:check
