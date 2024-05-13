@@ -91,10 +91,9 @@ describe('Git', () => {
         console.log({ cwd });
         console.log('message', result.error?.message);
 
-        expect(result.error?.message)
-          .toMatchInlineSnapshot(
+        expect(result.error?.message).toBe(
             "fatal: not a git repository (or any of the parent directories): .git"
-          );
+        );
       }).pipe(
         Effect.provideService(Process.Process, Process.getMock(cwd)),
         Effect.runPromise,

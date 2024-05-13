@@ -20,18 +20,18 @@ jobs:
       - name: Install Dependencies
         run: nix-shell --run "pnpm install --frozen-lockfile"
 
-
       - name: Test
-        run: nix-shell --run  "turbo test --output-logs='full'"
+        run: nix-shell --run "turbo test --output-logs='full'"
 
       - name: Build
-        run: nix-shell --run  "turbo build --output-logs='full'"
+        run: nix-shell --run "turbo build --output-logs='full'"
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v4
         if: always()
         with:
           report_paths: '.github/tests/*.xml'
+          detailed_summary: true
 
 #      - uses: andresz1/size-limit-action@v1
 #        with:

@@ -25,7 +25,7 @@
     "start": "ts-node packages/cli/index.ts",
     "test": "vitest",
     "lint": "eslint .",
-    "prettier": "prettier .",
+    "prettier": "prettier --check .",
     "tsc": "tsc",
     "build": "tsup packages/cli/index.ts",
     "publish": "changeset publish",
