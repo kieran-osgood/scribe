@@ -21,7 +21,7 @@ export const Initialize = Command.make(
   { verbose: _verbose },
   ({ verbose }) =>
     pipe(
-      Console.logHeader(`Init`),
+      Console.header(`Init`),
       Effect.tap(() =>
         Console.logGroup('info', 'Git')('Checking working tree clean'),
       ),
@@ -32,7 +32,7 @@ export const Initialize = Command.make(
           onFalse: () =>
             Effect.gen(function* ($) {
               yield* $(
-                Console.logWarn(Constants.WARNINGS.gitWorkingDirectoryDirty),
+                Console.warn(Constants.WARNINGS.gitWorkingDirectoryDirty),
               );
               return yield* $(Prompts.continueWarning);
             }),
@@ -40,7 +40,7 @@ export const Initialize = Command.make(
       ),
       // TODO: test this
       Effect.catchTag('GitStatusError', error =>
-        Console.logWarn(error.toString()).pipe(
+        Console.warn(error.toString()).pipe(
           Effect.flatMap(() => Prompts.continueWarning),
         ),
       ),
@@ -51,7 +51,7 @@ export const Initialize = Command.make(
             pipe(
               Console.logGroup('info', 'Config')('Checking write path clear'),
               Effect.flatMap(() => checkConfigWritePathEmpty()),
-              Effect.tap(() => Console.logInfo('Writing...')),
+              Effect.tap(() => Console.info('Writing...')),
               Effect.flatMap(copyBaseScribeConfigToPath),
             ),
           onFalse: () => Effect.void,
@@ -60,9 +60,9 @@ export const Initialize = Command.make(
 
       Effect.catchTag('@scribe/core/fs/FileExistsError', error =>
         pipe(
-          Console.logError(`Failed to create config. Path not empty.`),
+          Console.error(`Failed to create config. Path not empty.`),
           // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-          Effect.tap(() => Console.logFile(error.error.path.toString())),
+          Effect.tap(() => Console.file(error.error.path.toString())),
         ),
       ),
 
@@ -73,12 +73,12 @@ export const Initialize = Command.make(
 
         return Console.logGroup(`success`, 'Success')().pipe(
           Effect.tap(() =>
-            Console.logSuccess(
+            Console.success(
               'Scribe init complete. Edit the config to begin templating.',
             ),
           ),
           // eslint-disable-next-line @typescript-eslint/no-base-to-string
-          Effect.tap(() => Console.logFile(fileDescriptor.toString())),
+          Effect.tap(() => Console.file(fileDescriptor.toString())),
         );
       }),
       Effect.catchTag('QuitException', () => Effect.void),

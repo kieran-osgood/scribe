@@ -64,7 +64,7 @@ export const Generate = Command.make(
           onTrue: () => Effect.void,
           onFalse: () =>
             Effect.gen(function* ($) {
-              yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
+              yield* $(Console.warn(WARNINGS.gitWorkingDirectoryDirty));
               return yield* $(Prompts.continueOrQuit);
             }),
         }),
@@ -115,14 +115,14 @@ export const Generate = Command.make(
         ),
       ),
       Effect.flatMap(_ =>
-        Console.logSuccess('Success').pipe(
+        Console.success('Success').pipe(
           Effect.tap(() => Console.log(`Output files:\n${_}\n`)),
         ),
       ),
 
       Effect.catchTags({
-        CosmicConfigError: Console.logError,
-        ConfigParseError: Console.logError,
+        CosmicConfigError: Console.error,
+        ConfigParseError: Console.error,
         QuitException: () => Console.log('Exiting...'),
       }),
       Logger.withMinimumLogLevel(
