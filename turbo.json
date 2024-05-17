@@ -7,11 +7,11 @@
     },
     "tsc": {},
     "lint": {},
-    "prettier": {},
+    "prettier:check": {},
     "test": {},
     "build": {
       "outputs": ["dist/**"],
-      "dependsOn": ["prettier", "lint", "tsc", "test"]
+      "dependsOn": ["prettier:check", "lint", "tsc", "test"]
     },
     "publish": {
       "dependsOn": ["build"]

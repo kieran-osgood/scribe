@@ -106,5 +106,4 @@ export const writeTemplates = (ctx: {
     ),
     Effect.all,
     Effect.map(Array.flatten),
-    id => id,
   );

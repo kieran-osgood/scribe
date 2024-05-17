@@ -1,6 +1,19 @@
 import { Prompt } from '@effect/cli';
 import { QuitException } from '@effect/platform/Terminal';
-import { Effect, pipe } from 'effect';
+import { Effect } from 'effect';
+
+const continueWarning = Prompt.toggle({
+  message: 'Continue?',
+  active: 'yes',
+  inactive: 'no',
+});
+
+const continueOrQuit = continueWarning.pipe(
+  Effect.if({
+    onTrue: () => Effect.void,
+    onFalse: () => Effect.fail(new QuitException()),
+  }),
+);
 
 const fileName = Prompt.text({
   message: 'Name:',
@@ -10,12 +23,6 @@ const fileName = Prompt.text({
       : Effect.fail(
           'File name may only include letters, numbers & underscores.',
         ),
-});
-
-const continueWarning = Prompt.toggle({
-  message: 'Continue?',
-  active: 'yes',
-  inactive: 'no',
 });
 
 const templates = (s: string[]) =>
@@ -29,18 +36,9 @@ const templates = (s: string[]) =>
     })),
   });
 
-const continueOrQuit = () =>
-  pipe(
-    Prompts.continueWarning,
-    Effect.if({
-      onTrue: () => Effect.void,
-      onFalse: () => Effect.fail(new QuitException()),
-    }),
-  );
-
 export const Prompts = {
-  templates,
-  continueWarning,
   continueOrQuit,
+  continueWarning,
   fileName,
+  templates,
 };

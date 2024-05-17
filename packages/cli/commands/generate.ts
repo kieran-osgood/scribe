@@ -65,12 +65,12 @@ export const Generate = Command.make(
           onFalse: () =>
             Effect.gen(function* ($) {
               yield* $(Console.logWarn(WARNINGS.gitWorkingDirectoryDirty));
-              return yield* $(Prompts.continueOrQuit());
+              return yield* $(Prompts.continueOrQuit);
             }),
         }),
       ),
 
-      Effect.catchTag('GitStatusError', () => Prompts.continueOrQuit()),
+      Effect.catchTag('GitStatusError', () => Prompts.continueOrQuit),
       Effect.flatMap(() =>
         Effect.gen(function* ($) {
           const _configPath = yield* $(FS.createConfigPathAbsolute(configPath));

@@ -1,9 +1,9 @@
-const github = 'https://github.com/kieran-osgood/scribe';
+const githubBaseUrl = 'https://github.com/kieran-osgood/scribe';
 
 export const URLS = {
   github: {
-    issues: `${github}/issues`,
-    newIssue: `${github}/issues/new`,
+    issues: `${githubBaseUrl}/issues`,
+    newIssue: `${githubBaseUrl}/issues/new`,
   },
 } as const;
 

@@ -1,6 +1,9 @@
 import { Context, Effect } from 'effect';
 import * as Layer from 'effect/Layer';
 
+/**
+ * Mark these with effect returns?
+ */
 export interface Process {
   cwd: () => string;
   exit: (code: number) => never;
