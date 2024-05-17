@@ -27,12 +27,7 @@ export const FS = Context.GenericTag<FS>('@effect/platform/FileSystem');
 export const FSLive = NFS;
 export const FSMock = memfs.fs as unknown as typeof NFS;
 
-export const getFS = (test: boolean) => {
-  return test ? FS.of(FSMock) : FS.of(FSLive);
-};
-
-export const layer = (test = false) =>
-  Layer.scoped(FS, Effect.succeed(getFS(test)));
+export const layer = Layer.scoped(FS, Effect.succeed(FS.of(FSLive)));
 
 export const writeFile = (
   file: NFS.PathOrFileDescriptor,

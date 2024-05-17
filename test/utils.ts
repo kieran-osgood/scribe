@@ -19,7 +19,7 @@ export const MainLive = (cwd: string) =>
     const _console = yield* $(MockConsole.make);
     return Layer.mergeAll(
       NodeFileSystem.layer,
-      FS.layer(false),
+      FS.layer,
       MockTerminal.layer,
       Process.layer(cwd),
       NodePath.layer,

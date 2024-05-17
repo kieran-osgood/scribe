@@ -14,8 +14,8 @@ export { type ScribeConfig } from '../config/index.js';
 Effect.suspend(() => Cli.run(process.argv)).pipe(
   Effect.provide(
     Layer.mergeAll(
-      NodeContext.layer,
-      FS.layer(),
+      NodeContext.layer, //
+      FS.layer,
       Process.layer(),
       Console.layer,
     ),
