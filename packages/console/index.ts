@@ -1,79 +1,40 @@
+import { bgBlue, black } from 'colorette';
 import {
-  bgBlue,
-  bgGreen,
-  bgRed,
-  bgYellow,
-  black,
-  blue,
-  cyan,
-  green,
-  red,
-  yellow,
-} from 'colorette';
-import { Console, Effect, flow, Layer, LogLevel, pipe } from 'effect';
-import * as Context from 'effect/Context';
+  Array as A,
+  Console,
+  Effect,
+  flow,
+  LogLevel as EffectLogLevel,
+  Match,
+  pipe,
+} from 'effect';
 
 import { SYMBOLS } from '../constants.js';
+import {
+  logColors,
+  logGroupColors,
+  LogLevel,
+  PrintFn,
+  printLogLevel,
+} from './colors.js';
 import * as Formatters from './formatter.js';
 
-export const ConsoleTag = Context.GenericTag<Console.Console, Console.Console>(
-  'effect/Console',
-);
+const colorise = (l: LogLevel) => {
+  const coloriser = logColors[l];
 
-export const layer = Layer.scoped(
-  ConsoleTag,
-  Effect.succeed(
-    ConsoleTag.of({
-      [Console.TypeId]: Console.TypeId,
-      debug: (...args: string[]) =>
-        Effect.sync(() => {
-          console.debug(cyan(String(args.join())));
-        }),
-      log: (...args: string[]) =>
-        Effect.sync(() => {
-          console.log(String(args.join()));
-        }),
-      info: (...args: string[]) =>
-        Effect.sync(() => {
-          console.info(blue(String(args.join())));
-        }),
-      warn: (...args: string[]) =>
-        Effect.sync(() => {
-          console.warn(`${SYMBOLS.warning} ${yellow(String(args.join()))}`);
-        }),
-      error: (...args: string[]) =>
-        Effect.sync(() => {
-          console.error(`${SYMBOLS.error} ${red(String(args.join()))}`);
-        }),
-      unsafe: globalThis.console,
-      assert: () => Effect.void,
-      clear: Effect.void,
-      count: () => Effect.void,
-      countReset: () => Effect.void,
-      dir: () => Effect.void,
-      dirxml: () => Effect.void,
-      group: () => Effect.void,
-      groupEnd: Effect.void,
-      table: () => Effect.void,
-      time: () => Effect.void,
-      timeEnd: () => Effect.void,
-      timeLog: () => Effect.void,
-      trace: () => Effect.void,
-    }),
-  ),
-);
+  return (...s: readonly unknown[]): string =>
+    pipe(s, A.map(flow(String, coloriser)), A.join(''));
+};
 
-// TODO: remove these
-// Core - styling handled via {@logger}
-export const log = Console.log;
-export const debug = Console.debug;
-export const info = Console.info;
-export const warn = Console.warn;
-export const error = Console.error;
+export const debug = flow(colorise('debug'), Console.debug);
+export const log = flow(colorise('log'), Console.log);
+export const info = flow(colorise('info'), Console.info);
+export const warn = flow(colorise('warn'), Console.warn);
+export const error = flow(colorise('error'), Console.error);
+export const success = flow(colorise('success'), Console.info);
 
-// Custom implementations
-export const success = (...s: string[]) =>
-  Console.log(`${SYMBOLS.success}  ${green(s.join())}`);
+export const successWithSymbol = (...s: readonly unknown[]) =>
+  Console.info(SYMBOLS.success, colorise('success')(s));
 
 export const file = (s: string) =>
   Console.log(`${SYMBOLS.directory} ${Formatters.file(s)}`);
@@ -83,18 +44,58 @@ export const header = flow(
   Effect.flatMap(flow(black, bgBlue, Console.log)),
 );
 
-type LogLevel = 'debug' | 'log' | 'info' | 'warn' | 'error' | 'success';
-const logBgColors = {
-  debug: flow(bgBlue, black),
-  log: flow(bgBlue, black),
-  info: flow(bgBlue, black),
-  warn: flow(bgYellow, black),
-  error: flow(bgRed, black),
-  success: flow(bgGreen, black),
-} satisfies Record<LogLevel, (s: string) => string>;
+export const logGroup = (logLevel: LogLevel, groupName: string) => {
+  return (message?: string) =>
+    Effect.gen(function* ($) {
+      const groupPrinter = getLogGroupPrinter(logLevel);
+      yield* $(groupPrinter(Formatters.spacer(groupName)));
 
-export const logGroup = (logLevel: LogLevel, g: string) => (s?: string) =>
-  pipe(
-    Console.log(logBgColors[logLevel](Formatters.spacer(g))),
-    Effect.tap(() => (s ? Console.log(s) : Effect.void)),
-  );
+      if (message) {
+        const printer = getLogPrinter(logLevel);
+        yield* $(printer(message));
+      }
+    });
+};
+
+type LogLevelPrinter = (logLevel: LogLevel) => PrintFn;
+
+const getLogGroupPrinter: LogLevelPrinter = pipe(
+  Match.type<LogLevel>(),
+  Match.when('log', printLogLevel(Console.log, logGroupColors)),
+  Match.when('debug', printLogLevel(Console.debug, logGroupColors)),
+  Match.when('info', printLogLevel(Console.info, logGroupColors)),
+  Match.when('warn', printLogLevel(Console.warn, logGroupColors)),
+  Match.when('error', printLogLevel(Console.error, logGroupColors)),
+  Match.when('success', printLogLevel(success, logGroupColors)),
+  Match.exhaustive,
+);
+
+const getLogPrinter: LogLevelPrinter = pipe(
+  Match.type<LogLevel>(),
+  Match.when('log', printLogLevel(Console.log, logColors)),
+  Match.when('debug', printLogLevel(Console.debug, logColors)),
+  Match.when('info', printLogLevel(Console.info, logColors)),
+  Match.when('warn', printLogLevel(Console.warn, logColors)),
+  Match.when('error', printLogLevel(Console.error, logColors)),
+  Match.when('success', printLogLevel(success, logColors)),
+  Match.exhaustive,
+);
+
+/**
+ * Sets production log level to Info, unless
+ * the --verbose flag is passed in
+ *
+ * Defaults to all in development, but can be overridden
+ * with the --verbose flag also
+ */
+export const setLogLevel = (verbose: boolean) => {
+  if (verbose) {
+    return EffectLogLevel.All;
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    return EffectLogLevel.Info;
+  }
+
+  return EffectLogLevel.All;
+};

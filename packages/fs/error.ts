@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import NFS from 'fs';
 
 export const tagName = <K extends string>(k: K) =>
-  `@scribe/core/fs/${k}` as const;
+  `@effect/platform/FileSystem/${k}` as const;
 
 export const FSError = <K extends string>(k: K) => Data.TaggedClass(tagName(k));
 

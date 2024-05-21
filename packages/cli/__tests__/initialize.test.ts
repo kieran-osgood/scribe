@@ -35,7 +35,8 @@ describe('[Given] Git Clean', () => {
           "Checking write path clear",
           "Writing...",
           " Success ",
-          "✅  Scribe init complete. Edit the config to begin templating.",
+          "✅",
+          "Scribe init complete. Edit the config to begin templating.",
           "📁 file://${cwd}/scribe.config.ts",
         ]
       `);
@@ -66,16 +67,17 @@ describe('[Given] Git Clean', () => {
 
       const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
       expect(lines).toMatchInlineSnapshot(`
-          [
-            "                                Init                               ",
-            " Git ",
-            "Checking working tree clean",
-            " Config ",
-            "Checking write path clear",
-            "Failed to create config. Path not empty.",
-            "📁 file://${cwd}/scribe.config.ts",
-          ]
-        `);
+        [
+          "                                Init                               ",
+          " Git ",
+          "Checking working tree clean",
+          " Config ",
+          "Checking write path clear",
+          " Fail ",
+          "Failed to create config. Path not empty.",
+          "📁 file://${cwd}/scribe.config.ts",
+        ]
+      `);
       expect(String(config)).toMatchSnapshot();
     }).pipe(runEffect(cwd));
   });
@@ -115,7 +117,8 @@ describe('[Given] Git dirty', () => {
             "Checking write path clear",
             "Writing...",
             " Success ",
-            "✅  Scribe init complete. Edit the config to begin templating.",
+            "✅",
+            "Scribe init complete. Edit the config to begin templating.",
             "📁 file://${cwd}/scribe.config.ts",
           ]
         `);

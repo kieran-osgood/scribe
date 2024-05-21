@@ -1,7 +1,7 @@
 import '@effect/platform/Terminal';
 
 import { Command, Options } from '@effect/cli';
-import { Effect, Logger, LogLevel, pipe } from 'effect';
+import { Effect, Logger, pipe } from 'effect';
 import path from 'path';
 
 import * as Console from '../../console/index.js';
@@ -38,7 +38,7 @@ export const Initialize = Command.make(
             }),
         }),
       ),
-      // TODO: test this
+
       Effect.catchTag('GitStatusError', error =>
         Console.warn(error.toString()).pipe(
           Effect.flatMap(() => Prompts.continueWarning),
@@ -58,13 +58,27 @@ export const Initialize = Command.make(
         }),
       ),
 
-      Effect.catchTag('@scribe/core/fs/FileExistsError', error =>
-        pipe(
-          Console.error(`Failed to create config. Path not empty.`),
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-          Effect.tap(() => Console.file(error.error.path.toString())),
-        ),
-      ),
+      Effect.catchTags({
+        '@effect/platform/FileSystem/StatError': error =>
+          pipe(
+            Console.logGroup(
+              'error',
+              'Fail',
+            )('Failed to create config. Path not empty.'),
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+            Effect.tap(() =>
+              Console.file(error.error.path?.toString() ?? 'Bad path'),
+            ),
+          ),
+        '@effect/platform/FileSystem/FileExistsError': error =>
+          pipe(
+            Console.logGroup(
+              'error',
+              'Fail',
+            )('Failed to create config. Path not empty.'),
+            Effect.tap(() => Console.file(error.error.path.toString())),
+          ),
+      }),
 
       Effect.flatMap(fileDescriptor => {
         if (!fileDescriptor) {
@@ -73,7 +87,7 @@ export const Initialize = Command.make(
 
         return Console.logGroup(`success`, 'Success')().pipe(
           Effect.tap(() =>
-            Console.success(
+            Console.successWithSymbol(
               'Scribe init complete. Edit the config to begin templating.',
             ),
           ),
@@ -82,13 +96,7 @@ export const Initialize = Command.make(
         );
       }),
       Effect.catchTag('QuitException', () => Effect.void),
-      Logger.withMinimumLogLevel(
-        verbose
-          ? LogLevel.All
-          : process.env.NODE_ENV === 'production'
-            ? LogLevel.Info
-            : LogLevel.All,
-      ),
+      Logger.withMinimumLogLevel(Console.setLogLevel(verbose)),
     ),
 );
 
@@ -101,21 +109,22 @@ const checkConfigWritePathEmpty = () =>
       pipe(
         createConfigPath(_process),
         FS.isFileOrDirectory,
-        Effect.if({
-          onTrue: () => createFileExistsError(),
-          onFalse: () => Effect.void,
-        }),
-        Effect.catchTag('@scribe/core/fs/StatError', error => {
+        Effect.catchTag('@effect/platform/FileSystem/StatError', error => {
           /**
+           *
            * ENOENT indicates the path is clear, and we can safely write there
            */
           if (error.error.code === 'ENOENT') {
-            return Effect.void;
+            return Effect.succeed(false);
           }
 
           // TODO: add ignore file exists
           // TODO: test case that hits this?
           return Effect.fail(error);
+        }),
+        Effect.if({
+          onTrue: () => createFileExistsError(),
+          onFalse: () => Effect.void,
         }),
       ),
     ),

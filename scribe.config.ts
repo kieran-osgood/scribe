@@ -1,4 +1,4 @@
-import { ScribeConfig } from './packages/cli/index';
+import { ScribeConfig } from '@kieran-osgood/scribe';
 
 export default {
   options: {

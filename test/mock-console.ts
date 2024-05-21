@@ -38,7 +38,6 @@ export const make = Effect.gen(function* (_) {
     );
 
   const debug: MockConsole['debug'] = (...args) => {
-    console.log('debug');
     return Ref.update(lines, Array.appendAll(args));
   };
 

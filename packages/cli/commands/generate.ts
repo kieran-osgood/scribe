@@ -1,6 +1,6 @@
 import { Command, Options } from '@effect/cli';
 import { Schema } from '@effect/schema';
-import { Array, Effect, flow, Logger, LogLevel, Option, pipe } from 'effect';
+import { Array, Effect, flow, Logger, Option, pipe } from 'effect';
 
 import * as Config from '../../config/index.js';
 import * as Console from '../../console/index.js';
@@ -115,7 +115,7 @@ export const Generate = Command.make(
         ),
       ),
       Effect.flatMap(_ =>
-        Console.success('Success').pipe(
+        Console.successWithSymbol('Success').pipe(
           Effect.tap(() => Console.log(`Output files:\n${_}\n`)),
         ),
       ),
@@ -125,12 +125,6 @@ export const Generate = Command.make(
         ConfigParseError: Console.error,
         QuitException: () => Console.log('Exiting...'),
       }),
-      Logger.withMinimumLogLevel(
-        verbose
-          ? LogLevel.All
-          : process.env.NODE_ENV === 'production'
-            ? LogLevel.Info
-            : LogLevel.All,
-      ),
+      Logger.withMinimumLogLevel(Console.setLogLevel(verbose)),
     ),
 );

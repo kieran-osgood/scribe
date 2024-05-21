@@ -41,6 +41,7 @@ export const runEffect =
       Logger.withMinimumLogLevel(LogLevel.All),
       Effect.runPromise,
     );
+
 type CreateMinimalProjectOptions = {
   git?: {
     init: boolean;
