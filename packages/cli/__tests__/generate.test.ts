@@ -12,31 +12,30 @@ import {
 } from '../../../test/utils.js';
 import * as Cli from '../cli.js';
 
-describe('DefaultCommand', () => {
-  describe('[Given] Git clean', () => {
-    describe('[When] `--config` passed in & fully interactive session', () => {
-      it('[Then] creates two files', async () => {
-        const cwd = createMinimalProject({
-          git: { init: true, dirty: false },
-          fixtures: { templateFiles: true, configFile: true },
-        });
-        const configPath = path.join(cwd, configFlag);
+describe('[Given] Git clean', () => {
+  describe('[When] `--config` passed in & fully interactive session', () => {
+    it('[Then] creates two files', async () => {
+      const cwd = createMinimalProject({
+        git: { init: true, dirty: false },
+        fixtures: { templateFiles: true, configFile: true },
+      });
+      const configPath = path.join(cwd, configFlag);
 
-        return Effect.gen(function* ($) {
-          const fiber = yield* $(
-            Effect.fork(Cli.run(['', '', `--config=${configPath}`])),
-          );
+      return Effect.gen(function* ($) {
+        const fiber = yield* $(
+          Effect.fork(Cli.run(['', '', `--config=${configPath}`])),
+        );
 
-          yield* $(MockTerminal.inputKey('down'));
-          yield* $(MockTerminal.inputKey('enter'));
-          yield* $(MockTerminal.inputText('Login'));
-          yield* $(MockTerminal.inputKey('enter'));
+        yield* $(MockTerminal.inputKey('down'));
+        yield* $(MockTerminal.inputKey('enter'));
+        yield* $(MockTerminal.inputText('Login'));
+        yield* $(MockTerminal.inputKey('enter'));
 
-          yield* $(Fiber.join(fiber));
+        yield* $(Fiber.join(fiber));
 
-          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
 
-          expect(lines).toMatchInlineSnapshot(`
+        expect(lines).toMatchInlineSnapshot(`
             [
               "? Template: › 
             ❯ component 
@@ -65,39 +64,39 @@ describe('DefaultCommand', () => {
             ]
           `);
 
-          const loginscreen = fs.readFileSync(
-            path.join(cwd, `examples/src/screens/Login.ts`),
-          );
-          expect(String(loginscreen)).toMatchSnapshot();
+        const loginscreen = fs.readFileSync(
+          path.join(cwd, `examples/src/screens/Login.ts`),
+        );
+        expect(String(loginscreen)).toMatchSnapshot();
 
-          const loginscreentest = fs.readFileSync(
-            path.join(cwd, `examples/src/screens/Login.test.ts`),
-          );
-          expect(String(loginscreentest)).toMatchSnapshot();
-        }).pipe(runEffect(cwd));
-      });
+        const loginscreentest = fs.readFileSync(
+          path.join(cwd, `examples/src/screens/Login.test.ts`),
+        );
+        expect(String(loginscreentest)).toMatchSnapshot();
+      }).pipe(runEffect(cwd));
     });
+  });
 
-    describe('[When] `--name` passed in', () => {
-      it('[Then] creates two files', async () => {
-        const cwd = createMinimalProject({
-          git: { init: true, dirty: false },
-          fixtures: { templateFiles: true, configFile: true },
-        });
-        const configPath = path.join(cwd, configFlag);
+  describe('[When] `--name` passed in', () => {
+    it('[Then] creates two files', async () => {
+      const cwd = createMinimalProject({
+        git: { init: true, dirty: false },
+        fixtures: { templateFiles: true, configFile: true },
+      });
+      const configPath = path.join(cwd, configFlag);
 
-        return Effect.gen(function* ($) {
-          const fiber = yield* $(
-            Effect.fork(
-              Cli.run(['', '', `--config=${configPath}`, '--name=Login']),
-            ),
-          );
+      return Effect.gen(function* ($) {
+        const fiber = yield* $(
+          Effect.fork(
+            Cli.run(['', '', `--config=${configPath}`, '--name=Login']),
+          ),
+        );
 
-          yield* $(MockTerminal.inputKey('down'));
-          yield* $(MockTerminal.inputKey('enter'));
-          yield* $(Fiber.join(fiber));
-          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-          expect(lines).toMatchInlineSnapshot(`
+        yield* $(MockTerminal.inputKey('down'));
+        yield* $(MockTerminal.inputKey('enter'));
+        yield* $(Fiber.join(fiber));
+        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        expect(lines).toMatchInlineSnapshot(`
             [
               "? Template: › 
             ❯ component 
@@ -117,41 +116,41 @@ describe('DefaultCommand', () => {
             ]
           `);
 
-          const loginscreen = fs.readFileSync(
-            path.join(cwd, `examples/src/screens/Login.ts`),
-          );
-          expect(String(loginscreen)).toMatchSnapshot();
+        const loginscreen = fs.readFileSync(
+          path.join(cwd, `examples/src/screens/Login.ts`),
+        );
+        expect(String(loginscreen)).toMatchSnapshot();
 
-          const loginscreentest = fs.readFileSync(
-            path.join(cwd, `examples/src/screens/Login.test.ts`),
-          );
-          expect(String(loginscreentest)).toMatchSnapshot();
-        }).pipe(runEffect(cwd));
-      });
+        const loginscreentest = fs.readFileSync(
+          path.join(cwd, `examples/src/screens/Login.test.ts`),
+        );
+        expect(String(loginscreentest)).toMatchSnapshot();
+      }).pipe(runEffect(cwd));
     });
+  });
 
-    describe('[When] `--template` passed in', () => {
-      it('[Then] creates two files', async () => {
-        const cwd = createMinimalProject({
-          git: { init: true, dirty: false },
-          fixtures: { templateFiles: true, configFile: true },
-        });
-        const configPath = path.join(cwd, configFlag);
+  describe('[When] `--template` passed in', () => {
+    it('[Then] creates two files', async () => {
+      const cwd = createMinimalProject({
+        git: { init: true, dirty: false },
+        fixtures: { templateFiles: true, configFile: true },
+      });
+      const configPath = path.join(cwd, configFlag);
 
-        return Effect.gen(function* ($) {
-          const fiber = yield* $(
-            Effect.fork(
-              Cli.run(['', '', `--config=${configPath}`, '--template=screen']),
-            ),
-          );
+      return Effect.gen(function* ($) {
+        const fiber = yield* $(
+          Effect.fork(
+            Cli.run(['', '', `--config=${configPath}`, '--template=screen']),
+          ),
+        );
 
-          yield* $(MockTerminal.inputText('Login'));
-          yield* $(MockTerminal.inputKey('enter'));
+        yield* $(MockTerminal.inputText('Login'));
+        yield* $(MockTerminal.inputKey('enter'));
 
-          yield* $(Fiber.join(fiber));
+        yield* $(Fiber.join(fiber));
 
-          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-          expect(lines).toMatchInlineSnapshot(`
+        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        expect(lines).toMatchInlineSnapshot(`
             [
               "? Name: › ",
               "? Name: › L",
@@ -171,44 +170,44 @@ describe('DefaultCommand', () => {
             ]
           `);
 
-          const loginscreen = fs.readFileSync(
-            path.join(cwd, `examples/src/screens/Login.ts`),
-          );
-          expect(String(loginscreen)).toMatchSnapshot();
+        const loginscreen = fs.readFileSync(
+          path.join(cwd, `examples/src/screens/Login.ts`),
+        );
+        expect(String(loginscreen)).toMatchSnapshot();
 
-          const loginscreentest = fs.readFileSync(
-            path.join(cwd, `examples/src/screens/Login.test.ts`),
-          );
-          expect(String(loginscreentest)).toMatchSnapshot();
-        }).pipe(runEffect(cwd));
-      });
+        const loginscreentest = fs.readFileSync(
+          path.join(cwd, `examples/src/screens/Login.test.ts`),
+        );
+        expect(String(loginscreentest)).toMatchSnapshot();
+      }).pipe(runEffect(cwd));
     });
+  });
 
-    describe('[Given] `--config --template --name passed` in', () => {
-      it('[Then] creates two files', async () => {
-        const cwd = createMinimalProject({
-          git: { init: true, dirty: false },
-          fixtures: { templateFiles: true, configFile: true },
-        });
-        const configPath = path.join(cwd, configFlag);
+  describe('[Given] `--config --template --name passed` in', () => {
+    it('[Then] creates two files', async () => {
+      const cwd = createMinimalProject({
+        git: { init: true, dirty: false },
+        fixtures: { templateFiles: true, configFile: true },
+      });
+      const configPath = path.join(cwd, configFlag);
 
-        return Effect.gen(function* ($) {
-          const fiber = yield* $(
-            Effect.fork(
-              Cli.run([
-                '',
-                '',
-                `--config=${configPath}`,
-                '--name=Login',
-                '--template=screen',
-              ]),
-            ),
-          );
+      return Effect.gen(function* ($) {
+        const fiber = yield* $(
+          Effect.fork(
+            Cli.run([
+              '',
+              '',
+              `--config=${configPath}`,
+              '--name=Login',
+              '--template=screen',
+            ]),
+          ),
+        );
 
-          yield* $(Fiber.join(fiber));
+        yield* $(Fiber.join(fiber));
 
-          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-          expect(lines).toMatchInlineSnapshot(`
+        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        expect(lines).toMatchInlineSnapshot(`
             [
               "✅",
               "Success",
@@ -219,49 +218,49 @@ describe('DefaultCommand', () => {
             ]
           `);
 
-          const loginscreen = fs.readFileSync(
-            path.join(cwd, `examples/src/screens/Login.ts`),
-          );
-          expect(String(loginscreen)).toMatchSnapshot();
+        const loginscreen = fs.readFileSync(
+          path.join(cwd, `examples/src/screens/Login.ts`),
+        );
+        expect(String(loginscreen)).toMatchSnapshot();
 
-          const loginscreentest = fs.readFileSync(
-            path.join(cwd, `examples/src/screens/Login.test.ts`),
-          );
-          expect(String(loginscreentest)).toMatchSnapshot();
-        }).pipe(runEffect(cwd));
-      });
+        const loginscreentest = fs.readFileSync(
+          path.join(cwd, `examples/src/screens/Login.test.ts`),
+        );
+        expect(String(loginscreentest)).toMatchSnapshot();
+      }).pipe(runEffect(cwd));
     });
   });
+});
 
-  describe('[Given] Git Dirty', function () {
-    describe('[Given] prompts to continue', () => {
-      it('[Then] user answers `y`, creates two files', async () => {
-        const cwd = createMinimalProject({
-          git: { init: true, dirty: true },
-          fixtures: { configFile: true, templateFiles: true },
-        });
-        const configPath = path.join(cwd, configFlag);
+describe('[Given] Git Dirty', function () {
+  describe('[Given] prompts to continue', () => {
+    it('[Then] user answers `y`, creates two files', async () => {
+      const cwd = createMinimalProject({
+        git: { init: true, dirty: true },
+        fixtures: { configFile: true, templateFiles: true },
+      });
+      const configPath = path.join(cwd, configFlag);
 
-        return Effect.gen(function* ($) {
-          const fiber = yield* $(
-            Effect.fork(
-              Cli.run([
-                '',
-                '',
-                `--config=${configPath}`,
-                '--name=Login',
-                '--template=screen',
-              ]),
-            ),
-          );
+      return Effect.gen(function* ($) {
+        const fiber = yield* $(
+          Effect.fork(
+            Cli.run([
+              '',
+              '',
+              `--config=${configPath}`,
+              '--name=Login',
+              '--template=screen',
+            ]),
+          ),
+        );
 
-          yield* $(MockTerminal.inputKey('left'));
-          yield* $(MockTerminal.inputKey('enter'));
+        yield* $(MockTerminal.inputKey('left'));
+        yield* $(MockTerminal.inputKey('enter'));
 
-          yield* $(Fiber.join(fiber));
+        yield* $(Fiber.join(fiber));
 
-          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-          expect(lines).toMatchInlineSnapshot(`
+        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        expect(lines).toMatchInlineSnapshot(`
             [
               "Git working tree dirty - proceed with caution.
             Recommendation: commit all changes before proceeding.",
@@ -279,44 +278,44 @@ describe('DefaultCommand', () => {
             ]
           `);
 
-          const loginscreen = fs.readFileSync(
-            path.join(cwd, `examples/src/screens/Login.ts`),
-          );
-          expect(String(loginscreen)).toMatchSnapshot();
+        const loginscreen = fs.readFileSync(
+          path.join(cwd, `examples/src/screens/Login.ts`),
+        );
+        expect(String(loginscreen)).toMatchSnapshot();
 
-          const loginscreentest = fs.readFileSync(
-            path.join(cwd, `examples/src/screens/Login.test.ts`),
-          );
-          expect(String(loginscreentest)).toMatchSnapshot();
-        }).pipe(runEffect(cwd));
+        const loginscreentest = fs.readFileSync(
+          path.join(cwd, `examples/src/screens/Login.test.ts`),
+        );
+        expect(String(loginscreentest)).toMatchSnapshot();
+      }).pipe(runEffect(cwd));
+    });
+
+    it('[Then] user answers `n`, cli aborts without writing file', async () => {
+      const cwd = createMinimalProject({
+        git: { init: true, dirty: true },
+        fixtures: { configFile: true, templateFiles: true },
       });
+      const configPath = path.join(cwd, configFlag);
 
-      it('[Then] user answers `n`, cli aborts without writing file', async () => {
-        const cwd = createMinimalProject({
-          git: { init: true, dirty: true },
-          fixtures: { configFile: true, templateFiles: true },
-        });
-        const configPath = path.join(cwd, configFlag);
+      return Effect.gen(function* ($) {
+        const fiber = yield* $(
+          Effect.fork(
+            Cli.run([
+              '',
+              '',
+              `--config=${configPath}`,
+              '--name=Login',
+              '--template=screen',
+            ]),
+          ),
+        );
 
-        return Effect.gen(function* ($) {
-          const fiber = yield* $(
-            Effect.fork(
-              Cli.run([
-                '',
-                '',
-                `--config=${configPath}`,
-                '--name=Login',
-                '--template=screen',
-              ]),
-            ),
-          );
+        yield* $(MockTerminal.inputKey('enter'));
 
-          yield* $(MockTerminal.inputKey('enter'));
+        yield* $(Fiber.join(fiber));
 
-          yield* $(Fiber.join(fiber));
-
-          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-          expect(lines).toMatchInlineSnapshot(`
+        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        expect(lines).toMatchInlineSnapshot(`
             [
               "Git working tree dirty - proceed with caution.
             Recommendation: commit all changes before proceeding.",
@@ -327,40 +326,40 @@ describe('DefaultCommand', () => {
               "Exiting...",
             ]
           `);
-        }).pipe(runEffect(cwd));
-      });
+      }).pipe(runEffect(cwd));
     });
   });
+});
 
-  describe('[Given] *Not* Git', function () {
-    describe('[Given] prompts to continue', () => {
-      it('[Then] user answers y, creates two files', async () => {
-        const cwd = createMinimalProject({
-          git: { init: false, dirty: false },
-          fixtures: { configFile: true, templateFiles: true },
-        });
-        const configPath = path.join(cwd, configFlag);
+describe('[Given] *Not* Git', function () {
+  describe('[Given] prompts to continue', () => {
+    it('[Then] user answers y, creates two files', async () => {
+      const cwd = createMinimalProject({
+        git: { init: false, dirty: false },
+        fixtures: { configFile: true, templateFiles: true },
+      });
+      const configPath = path.join(cwd, configFlag);
 
-        return Effect.gen(function* ($) {
-          const fiber = yield* $(
-            Effect.fork(
-              Cli.run([
-                '',
-                '',
-                `--config=${configPath}`,
-                '--name=Login',
-                '--template=screen',
-              ]),
-            ),
-          );
+      return Effect.gen(function* ($) {
+        const fiber = yield* $(
+          Effect.fork(
+            Cli.run([
+              '',
+              '',
+              `--config=${configPath}`,
+              '--name=Login',
+              '--template=screen',
+            ]),
+          ),
+        );
 
-          yield* $(MockTerminal.inputKey('left'));
-          yield* $(MockTerminal.inputKey('enter'));
+        yield* $(MockTerminal.inputKey('left'));
+        yield* $(MockTerminal.inputKey('enter'));
 
-          yield* $(Fiber.join(fiber));
+        yield* $(Fiber.join(fiber));
 
-          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-          expect(lines).toMatchInlineSnapshot(`
+        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        expect(lines).toMatchInlineSnapshot(`
             [
               "? Continue? › yes / no",
               "? Continue? › yes / no",
@@ -375,35 +374,35 @@ describe('DefaultCommand', () => {
             ",
             ]
           `);
-        }).pipe(runEffect(cwd));
+      }).pipe(runEffect(cwd));
+    });
+
+    it('[Then] user answers `n`, cli aborts without writing file', async () => {
+      const cwd = createMinimalProject({
+        git: { init: false, dirty: false },
+        fixtures: { configFile: true, templateFiles: true },
       });
+      const configPath = path.join(cwd, configFlag);
+      return Effect.gen(function* ($) {
+        const fiber = yield* $(
+          Effect.fork(
+            Cli.run([
+              '',
+              '',
+              `--config=${configPath}`,
+              '--name=Login',
+              '--template=screen',
+            ]),
+          ),
+        );
 
-      it('[Then] user answers `n`, cli aborts without writing file', async () => {
-        const cwd = createMinimalProject({
-          git: { init: false, dirty: false },
-          fixtures: { configFile: true, templateFiles: true },
-        });
-        const configPath = path.join(cwd, configFlag);
-        return Effect.gen(function* ($) {
-          const fiber = yield* $(
-            Effect.fork(
-              Cli.run([
-                '',
-                '',
-                `--config=${configPath}`,
-                '--name=Login',
-                '--template=screen',
-              ]),
-            ),
-          );
+        yield* $(MockTerminal.inputKey('enter'));
 
-          yield* $(MockTerminal.inputKey('enter'));
+        yield* $(Fiber.join(fiber));
 
-          yield* $(Fiber.join(fiber));
+        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
 
-          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-
-          expect(lines).toMatchInlineSnapshot(`
+        expect(lines).toMatchInlineSnapshot(`
             [
               "? Continue? › yes / no",
               "✔ Continue? … yes / no
@@ -412,19 +411,19 @@ describe('DefaultCommand', () => {
               "Exiting...",
             ]
           `);
-        }).pipe(runEffect(cwd));
-      });
+      }).pipe(runEffect(cwd));
     });
   });
+});
 
-  it('[Given] --help flag [Then] print help information', async () => {
-    const cwd = createMinimalProject();
+it('[Given] --help flag [Then] print help information', async () => {
+  const cwd = createMinimalProject();
 
-    return Effect.gen(function* ($) {
-      const fiber = yield* $(Effect.fork(Cli.run(['', '', '--help'])));
-      yield* $(Fiber.join(fiber));
-      const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-      expect(lines).toMatchInlineSnapshot(`
+  return Effect.gen(function* ($) {
+    const fiber = yield* $(Effect.fork(Cli.run(['', '', '--help'])));
+    yield* $(Fiber.join(fiber));
+    const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+    expect(lines).toMatchInlineSnapshot(`
         [
           "Scribe
 
@@ -516,6 +515,5 @@ describe('DefaultCommand', () => {
         ",
         ]
       `);
-    }).pipe(runEffect(cwd));
-  });
+  }).pipe(runEffect(cwd));
 });
