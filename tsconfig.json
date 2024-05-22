@@ -15,6 +15,7 @@
       "@scribe/cli": ["packages/cli/index.js"],
       "@scribe/config": ["packages/config/index.js"],
       "@scribe/console": ["packages/console/index.js"],
+      "@scribe/constants": ["packages/constants.js"],
       "@scribe/fs": ["packages/fs/index.js"],
       "@scribe/git": ["packages/git/index.js"],
       "@scribe/process": ["packages/process/index.js"],
