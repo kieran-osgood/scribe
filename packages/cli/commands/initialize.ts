@@ -1,14 +1,11 @@
-import '@effect/platform/Terminal';
-
 import { Command, Options } from '@effect/cli';
+import * as Console from '@scribe/console';
+import * as Constants from '@scribe/constants';
+import * as FS from '@scribe/fs';
+import * as Process from '@scribe/process';
+import { Prompts } from '@scribe/ui';
 import { Effect, Logger, pipe } from 'effect';
 import path from 'path';
-
-import * as Console from '../../console/index.js';
-import * as Constants from '../../constants.js';
-import * as FS from '../../fs/index.js';
-import * as Process from '../../process/index.js';
-import { Prompts } from '../../ui/index.js';
 
 const _verbose = Options.boolean('verbose').pipe(
   Options.withDescription('Sets LogLevel to All (default: false)'),

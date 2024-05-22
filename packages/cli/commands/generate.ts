@@ -1,12 +1,11 @@
 import { Command, Options } from '@effect/cli';
 import { Schema } from '@effect/schema';
+import * as Config from '@scribe/config';
+import * as Console from '@scribe/console';
+import * as FS from '@scribe/fs';
+import { TemplateFile } from '@scribe/renderer';
+import { Prompts } from '@scribe/ui';
 import { Array, Effect, flow, Logger, pipe } from 'effect';
-
-import * as Config from '../../config/index.js';
-import * as Console from '../../console/index.js';
-import * as FS from '../../fs/index.js';
-import { TemplateFile } from '../../renderer/index.js';
-import { Prompts } from '../../ui/index.js';
 
 const _name = Options.text('name').pipe(
   Options.withAlias('n'),
@@ -57,7 +56,7 @@ export const Generate = Command.make(
     pipe(
       Prompts.DirtyGitCheck(),
 
-      Effect.catchTag('GitStatusError', () => Prompts.continueOrQuit),
+      Effect.catchTag('GitStatusError', () => Prompts.ToggleContinueOrQuit),
 
       Effect.flatMap(() =>
         Effect.gen(function* ($) {
@@ -68,12 +67,12 @@ export const Generate = Command.make(
 
           const _template: string = yield* $(
             template,
-            Effect.orElse(() => Prompts.templates(templates)),
+            Effect.orElse(() => Prompts.SelectTemplate(templates)),
           );
 
           const _name = yield* $(
             name,
-            Effect.orElse(() => Prompts.fileName),
+            Effect.orElse(() => Prompts.InputFileName),
           );
 
           const config = yield* $(Config.readConfig(_configPath));

@@ -4,30 +4,32 @@ import * as Constants from '@scribe/constants';
 import * as Git from '@scribe/git';
 import { Console, Effect } from 'effect';
 
-const continueWarning = Prompt.toggle({
+const ToggleContinue = Prompt.toggle({
   message: 'Continue?',
   active: 'yes',
   inactive: 'no',
 });
 
-const continueOrQuit = continueWarning.pipe(
+const ToggleContinueOrQuit = ToggleContinue.pipe(
   Effect.if({
     onTrue: () => Effect.void,
     onFalse: () => Effect.fail(new QuitException()),
   }),
 );
 
-const fileName = Prompt.text({
+const InputFileName = Prompt.text({
   message: 'Name:',
   validate: s =>
-    /^([A-Za-z\-_\d])+$/.test(s)
-      ? Effect.succeed(s)
-      : Effect.fail(
+    Effect.if(/^([A-Za-z\-_\d])+$/.test(s), {
+      onTrue: () => Effect.succeed(s),
+      onFalse: () =>
+        Effect.fail(
           'File name may only include letters, numbers & underscores.',
         ),
+    }),
 });
 
-const templates = (s: string[]) =>
+const SelectTemplate = (s: string[]) =>
   Prompt.select({
     message: 'Template:',
     choices: s.map(_ => ({
@@ -46,16 +48,16 @@ const DirtyGitCheck = () =>
         onFalse: () =>
           Effect.gen(function* ($) {
             yield* $(Console.warn(Constants.WARNINGS.gitWorkingDirectoryDirty));
-            yield* $(Prompts.continueOrQuit);
+            yield* $(Prompts.ToggleContinueOrQuit);
           }),
       }),
     ),
   );
 
 export const Prompts = {
-  continueOrQuit,
-  continueWarning,
-  fileName,
-  templates,
+  ToggleContinueOrQuit,
+  ToggleContinue,
+  InputFileName,
+  SelectTemplate,
   DirtyGitCheck,
 };
