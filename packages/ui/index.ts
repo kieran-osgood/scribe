@@ -1,6 +1,8 @@
 import { Prompt } from '@effect/cli';
 import { QuitException } from '@effect/platform/Terminal';
-import { Effect } from 'effect';
+import * as Constants from '@scribe/constants';
+import * as Git from '@scribe/git';
+import { Console, Effect } from 'effect';
 
 const continueWarning = Prompt.toggle({
   message: 'Continue?',
@@ -36,9 +38,24 @@ const templates = (s: string[]) =>
     })),
   });
 
+const DirtyGitCheck = () =>
+  Git.isWorkingTreeClean().pipe(
+    Effect.flatMap(
+      Effect.if({
+        onTrue: () => Effect.void,
+        onFalse: () =>
+          Effect.gen(function* ($) {
+            yield* $(Console.warn(Constants.WARNINGS.gitWorkingDirectoryDirty));
+            yield* $(Prompts.continueOrQuit);
+          }),
+      }),
+    ),
+  );
+
 export const Prompts = {
   continueOrQuit,
   continueWarning,
   fileName,
   templates,
+  DirtyGitCheck,
 };

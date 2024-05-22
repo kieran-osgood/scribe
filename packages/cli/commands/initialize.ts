@@ -7,7 +7,6 @@ import path from 'path';
 import * as Console from '../../console/index.js';
 import * as Constants from '../../constants.js';
 import * as FS from '../../fs/index.js';
-import * as Git from '../../git/index.js';
 import * as Process from '../../process/index.js';
 import { Prompts } from '../../ui/index.js';
 
@@ -25,38 +24,15 @@ export const Initialize = Command.make(
       Effect.tap(() =>
         Console.logGroup('info', 'Git')('Checking working tree clean'),
       ),
-      Effect.flatMap(() => Git.isWorkingTreeClean()),
-      Effect.flatMap(
-        Effect.if({
-          onTrue: () => Effect.succeed(true),
-          onFalse: () =>
-            Effect.gen(function* ($) {
-              yield* $(
-                Console.warn(Constants.WARNINGS.gitWorkingDirectoryDirty),
-              );
-              return yield* $(Prompts.continueWarning);
-            }),
-        }),
-      ),
 
-      Effect.catchTag('GitStatusError', error =>
-        Console.warn(error.toString()).pipe(
-          Effect.flatMap(() => Prompts.continueWarning),
-        ),
-      ),
+      Effect.flatMap(Prompts.DirtyGitCheck),
 
-      Effect.flatMap(
-        Effect.if({
-          onTrue: () =>
-            pipe(
-              Console.logGroup('info', 'Config')('Checking write path clear'),
-              Effect.flatMap(() => checkConfigWritePathEmpty()),
-              Effect.tap(() => Console.info('Writing...')),
-              Effect.flatMap(copyBaseScribeConfigToPath),
-            ),
-          onFalse: () => Effect.void,
-        }),
+      Effect.tap(() =>
+        Console.logGroup('info', 'Config')('Checking write path clear'),
       ),
+      Effect.flatMap(() => checkConfigWritePathEmpty()),
+      Effect.tap(() => Console.info('Writing...')),
+      Effect.flatMap(copyBaseScribeConfigToPath),
 
       Effect.catchTags({
         '@effect/platform/FileSystem/StatError': error =>
@@ -95,7 +71,11 @@ export const Initialize = Command.make(
           Effect.tap(() => Console.file(fileDescriptor.toString())),
         );
       }),
-      Effect.catchTag('QuitException', () => Effect.void),
+
+      Effect.catchTags({
+        QuitException: () => Effect.void,
+      }),
+
       Logger.withMinimumLogLevel(Console.setLogLevel(verbose)),
     ),
 );

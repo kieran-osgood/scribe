@@ -1,12 +1,10 @@
 import { Command, Options } from '@effect/cli';
 import { Schema } from '@effect/schema';
-import { Array, Effect, flow, Logger, Option, pipe } from 'effect';
+import { Array, Effect, flow, Logger, pipe } from 'effect';
 
 import * as Config from '../../config/index.js';
 import * as Console from '../../console/index.js';
-import { WARNINGS } from '../../constants.js';
 import * as FS from '../../fs/index.js';
-import * as Git from '../../git/index.js';
 import { TemplateFile } from '../../renderer/index.js';
 import { Prompts } from '../../ui/index.js';
 
@@ -57,20 +55,10 @@ export const Generate = Command.make(
   },
   ({ configPath, name, template, verbose }) =>
     pipe(
-      Git.isWorkingTreeClean(),
-      // TODO: add ignore git
-      Effect.flatMap(
-        Effect.if({
-          onTrue: () => Effect.void,
-          onFalse: () =>
-            Effect.gen(function* ($) {
-              yield* $(Console.warn(WARNINGS.gitWorkingDirectoryDirty));
-              return yield* $(Prompts.continueOrQuit);
-            }),
-        }),
-      ),
+      Prompts.DirtyGitCheck(),
 
       Effect.catchTag('GitStatusError', () => Prompts.continueOrQuit),
+
       Effect.flatMap(() =>
         Effect.gen(function* ($) {
           const _configPath = yield* $(FS.createConfigPathAbsolute(configPath));
@@ -78,21 +66,14 @@ export const Generate = Command.make(
             Config.readUserTemplateOptions(_configPath),
           );
 
-          const _template = yield* $(
+          const _template: string = yield* $(
             template,
-            // TODO: orElse
-            Option.match({
-              onSome: Effect.succeed,
-              onNone: () => Prompts.templates(templates),
-            }),
+            Effect.orElse(() => Prompts.templates(templates)),
           );
 
           const _name = yield* $(
             name,
-            Option.match({
-              onSome: Effect.succeed,
-              onNone: () => Prompts.fileName,
-            }),
+            Effect.orElse(() => Prompts.fileName),
           );
 
           const config = yield* $(Config.readConfig(_configPath));
@@ -114,6 +95,7 @@ export const Generate = Command.make(
           Array.join('\n'),
         ),
       ),
+
       Effect.flatMap(_ =>
         Console.successWithSymbol('Success').pipe(
           Effect.tap(() => Console.log(`Output files:\n${_}\n`)),
