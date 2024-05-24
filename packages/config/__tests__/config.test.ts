@@ -1,4 +1,5 @@
-import { Effect, pipe } from 'effect';
+import * as V from '@effect/vitest';
+import { Effect } from 'effect';
 
 import {
   checkForTemplates,
@@ -10,138 +11,116 @@ import { ConfigParseError, CosmicConfigError } from '../error.js';
 
 describe('config', function () {
   // describe('getCosmicExplorer', () => {
-  //   it('should return an instance of Explorer', () => {
+  //   V.it.scoped('should return an instance of Explorer', () => {
   //     const result = getCosmicExplorer();
   //     expect(result).toMatchObject({});
   //   });
   // });
 
   describe('readConfig', () => {
-    it('should return valid config', async () =>
-      pipe(
+    V.it.scoped('should return valid config', () =>
+      Effect.gen(function* ($) {
+        const result = yield* $(
+          readConfig('test/fixtures/config/good-scribe.config.ts'),
+        );
+        expect(result).toMatchSnapshot();
+      }),
+    );
+    describe('should return ConfigParseError ', () => {
+      V.it.scoped('when reads config with invalid syntax', () =>
         Effect.gen(function* ($) {
           const result = yield* $(
-            readConfig('test/fixtures/config/good-scribe.config.ts'),
+            readConfig('test/fixtures/config/bad-syntax-scribe.config.ts'),
+            Effect.flip,
           );
-          expect(result).toMatchSnapshot();
+          expect(result).toBeInstanceOf(ConfigParseError);
         }),
-        Effect.runPromise,
-      ));
-    describe('should return ConfigParseError ', () => {
-      it('when reads config with invalid syntax', async () =>
-        pipe(
-          Effect.gen(function* ($) {
-            const result = yield* $(
-              readConfig('test/fixtures/config/bad-syntax-scribe.config.ts'),
-              Effect.flip,
-            );
-            expect(result).toBeInstanceOf(ConfigParseError);
-          }),
-          Effect.runPromise,
-        ));
+      );
 
-      it('when reads config with missing export', async () =>
-        pipe(
-          Effect.gen(function* ($) {
-            const result = yield* $(
-              readConfig(
-                'test/fixtures/config/missing-export-scribe.config.ts',
-              ),
-              Effect.flip,
-            );
-            expect(result).toBeInstanceOf(ConfigParseError);
-          }),
-          Effect.runPromise,
-        ));
+      V.it.scoped('when reads config with missing export', () =>
+        Effect.gen(function* ($) {
+          const result = yield* $(
+            readConfig('test/fixtures/config/missing-export-scribe.config.ts'),
+            Effect.flip,
+          );
+          expect(result).toBeInstanceOf(ConfigParseError);
+        }),
+      );
     });
 
-    it('should return CosmicConfigError if getCosmicExplorer.load() throws', async () =>
-      pipe(
+    V.it.scoped(
+      'should return CosmicConfigError if getCosmicExplorer.load() throws',
+      () =>
         Effect.gen(function* ($) {
           const result = yield* $(readConfig('bad-path'), Effect.flip);
           expect(result).toBeInstanceOf(CosmicConfigError);
         }),
-        Effect.runPromise,
-      ));
+    );
   });
 
   describe('checkForTemplates', () => {
-    it('should return input if non empty array', async () =>
-      pipe(
-        Effect.gen(function* ($) {
-          const input = [''];
-          const result = yield* $(checkForTemplates(input));
-          expect(result).toBe(input);
-        }),
-        Effect.runPromise,
-      ));
+    V.it.scoped('should return input if non empty array', () =>
+      Effect.gen(function* ($) {
+        const input = [''];
+        const result = yield* $(checkForTemplates(input));
+        expect(result).toBe(input);
+      }),
+    );
 
-    it('should return CosmicConfigError if empty array', async () =>
-      pipe(
-        Effect.gen(function* ($) {
-          const result = yield* $(checkForTemplates([]), Effect.flip);
-          expect(result).toBeInstanceOf(CosmicConfigError);
-        }),
-        Effect.runPromise,
-      ));
+    V.it.scoped('should return CosmicConfigError if empty array', () =>
+      Effect.gen(function* ($) {
+        const result = yield* $(checkForTemplates([]), Effect.flip);
+        expect(result).toBeInstanceOf(CosmicConfigError);
+      }),
+    );
   });
 
   describe('readUserTemplateOptions', () => {
-    it('should return the keys from config.template', async () =>
-      pipe(
-        Effect.gen(function* ($) {
-          const result = yield* $(
-            readUserTemplateOptions(
-              'test/fixtures/config/good-scribe.config.ts',
-            ),
-          );
-          expect(result).toEqual(
-            expect.arrayContaining(['screen', 'component']),
-          );
-        }),
-        Effect.runPromise,
-      ));
+    V.it.scoped('should return the keys from config.template', () =>
+      Effect.gen(function* ($) {
+        const result = yield* $(
+          readUserTemplateOptions('test/fixtures/config/good-scribe.config.ts'),
+        );
+        expect(result).toEqual(expect.arrayContaining(['screen', 'component']));
+      }),
+    );
   });
 
   describe('extractConfig', () => {
-    it('should return config if isEmpty false', async () =>
-      pipe(
-        Effect.gen(function* ($) {
-          const result = yield* $(
-            mapCosmicConfig({
-              isEmpty: false,
-              config: 'abc',
-              filepath: '',
-            }),
-          );
-          expect(result).toEqual('abc');
-        }),
-        Effect.runPromise,
-      ));
+    V.it.scoped('should return config if isEmpty false', () =>
+      Effect.gen(function* ($) {
+        const result = yield* $(
+          mapCosmicConfig({
+            isEmpty: false,
+            config: 'abc',
+            filepath: '',
+          }),
+        );
+        expect(result).toEqual('abc');
+      }),
+    );
 
-    it('should return CosmicConfigError if isEmpty true', async () =>
-      pipe(
-        Effect.gen(function* ($) {
-          const result = yield* $(
-            mapCosmicConfig({
-              isEmpty: true,
-              config: {},
-              filepath: '',
-            }),
-            Effect.flip,
-          );
-          expect(result).toBeInstanceOf(CosmicConfigError);
-        }),
-        Effect.runPromise,
-      ));
+    V.it.scoped('should return CosmicConfigError if isEmpty true', () =>
+      Effect.gen(function* ($) {
+        const result = yield* $(
+          mapCosmicConfig({
+            isEmpty: true,
+            config: {},
+            filepath: '',
+          }),
+          Effect.flip,
+        );
+        expect(result).toBeInstanceOf(CosmicConfigError);
+      }),
+    );
 
-    it('should return CosmicConfigError if CosmicConfigResult was null', async () =>
-      pipe(
+    V.it.scoped(
+      'should return CosmicConfigError if CosmicConfigResult was null',
+      () =>
         Effect.gen(function* ($) {
           const result = yield* $(mapCosmicConfig(null), Effect.flip);
           expect(result).toBeInstanceOf(CosmicConfigError);
         }),
-        Effect.runPromise,
-      ));
+    );
   });
 });

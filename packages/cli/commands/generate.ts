@@ -1,4 +1,4 @@
-import { Command, Options } from '@effect/cli';
+import { Command } from '@effect/cli';
 import { Schema } from '@effect/schema';
 import * as Config from '@scribe/config';
 import * as Console from '@scribe/console';
@@ -7,35 +7,21 @@ import { TemplateFile } from '@scribe/renderer';
 import { Prompts } from '@scribe/ui';
 import { Array, Effect, flow, Logger, pipe } from 'effect';
 
-const _name = Options.text('name').pipe(
-  Options.withAlias('n'),
-  Options.withDescription('The key of templates to generate.'),
-  Options.optional,
-);
+import {
+  ConfigPath,
+  CwdOverride,
+  Template,
+  TemplateName,
+  VerboseLogging,
+} from '../arguments.js';
 
-const _template = Options.text('template').pipe(
-  Options.withAlias('t'),
-  Options.withDescription(
-    'Specify the name of the template to generate. Must be a key under templates in config.',
-  ),
-  Options.optional,
-);
-
-const _config = Options.text('config').pipe(
-  Options.withAlias('c'),
-  Options.withDescription('Path to the config (default: scribe.config.ts)'),
-  Options.withDefault('scribe.config.ts'),
-);
-
-const _cwd = Options.text('cwd').pipe(
-  Options.withDescription('Override the cwd (default: process.cwd()'),
-  Options.withDefault(process.cwd()),
-);
-
-const _verbose = Options.boolean('verbose').pipe(
-  Options.withDescription('Sets LogLevel to All (default: false)'),
-  Options.withDefault(false),
-);
+const args = {
+  configPath: ConfigPath,
+  name: TemplateName,
+  template: Template,
+  cwd: CwdOverride,
+  verbose: VerboseLogging,
+} satisfies Command.Command.Config;
 
 type ConfigContext = {
   readonly name: string;
@@ -45,13 +31,7 @@ type ConfigContext = {
 };
 export const Generate = Command.make(
   'scribe',
-  {
-    configPath: _config,
-    name: _name,
-    template: _template,
-    cwd: _cwd,
-    verbose: _verbose,
-  },
+  args,
   ({ configPath, name, template, verbose }) =>
     pipe(
       Prompts.DirtyGitCheck(),

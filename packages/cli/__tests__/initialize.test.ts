@@ -1,3 +1,4 @@
+import * as V from '@effect/vitest';
 import { Array, Effect, Fiber } from 'effect';
 import fs from 'fs';
 import path from 'path';
@@ -10,23 +11,25 @@ import { readConfig } from '../../config/index.js';
 import * as Cli from '../cli.js';
 
 describe('[Given] Git Clean', () => {
-  it('[When] user accepts [Then] create schema compatible file', async () => {
-    const cwd = createMinimalProject({
-      git: { dirty: false, init: true },
-      fixtures: { configFile: false, templateFiles: false },
-    });
+  V.it.scoped(
+    '[When] user accepts [Then] create schema compatible file',
+    ({ expect }) => {
+      const cwd = createMinimalProject({
+        git: { dirty: false, init: true },
+        fixtures: { configFile: false, templateFiles: false },
+      });
 
-    return Effect.gen(function* ($) {
-      const args = Array.make('', '', 'init');
-      const fiber = yield* $(Effect.fork(Cli.run(args)));
+      return Effect.gen(function* ($) {
+        const args = Array.make('', '', 'init');
+        const fiber = yield* $(Effect.fork(Cli.run(args)));
 
-      yield* $(MockTerminal.inputKey('left'));
-      yield* $(MockTerminal.inputKey('enter'));
+        yield* $(MockTerminal.inputKey('left'));
+        yield* $(MockTerminal.inputKey('enter'));
 
-      yield* $(Fiber.join(fiber));
+        yield* $(Fiber.join(fiber));
 
-      const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-      expect(lines).toMatchInlineSnapshot(`
+        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        expect(lines).toMatchInlineSnapshot(`
         [
           "                                Init                               ",
           " Git ",
@@ -40,19 +43,20 @@ describe('[Given] Git Clean', () => {
           "📁 file://${cwd}/scribe.config.ts",
         ]
       `);
-      const configPath = path.join(cwd, `scribe.config.ts`);
-      const configTxt = fs.readFileSync(configPath).toString();
-      expect(configTxt).toMatchSnapshot();
+        const configPath = path.join(cwd, `scribe.config.ts`);
+        const configTxt = fs.readFileSync(configPath).toString();
+        expect(configTxt).toMatchSnapshot();
 
-      const result = yield* $(readConfig(configPath));
-      expect(result).toEqual({
-        options: { rootOutDir: '.', templatesDirectories: ['.'] },
-        templates: {},
-      });
-    }).pipe(runEffect(cwd));
-  });
+        const result = yield* $(readConfig(configPath));
+        expect(result).toEqual({
+          options: { rootOutDir: '.', templatesDirectories: ['.'] },
+          templates: {},
+        });
+      }).pipe(runEffect(cwd));
+    },
+  );
 
-  it('[When] filepath full [then] print failure', async () => {
+  V.it.scoped('[When] filepath full [then] print failure', ({ expect }) => {
     const cwd = createMinimalProject();
 
     return Effect.gen(function* ($) {
@@ -85,7 +89,7 @@ describe('[Given] Git Clean', () => {
 
 describe('[Given] Git dirty', () => {
   describe('[Then] prompt user to continue', () => {
-    it('[When] user accepts [Then] create file', async () => {
+    V.it.scoped('[When] user accepts [Then] create file', ({ expect }) => {
       const cwd = createMinimalProject({
         git: { dirty: true, init: true },
         fixtures: { configFile: false, templateFiles: false },
@@ -125,22 +129,24 @@ describe('[Given] Git dirty', () => {
       }).pipe(runEffect(cwd));
     });
 
-    it('[When] user declines [Then] abort without writing', async () => {
-      const cwd = createMinimalProject({
-        git: { dirty: true, init: true },
-        fixtures: { configFile: false, templateFiles: false },
-      });
+    V.it.scoped(
+      '[When] user declines [Then] abort without writing',
+      ({ expect }) => {
+        const cwd = createMinimalProject({
+          git: { dirty: true, init: true },
+          fixtures: { configFile: false, templateFiles: false },
+        });
 
-      return Effect.gen(function* ($) {
-        const args = Array.make('', '', 'init');
-        const fiber = yield* $(Effect.fork(Cli.run(args)));
+        return Effect.gen(function* ($) {
+          const args = Array.make('', '', 'init');
+          const fiber = yield* $(Effect.fork(Cli.run(args)));
 
-        yield* $(MockTerminal.inputKey('enter'));
+          yield* $(MockTerminal.inputKey('enter'));
 
-        yield* $(Fiber.join(fiber));
+          yield* $(Fiber.join(fiber));
 
-        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-        expect(lines).toMatchInlineSnapshot(`
+          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+          expect(lines).toMatchInlineSnapshot(`
             [
               "                                Init                               ",
               " Git ",
@@ -154,24 +160,23 @@ describe('[Given] Git dirty', () => {
             ]
           `);
 
-        expect(() =>
-          fs.readFileSync(`${cwd}/scribe.config.ts`),
-        ).toThrowErrorMatchingInlineSnapshot(
-          `[Error: ENOENT: no such file or directory, open '${cwd}/scribe.config.ts']`,
-        );
-      }).pipe(runEffect(cwd));
-    });
+          expect(() =>
+            fs.readFileSync(`${cwd}/scribe.config.ts`),
+          ).toThrowErrorMatchingInlineSnapshot(
+            `[Error: ENOENT: no such file or directory, open '${cwd}/scribe.config.ts']`,
+          );
+        }).pipe(runEffect(cwd));
+      },
+    );
   });
 });
 
-it('[Given] --help flag [Then] print help information', async () => {
+V.it.scoped('[Given] --help flag [Then] print help information', () => {
   const cwd = createMinimalProject();
 
   return Effect.gen(function* ($) {
     const args = Array.make('', '', 'init', '--help');
-    const fiber = yield* $(Effect.fork(Cli.run(args)));
-
-    yield* $(Fiber.join(fiber));
+    yield* $(Cli.run(args));
 
     const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
     expect(lines).toMatchInlineSnapshot(`

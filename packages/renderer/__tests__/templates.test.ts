@@ -1,4 +1,5 @@
-import { Array, Effect, pipe } from 'effect';
+import * as V from '@effect/vitest';
+import { Array, Effect } from 'effect';
 import * as memfs from 'memfs';
 import { vol } from 'memfs';
 import path from 'path';
@@ -14,7 +15,7 @@ import {
 } from '../template-file.js';
 
 beforeEach(() => {
-  vi.restoreAllMocks();
+  V.vitest.restoreAllMocks();
 });
 
 const screenFileContents = `describe('{{Name}}', function() {
@@ -78,61 +79,59 @@ const templateOutput = {
 };
 
 describe('writeTemplate', () => {
-  it('should write file', async () =>
-    pipe(
-      Effect.gen(function* ($) {
-        const ctx = {
-          fileContents,
-          output: templateOutput,
-          ..._ctx,
-        } satisfies WriteTemplateCtx;
-        const result = yield* $(writeTemplate(ctx));
-        const _process = yield* $(Process.Process);
-        expect(result).toBe(
-          path.join(_process.cwd(), '/test/fixtures/config/login.ts'),
-        );
+  V.it.scoped('should write file', () =>
+    Effect.gen(function* ($) {
+      const ctx = {
+        fileContents,
+        output: templateOutput,
+        ..._ctx,
+      } satisfies WriteTemplateCtx;
+      const result = yield* $(writeTemplate(ctx));
+      const _process = yield* $(Process.Process);
+      expect(result).toBe(
+        path.join(_process.cwd(), '/test/fixtures/config/login.ts'),
+      );
 
-        const readResult = yield* $(
-          FS.readFile('test/fixtures/config/login.ts', null),
-        );
-        expect(String(readResult)).toBe(fileContents);
-      }),
+      const readResult = yield* $(
+        FS.readFile('test/fixtures/config/login.ts', null),
+      );
+      expect(String(readResult)).toBe(fileContents);
+    }).pipe(
       Effect.provideService(FS.FS, FS.FSMock),
       // TODO: ProcessLive in use?
       Effect.provideService(Process.Process, Process.ProcessLive),
-      Effect.runPromise,
-    ));
+    ),
+  );
 });
 
 describe('constructTemplate', () => {
-  it('should return fileContents formatted with variables', async () =>
-    pipe(
-      Effect.gen(function* ($) {
-        const ctx = {
+  V.it.scoped('should return fileContents formatted with variables', () =>
+    Effect.gen(function* ($) {
+      const ctx = {
+        output: {
+          templateFileKey: 'screen',
           output: {
-            templateFileKey: 'screen',
-            output: {
-              fileName: '{{Name}}.ts', // good-scribe
-              directory: '',
-            },
+            fileName: '{{Name}}.ts', // good-scribe
+            directory: '',
           },
-          ..._ctx,
-        } satisfies ConstructTemplateCtx;
+        },
+        ..._ctx,
+      } satisfies ConstructTemplateCtx;
 
-        yield* $(
-          FS.writeFileWithDir(
-            path.join(process.cwd(), './test/fixtures/screen.scribe'),
-            screenFileContents,
-            null,
-          ),
-        );
+      yield* $(
+        FS.writeFileWithDir(
+          path.join(process.cwd(), './test/fixtures/screen.scribe'),
+          screenFileContents,
+          null,
+        ),
+      );
 
-        const result = yield* $(
-          constructTemplate(ctx),
-          Effect.map(Array.map(_ => _.fileContents)),
-        );
+      const result = yield* $(
+        constructTemplate(ctx),
+        Effect.map(Array.map(_ => _.fileContents)),
+      );
 
-        expect(result).toMatchInlineSnapshot(`
+      expect(result).toMatchInlineSnapshot(`
           [
             "describe('login', function() {
             it('should ', function() {
@@ -141,38 +140,37 @@ describe('constructTemplate', () => {
           });",
           ]
         `);
-      }),
+    }).pipe(
       Effect.provideService(FS.FS, FS.FSMock),
       Effect.provideService(Process.Process, Process.ProcessLive),
-      Effect.runPromise,
-    ));
+    ),
+  );
 
-  it('should check process root dir for templates', async () =>
-    pipe(
-      Effect.gen(function* ($) {
-        const ctx = {
-          ..._ctx,
+  V.it.scoped('should check process root dir for templates', () =>
+    Effect.gen(function* ($) {
+      const ctx = {
+        ..._ctx,
+        output: {
+          templateFileKey: 'screen',
           output: {
-            templateFileKey: 'screen',
-            output: {
-              fileName: '{{Name}}.ts',
-              directory: '',
-            },
+            fileName: '{{Name}}.ts',
+            directory: '',
           },
-          config: {
-            templates: _ctx.config.templates,
-          },
-        } satisfies ConstructTemplateCtx;
+        },
+        config: {
+          templates: _ctx.config.templates,
+        },
+      } satisfies ConstructTemplateCtx;
 
-        const rootDirScribePath = path.join(process.cwd(), '', 'screen.scribe');
-        memfs.vol.writeFileSync(rootDirScribePath, screenFileContents);
+      const rootDirScribePath = path.join(process.cwd(), '', 'screen.scribe');
+      memfs.vol.writeFileSync(rootDirScribePath, screenFileContents);
 
-        const result = yield* $(
-          constructTemplate(ctx),
-          Effect.map(Array.map(_ => _.fileContents)),
-        );
+      const result = yield* $(
+        constructTemplate(ctx),
+        Effect.map(Array.map(_ => _.fileContents)),
+      );
 
-        expect(result).toMatchInlineSnapshot(`
+      expect(result).toMatchInlineSnapshot(`
           [
             "describe('login', function() {
             it('should ', function() {
@@ -181,32 +179,31 @@ describe('constructTemplate', () => {
           });",
           ]
         `);
-      }),
+    }).pipe(
       Effect.provideService(FS.FS, FS.FSMock),
       Effect.provideService(Process.Process, Process.ProcessLive),
-      Effect.runPromise,
-    ));
+    ),
+  );
 
-  it("should throw if scribe file isn't readable", async () =>
-    pipe(
-      Effect.gen(function* ($) {
-        const ctx = {
+  V.it.scoped("should throw if scribe file isn't readable", () =>
+    Effect.gen(function* ($) {
+      const ctx = {
+        output: {
+          templateFileKey: 'BADKEY',
           output: {
-            templateFileKey: 'BADKEY',
-            output: {
-              fileName: '', // good-scribe
-              directory: '',
-            },
+            fileName: '', // good-scribe
+            directory: '',
           },
-          ..._ctx,
-        } satisfies ConstructTemplateCtx;
+        },
+        ..._ctx,
+      } satisfies ConstructTemplateCtx;
 
-        const result = yield* $(constructTemplate(ctx), Effect.flip);
+      const result = yield* $(constructTemplate(ctx), Effect.flip);
 
-        expect(result).toBeInstanceOf(FS.ReadFileError);
-      }),
+      expect(result).toBeInstanceOf(FS.ReadFileError);
+    }).pipe(
       Effect.provideService(FS.FS, FS.FSMock),
       Effect.provideService(Process.Process, Process.ProcessLive),
-      Effect.runPromise,
-    ));
+    ),
+  );
 });

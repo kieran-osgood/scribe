@@ -1,4 +1,4 @@
-import { Command, Options } from '@effect/cli';
+import { Command } from '@effect/cli';
 import * as Console from '@scribe/console';
 import * as Constants from '@scribe/constants';
 import * as FS from '@scribe/fs';
@@ -7,74 +7,69 @@ import { Prompts } from '@scribe/ui';
 import { Effect, Logger, pipe } from 'effect';
 import path from 'path';
 
-const _verbose = Options.boolean('verbose').pipe(
-  Options.withDescription('Sets LogLevel to All (default: false)'),
-  Options.withDefault(false),
-);
+import { VerboseLogging } from '../arguments.js';
 
-export const Initialize = Command.make(
-  'init',
-  { verbose: _verbose },
-  ({ verbose }) =>
-    pipe(
-      Console.header(`Init`),
-      Effect.tap(() =>
-        Console.logGroup('info', 'Git')('Checking working tree clean'),
-      ),
+const args = {
+  verbose: VerboseLogging,
+} satisfies Command.Command.Config;
 
-      Effect.flatMap(Prompts.DirtyGitCheck),
-
-      Effect.tap(() =>
-        Console.logGroup('info', 'Config')('Checking write path clear'),
-      ),
-      Effect.flatMap(() => checkConfigWritePathEmpty()),
-      Effect.tap(() => Console.info('Writing...')),
-      Effect.flatMap(copyBaseScribeConfigToPath),
-
-      Effect.catchTags({
-        '@effect/platform/FileSystem/StatError': error =>
-          pipe(
-            Console.logGroup(
-              'error',
-              'Fail',
-            )('Failed to create config. Path not empty.'),
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-            Effect.tap(() =>
-              Console.file(error.error.path?.toString() ?? 'Bad path'),
-            ),
-          ),
-        '@effect/platform/FileSystem/FileExistsError': error =>
-          pipe(
-            Console.logGroup(
-              'error',
-              'Fail',
-            )('Failed to create config. Path not empty.'),
-            Effect.tap(() => Console.file(error.error.path.toString())),
-          ),
-      }),
-
-      Effect.flatMap(fileDescriptor => {
-        if (!fileDescriptor) {
-          return Effect.void;
-        }
-
-        return Console.logGroup(`success`, 'Success')().pipe(
-          Effect.tap(() =>
-            Console.successWithSymbol(
-              'Scribe init complete. Edit the config to begin templating.',
-            ),
-          ),
-          // eslint-disable-next-line @typescript-eslint/no-base-to-string
-          Effect.tap(() => Console.file(fileDescriptor.toString())),
-        );
-      }),
-
-      Effect.catchTags({
-        QuitException: () => Effect.void,
-      }),
-
-      Logger.withMinimumLogLevel(Console.setLogLevel(verbose)),
+export const Initialize = Command.make('init', args, ({ verbose }) =>
+  pipe(
+    Console.header(`Init`),
+    Effect.tap(() =>
+      Console.logGroup('info', 'Git')('Checking working tree clean'),
     ),
+
+    Effect.flatMap(Prompts.DirtyGitCheck),
+
+    Effect.tap(() =>
+      Console.logGroup('info', 'Config')('Checking write path clear'),
+    ),
+    Effect.flatMap(() => checkConfigWritePathEmpty()),
+    Effect.tap(() => Console.info('Writing...')),
+    Effect.flatMap(copyBaseScribeConfigToPath),
+
+    Effect.flatMap(fileDescriptor => {
+      if (!fileDescriptor) {
+        return Effect.void;
+      }
+
+      return Console.logGroup(`success`, 'Success')().pipe(
+        Effect.tap(() =>
+          Console.successWithSymbol(
+            'Scribe init complete. Edit the config to begin templating.',
+          ),
+        ),
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
+        Effect.tap(() => Console.file(fileDescriptor.toString())),
+      );
+    }),
+
+    Effect.catchTags({
+      '@effect/platform/FileSystem/StatError': error =>
+        Console.logGroup(
+          'error',
+          'Fail',
+        )('Failed to create config. Path not empty.').pipe(
+          Effect.tap(() =>
+            Console.file(error.error.path?.toString() ?? 'Bad path'),
+          ),
+        ),
+      '@effect/platform/FileSystem/FileExistsError': error =>
+        Console.logGroup(
+          'error',
+          'Fail',
+        )('Failed to create config. Path not empty.').pipe(
+          Effect.tap(() => Console.file(error.error.path.toString())),
+        ),
+    }),
+
+    Effect.catchTags({
+      QuitException: () => Effect.void,
+    }),
+
+    Logger.withMinimumLogLevel(Console.setLogLevel(verbose)),
+  ),
 );
 
 const createConfigPath = (_process: Process.Process) =>

@@ -1,3 +1,4 @@
+import * as V from '@effect/vitest';
 import * as Process from '@scribe/process';
 import { Effect } from 'effect';
 import { beforeEach, vi } from 'vitest';
@@ -26,21 +27,22 @@ afterEach(() => {
 
 describe('Git', () => {
   describe('[Given] checkWorkingTreeClean()', () => {
-    it('[When] simple-git created on non-existent directory [Then] return error', async () => {
-      return Effect.gen(function* ($) {
-        const result = yield* $(isWorkingTreeClean(), Effect.flip);
-        expect(result).toBeInstanceOf(SimpleGitError);
-      }).pipe(
-        Effect.provideService(
-          Process.Process,
-          Process.getMock('/non-existent-directory'),
+    V.it.scoped(
+      '[When] simple-git created on non-existent directory [Then] return error',
+      () =>
+        Effect.gen(function* ($) {
+          const result = yield* $(isWorkingTreeClean(), Effect.flip);
+          expect(result).toBeInstanceOf(SimpleGitError);
+        }).pipe(
+          Effect.provideService(
+            Process.Process,
+            Process.getMock('/non-existent-directory'),
+          ),
         ),
-        Effect.runPromise,
-      );
-    });
+    );
 
     describe('[Given] Within a git repository', () => {
-      it('[When] .isClean() === true [Then] return true', async () => {
+      V.it.scoped('[When] .isClean() === true [Then] return true', () => {
         const cwd = createMinimalProject({
           git: { init: true, dirty: false },
         });
@@ -48,14 +50,11 @@ describe('Git', () => {
         return Effect.gen(function* ($) {
           const result = yield* $(isWorkingTreeClean());
           expect(result).toBe(true);
-        }).pipe(
-          Effect.provideService(Process.Process, Process.getMock(cwd)),
-          Effect.runPromise,
-        );
+        }).pipe(Effect.provideService(Process.Process, Process.getMock(cwd)));
       });
 
       // TODO: handle accepting or rejecting continue on dirty
-      it('[When] .isClean() === false [Then] return false', async () => {
+      V.it.scoped('[When] .isClean() === false [Then] return false', () => {
         const cwd = createMinimalProject({
           git: { init: true, dirty: true },
         });
@@ -63,32 +62,29 @@ describe('Git', () => {
         return Effect.gen(function* ($) {
           const result = yield* $(isWorkingTreeClean());
           expect(result).toBe(false);
-        }).pipe(
-          Effect.provideService(Process.Process, Process.getMock(cwd)),
-          Effect.runPromise,
-        );
+        }).pipe(Effect.provideService(Process.Process, Process.getMock(cwd)));
       });
     });
 
-    it('[When] No Git repository [Then] returns GitStatusError', async () => {
-      const cwd = createMinimalProject({
-        git: { init: false, dirty: false },
-      });
+    V.it.scoped(
+      '[When] No Git repository [Then] returns GitStatusError',
+      () => {
+        const cwd = createMinimalProject({
+          git: { init: false, dirty: false },
+        });
 
-      return Effect.gen(function* ($) {
-        const result = yield* $(isWorkingTreeClean(), Effect.flip);
-        expect(result).toBeInstanceOf(GitStatusError);
+        return Effect.gen(function* ($) {
+          const result = yield* $(isWorkingTreeClean(), Effect.flip);
+          expect(result).toBeInstanceOf(GitStatusError);
 
-        expect(result.error?.message).toMatchInlineSnapshot(
-          `
+          expect(result.error?.message).toMatchInlineSnapshot(
+            `
             "fatal: not a git repository (or any of the parent directories): .git
             "
           `,
-        );
-      }).pipe(
-        Effect.provideService(Process.Process, Process.getMock(cwd)),
-        Effect.runPromise,
-      );
-    });
+          );
+        }).pipe(Effect.provideService(Process.Process, Process.getMock(cwd)));
+      },
+    );
   });
 });

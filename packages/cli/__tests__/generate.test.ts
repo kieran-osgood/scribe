@@ -1,3 +1,4 @@
+import * as V from '@effect/vitest';
 import { Effect, Fiber } from 'effect';
 import fs from 'fs';
 import path from 'path';
@@ -14,13 +15,12 @@ import * as Cli from '../cli.js';
 
 describe('[Given] Git clean', () => {
   describe('[When] `--config` passed in & fully interactive session', () => {
-    it('[Then] creates two files', async () => {
+    V.it.scoped('[Then] creates two files', ({ expect }) => {
       const cwd = createMinimalProject({
         git: { init: true, dirty: false },
         fixtures: { templateFiles: true, configFile: true },
       });
       const configPath = path.join(cwd, configFlag);
-
       return Effect.gen(function* ($) {
         const fiber = yield* $(
           Effect.fork(Cli.run(['', '', `--config=${configPath}`])),
@@ -78,7 +78,7 @@ describe('[Given] Git clean', () => {
   });
 
   describe('[When] `--name` passed in', () => {
-    it('[Then] creates two files', async () => {
+    V.it.scoped('[Then] creates two files', ({ expect }) => {
       const cwd = createMinimalProject({
         git: { init: true, dirty: false },
         fixtures: { templateFiles: true, configFile: true },
@@ -130,7 +130,7 @@ describe('[Given] Git clean', () => {
   });
 
   describe('[When] `--template` passed in', () => {
-    it('[Then] creates two files', async () => {
+    V.it.scoped('[Then] creates two files', ({ expect }) => {
       const cwd = createMinimalProject({
         git: { init: true, dirty: false },
         fixtures: { templateFiles: true, configFile: true },
@@ -184,7 +184,7 @@ describe('[Given] Git clean', () => {
   });
 
   describe('[Given] `--config --template --name passed` in', () => {
-    it('[Then] creates two files', async () => {
+    V.it.scoped('[Then] creates two files', ({ expect }) => {
       const cwd = createMinimalProject({
         git: { init: true, dirty: false },
         fixtures: { templateFiles: true, configFile: true },
@@ -234,7 +234,7 @@ describe('[Given] Git clean', () => {
 
 describe('[Given] Git Dirty', function () {
   describe('[Given] prompts to continue', () => {
-    it('[Then] user answers `y`, creates two files', async () => {
+    V.it.scoped('[Then] user answers `y`, creates two files', ({ expect }) => {
       const cwd = createMinimalProject({
         git: { init: true, dirty: true },
         fixtures: { configFile: true, templateFiles: true },
@@ -290,32 +290,34 @@ describe('[Given] Git Dirty', function () {
       }).pipe(runEffect(cwd));
     });
 
-    it('[Then] user answers `n`, cli aborts without writing file', async () => {
-      const cwd = createMinimalProject({
-        git: { init: true, dirty: true },
-        fixtures: { configFile: true, templateFiles: true },
-      });
-      const configPath = path.join(cwd, configFlag);
+    V.it.scoped(
+      '[Then] user answers `n`, cli aborts without writing file',
+      ({ expect }) => {
+        const cwd = createMinimalProject({
+          git: { init: true, dirty: true },
+          fixtures: { configFile: true, templateFiles: true },
+        });
+        const configPath = path.join(cwd, configFlag);
 
-      return Effect.gen(function* ($) {
-        const fiber = yield* $(
-          Effect.fork(
-            Cli.run([
-              '',
-              '',
-              `--config=${configPath}`,
-              '--name=Login',
-              '--template=screen',
-            ]),
-          ),
-        );
+        return Effect.gen(function* ($) {
+          const fiber = yield* $(
+            Effect.fork(
+              Cli.run([
+                '',
+                '',
+                `--config=${configPath}`,
+                '--name=Login',
+                '--template=screen',
+              ]),
+            ),
+          );
 
-        yield* $(MockTerminal.inputKey('enter'));
+          yield* $(MockTerminal.inputKey('enter'));
 
-        yield* $(Fiber.join(fiber));
+          yield* $(Fiber.join(fiber));
 
-        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-        expect(lines).toMatchInlineSnapshot(`
+          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+          expect(lines).toMatchInlineSnapshot(`
             [
               "Git working tree dirty - proceed with caution.
             Recommendation: commit all changes before proceeding.",
@@ -326,14 +328,15 @@ describe('[Given] Git Dirty', function () {
               "Exiting...",
             ]
           `);
-      }).pipe(runEffect(cwd));
-    });
+        }).pipe(runEffect(cwd));
+      },
+    );
   });
 });
 
 describe('[Given] *Not* Git', function () {
   describe('[Given] prompts to continue', () => {
-    it('[Then] user answers y, creates two files', async () => {
+    V.it.scoped('[Then] user answers y, creates two files', ({ expect }) => {
       const cwd = createMinimalProject({
         git: { init: false, dirty: false },
         fixtures: { configFile: true, templateFiles: true },
@@ -377,32 +380,34 @@ describe('[Given] *Not* Git', function () {
       }).pipe(runEffect(cwd));
     });
 
-    it('[Then] user answers `n`, cli aborts without writing file', async () => {
-      const cwd = createMinimalProject({
-        git: { init: false, dirty: false },
-        fixtures: { configFile: true, templateFiles: true },
-      });
-      const configPath = path.join(cwd, configFlag);
-      return Effect.gen(function* ($) {
-        const fiber = yield* $(
-          Effect.fork(
-            Cli.run([
-              '',
-              '',
-              `--config=${configPath}`,
-              '--name=Login',
-              '--template=screen',
-            ]),
-          ),
-        );
+    V.it.scoped(
+      '[Then] user answers `n`, cli aborts without writing file',
+      ({ expect }) => {
+        const cwd = createMinimalProject({
+          git: { init: false, dirty: false },
+          fixtures: { configFile: true, templateFiles: true },
+        });
+        const configPath = path.join(cwd, configFlag);
+        return Effect.gen(function* ($) {
+          const fiber = yield* $(
+            Effect.fork(
+              Cli.run([
+                '',
+                '',
+                `--config=${configPath}`,
+                '--name=Login',
+                '--template=screen',
+              ]),
+            ),
+          );
 
-        yield* $(MockTerminal.inputKey('enter'));
+          yield* $(MockTerminal.inputKey('enter'));
 
-        yield* $(Fiber.join(fiber));
+          yield* $(Fiber.join(fiber));
 
-        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
 
-        expect(lines).toMatchInlineSnapshot(`
+          expect(lines).toMatchInlineSnapshot(`
             [
               "? Continue? › yes / no",
               "✔ Continue? … yes / no
@@ -411,19 +416,22 @@ describe('[Given] *Not* Git', function () {
               "Exiting...",
             ]
           `);
-      }).pipe(runEffect(cwd));
-    });
+        }).pipe(runEffect(cwd));
+      },
+    );
   });
 });
 
-it('[Given] --help flag [Then] print help information', async () => {
-  const cwd = createMinimalProject();
+V.it.scoped(
+  '[Given] --help flag [Then] print help information',
+  ({ expect }) => {
+    const cwd = createMinimalProject();
 
-  return Effect.gen(function* ($) {
-    const fiber = yield* $(Effect.fork(Cli.run(['', '', '--help'])));
-    yield* $(Fiber.join(fiber));
-    const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-    expect(lines).toMatchInlineSnapshot(`
+    return Effect.gen(function* ($) {
+      const fiber = yield* $(Effect.fork(Cli.run(['', '', '--help'])));
+      yield* $(Fiber.join(fiber));
+      const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+      expect(lines).toMatchInlineSnapshot(`
         [
           "Scribe
 
@@ -515,5 +523,6 @@ it('[Given] --help flag [Then] print help information', async () => {
         ",
         ]
       `);
-  }).pipe(runEffect(cwd));
-});
+    }).pipe(runEffect(cwd));
+  },
+);

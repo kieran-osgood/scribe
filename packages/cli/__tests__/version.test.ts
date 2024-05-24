@@ -1,5 +1,5 @@
+import * as V from '@effect/vitest';
 import { Array, Effect, Fiber } from 'effect';
-import { describe } from 'vitest';
 
 import packageJson from '../../../package.json';
 import * as MockConsole from '../../../test/mock-console.js';
@@ -7,20 +7,20 @@ import { runEffect } from '../../../test/utils.js';
 import * as Cli from '../cli.js';
 
 describe('VersionCommand', () => {
-  it('[Given] --version flag [Then] print version from package.json', async () => {
-    return Effect.gen(function* ($) {
-      const args = Array.make('', '', '--version');
-      const fiber = yield* $(Effect.fork(Cli.run(args)));
+  V.it.scoped(
+    '[Given] --version flag [Then] print version from package.json',
+    () => {
+      return Effect.gen(function* ($) {
+        const args = Array.make('', '', '--version');
+        const fiber = yield* $(Effect.fork(Cli.run(args)));
 
-      yield* $(Fiber.join(fiber));
+        yield* $(Fiber.join(fiber));
 
-      const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
-      expect(lines).toMatchInlineSnapshot(`
-        [
-          "${packageJson.version}
-        ",
-        ]
-      `);
-    }).pipe(runEffect(''));
-  });
+        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+
+        expect(lines).toHaveLength(1);
+        expect(lines[0]).toContain(packageJson.version);
+      }).pipe(runEffect(''));
+    },
+  );
 });

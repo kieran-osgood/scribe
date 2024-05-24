@@ -1,3 +1,4 @@
+import * as V from '@effect/vitest';
 import {
   Console as EffectConsole,
   Effect,
@@ -14,12 +15,8 @@ export const MainLive = Effect.gen(function* ($) {
   return Layer.mergeAll(EffectConsole.setConsole(_console));
 }).pipe(Layer.unwrapEffect);
 
-export const runEffect = async <A, E>(self: Effect.Effect<A, E>): Promise<A> =>
-  Effect.provide(self, MainLive).pipe(
-    // TODO: test different loglevels
-    // Logger.withMinimumLogLevel(LogLevel.All),
-    Effect.runPromise,
-  );
+export const runEffect = <A, E>(self: Effect.Effect<A, E>) =>
+  Effect.provide(self, MainLive);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type Colors = typeof import('../../../packages/console/colors.ts');
@@ -29,8 +26,8 @@ describe('Console', () => {
    * Tests for all the colors in this map
    * @see {@link Colors.logColors logColors}
    */
-  it('should print statements with colors', async () => {
-    return Effect.gen(function* ($) {
+  V.it.scoped('should print statements with colors', () =>
+    Effect.gen(function* ($) {
       yield* $(Console.debug('debugs are cyan'));
       yield* $(Console.log('logs are plain'));
       yield* $(Console.info('infos are blue'));
@@ -56,15 +53,15 @@ describe('Console', () => {
         ]
       `,
       );
-    }).pipe(runEffect);
-  });
+    }).pipe(runEffect),
+  );
 
   /**
    * Tests for all the colors in this map
    * @see {@link Colors.logGroupColors logGroupColors}
    */
-  it('should print group headers with backgrounds', async () => {
-    return Effect.gen(function* ($) {
+  V.it.scoped('should print group headers with backgrounds', () =>
+    Effect.gen(function* ($) {
       yield* $(
         Console.logGroup(
           'debug',
@@ -116,8 +113,6 @@ describe('Console', () => {
           "[32m[32mAnd so are their subtitles[32m[39m",
         ]
       `);
-    })
-      .pipe(Logger.withMinimumLogLevel(LogLevel.All))
-      .pipe(runEffect);
-  });
+    }).pipe(Logger.withMinimumLogLevel(LogLevel.All), runEffect),
+  );
 });
