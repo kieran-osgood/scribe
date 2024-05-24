@@ -20,7 +20,7 @@ const args = {
   name: TemplateName,
   template: Template,
   cwd: CwdOverride,
-  verbose: VerboseLogging,
+  verboseLogging: VerboseLogging,
 } satisfies Command.Command.Config;
 
 type ConfigContext = {
@@ -32,7 +32,7 @@ type ConfigContext = {
 export const Generate = Command.make(
   'scribe',
   args,
-  ({ configPath, name, template, verbose }) =>
+  ({ configPath, name, template, verboseLogging }) =>
     pipe(
       Prompts.DirtyGitCheck(),
 
@@ -86,6 +86,6 @@ export const Generate = Command.make(
         ConfigParseError: Console.error,
         QuitException: () => Console.log('Exiting...'),
       }),
-      Logger.withMinimumLogLevel(Console.setLogLevel(verbose)),
+      Logger.withMinimumLogLevel(Console.setLogLevel(verboseLogging)),
     ),
 );

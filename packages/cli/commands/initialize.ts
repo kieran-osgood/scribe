@@ -10,10 +10,10 @@ import path from 'path';
 import { VerboseLogging } from '../arguments.js';
 
 const args = {
-  verbose: VerboseLogging,
+  verboseLogging: VerboseLogging,
 } satisfies Command.Command.Config;
 
-export const Initialize = Command.make('init', args, ({ verbose }) =>
+export const Initialize = Command.make('init', args, ({ verboseLogging }) =>
   pipe(
     Console.header(`Init`),
     Effect.tap(() =>
@@ -68,7 +68,7 @@ export const Initialize = Command.make('init', args, ({ verbose }) =>
       QuitException: () => Effect.void,
     }),
 
-    Logger.withMinimumLogLevel(Console.setLogLevel(verbose)),
+    Logger.withMinimumLogLevel(Console.setLogLevel(verboseLogging)),
   ),
 );
 
