@@ -9,7 +9,6 @@ import { Array, Effect, flow, Logger, pipe } from 'effect';
 
 import {
   ConfigPath,
-  CwdOverride,
   Template,
   TemplateName,
   VerboseLogging,
@@ -19,7 +18,6 @@ const args = {
   configPath: ConfigPath,
   name: TemplateName,
   template: Template,
-  cwd: CwdOverride,
   verboseLogging: VerboseLogging,
 } satisfies Command.Command.Config;
 

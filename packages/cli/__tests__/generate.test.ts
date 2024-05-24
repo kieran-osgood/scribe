@@ -439,7 +439,7 @@ V.it.scoped(
 
         USAGE
 
-        $ scribe [(-c, --config text)] [(-n, --name text)] [(-t, --template text)] [--cwd text] [--verbose]
+        $ scribe [(-c, --config text)] [(-n, --name text)] [(-t, --template text)] [--verbose]
 
         OPTIONS
 
@@ -464,14 +464,6 @@ V.it.scoped(
           A user-defined piece of text.
 
           Specify the name of the template to generate. Must be a key under templates in config.
-
-          This setting is optional.
-
-        --cwd text
-
-          A user-defined piece of text.
-
-          Override the cwd (default: process.cwd()
 
           This setting is optional.
 

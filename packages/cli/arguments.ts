@@ -24,8 +24,3 @@ export const ConfigPath = Options.text('config').pipe(
   Options.withDescription('Path to the config (default: scribe.config.ts)'),
   Options.withDefault('scribe.config.ts'),
 );
-
-export const CwdOverride = Options.text('cwd').pipe(
-  Options.withDescription('Override the cwd (default: process.cwd()'),
-  Options.withDefault(process.cwd()),
-);
