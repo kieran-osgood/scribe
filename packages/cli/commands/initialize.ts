@@ -1,4 +1,5 @@
 import { Command } from '@effect/cli';
+import { FileSystem } from '@effect/platform';
 import * as Console from '@scribe/console';
 import * as Constants from '@scribe/constants';
 import * as FS from '@scribe/fs';
@@ -46,21 +47,19 @@ export const Initialize = Command.make('init', args, ({ verboseLogging }) =>
     }),
 
     Effect.catchTags({
-      '@effect/platform/FileSystem/StatError': error =>
-        Console.logGroup(
-          'error',
-          'Fail',
-        )('Failed to create config. Path not empty.').pipe(
-          Effect.tap(() =>
-            Console.file(error.error.path?.toString() ?? 'Bad path'),
-          ),
-        ),
       '@effect/platform/FileSystem/FileExistsError': error =>
         Console.logGroup(
           'error',
           'Fail',
         )('Failed to create config. Path not empty.').pipe(
           Effect.tap(() => Console.file(error.error.path.toString())),
+        ),
+      SystemError: error =>
+        Console.logGroup(
+          'error',
+          'Fail',
+        )('Failed to create config. Path not empty.').pipe(
+          Effect.tap(() => Console.file(error.message)),
         ),
     }),
 
@@ -81,12 +80,15 @@ const checkConfigWritePathEmpty = () =>
       pipe(
         createConfigPath(_process),
         FS.isFileOrDirectory,
-        Effect.catchTag('@effect/platform/FileSystem/StatError', error => {
+        Effect.if({
+          onTrue: () => createFileExistsError(),
+          onFalse: () => Effect.void,
+        }),
+        Effect.catchTag('SystemError', error => {
           /**
-           *
-           * ENOENT indicates the path is clear, and we can safely write there
+           * NotFound indicates the path is clear, and we can safely write there
            */
-          if (error.error.code === 'ENOENT') {
+          if (error.reason === 'NotFound') {
             return Effect.succeed(false);
           }
 
@@ -94,18 +96,19 @@ const checkConfigWritePathEmpty = () =>
           // TODO: test case that hits this?
           return Effect.fail(error);
         }),
-        Effect.if({
-          onTrue: () => createFileExistsError(),
-          onFalse: () => Effect.void,
-        }),
       ),
     ),
   );
 
 const copyBaseScribeConfigToPath = () =>
-  Process.Process.pipe(
-    Effect.map(createConfigPath),
-    Effect.flatMap(path => FS.writeFile(path, Constants.BASE_CONFIG, null)),
+  Effect.all([Process.Process, FileSystem.FileSystem]).pipe(
+    Effect.flatMap(([process, fs]) =>
+      pipe(createConfigPath(process), path =>
+        fs
+          .writeFileString(path, Constants.BASE_CONFIG)
+          .pipe(Effect.map(() => path)),
+      ),
+    ),
   );
 
 const createFileExistsError = () =>

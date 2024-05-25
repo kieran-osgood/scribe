@@ -1,141 +1,31 @@
+import { FileSystem } from '@effect/platform';
+import { NodeFileSystem } from '@effect/platform-node';
 import * as V from '@effect/vitest';
-import { Context, Effect, pipe } from 'effect';
-import * as NFS from 'fs';
-import * as memfs from 'memfs';
-import { DirectoryJSON, vol } from 'memfs';
+import { Effect, Layer } from 'effect';
 import path from 'path';
+import * as tempy from 'tempy';
 
-import {
-  MkDirError,
-  ReadFileError,
-  StatError,
-  WriteFileError,
-} from '../error.js';
 import * as FS from '../fs.js';
-
-/**
- * Provides a JSON representation of the current working directory
- * in the in-memory file system.
- *
- * @return {DirectoryJSON}
- */
-export const cwdAsJson = (): DirectoryJSON =>
-  vol.toJSON(process.cwd(), undefined, true);
 
 const fileContents = 'super secret file';
 
-beforeEach(() => {
-  V.vitest.restoreAllMocks();
-});
-
-beforeEach(() => {
-  vol.mkdirSync(process.cwd(), { recursive: true });
-});
-afterEach(() => {
-  vol.reset();
-});
-
-export const FSMock = Context.make(FS.FS, memfs.fs as unknown as typeof NFS);
-
-describe('fs', () => {
-  describe('readFile', () => {
-    V.it.scoped('should read file to path', () =>
-      Effect.gen(function* ($) {
-        const filePath = 'template1.txt';
-        memfs.vol.writeFileSync(filePath, fileContents);
-
-        const result = yield* $(FS.readFile(filePath, null));
-
-        expect(String(result)).toBe(fileContents);
-      }).pipe(Effect.provide(FSMock)),
-    );
-
-    V.it.scoped('throw error if file doesnt exist', () =>
-      Effect.gen(function* ($) {
-        const filePath = path.join(process.cwd(), './template2.txt');
-        const result = yield* $(FS.readFile(filePath, null), Effect.flip);
-
-        expect(result).toBeInstanceOf(ReadFileError);
-      }).pipe(Effect.provide(FSMock)),
-    );
-  });
-
-  describe('writeFile', () => {
-    V.it.scoped('should write file to path and read it back', () =>
-      Effect.gen(function* ($) {
-        const filePath = './template3.txt';
-
-        expect(
-          yield* $(FS.writeFile(filePath, fileContents, null)), //
-        ).toBe('./template3.txt');
-        expect(
-          yield* $(FS.readFile(filePath, { encoding: 'utf8' })), //
-        ).toEqual(fileContents);
-      }).pipe(Effect.provide(FSMock)),
-    );
-
-    V.it.scoped('should write file to path and read it back', () =>
-      Effect.gen(function* ($) {
-        const filePath = '/some/nonexistent/path/template4.txt';
-
-        const result = yield* $(
-          pipe(FS.writeFile(filePath, fileContents, null), Effect.flip),
-        );
-        expect(result).toBeInstanceOf(WriteFileError);
-      }).pipe(Effect.provide(FSMock)),
-    );
-  });
-
-  describe('mkdir', () => {
-    V.it.scoped('creates recursively ', () =>
-      Effect.gen(function* ($) {
-        const filePath = './mkdir/nested/path';
-        const statError = yield* $(FS.isFileOrDirectory(filePath), Effect.flip);
-        expect(statError).toBeInstanceOf(StatError);
-
-        yield* $(FS.mkdir(filePath, { recursive: true }));
-
-        const exists = yield* $(FS.isFileOrDirectory(filePath));
-        expect(exists).toBe(true);
-      }).pipe(Effect.provide(FSMock)),
-    );
-
-    V.it.scoped('returns undefined if dir already exists', () =>
-      Effect.gen(function* ($) {
-        const filePath = './some/path';
-        memfs.vol.mkdirSync(filePath, { recursive: true });
-        const previousDirStructure = cwdAsJson();
-
-        const result = yield* $(FS.mkdir(filePath, { recursive: true }));
-        expect(result).toBe(undefined);
-        expect(cwdAsJson()).toEqual(previousDirStructure);
-      }).pipe(Effect.provide(FSMock)),
-    );
-
-    V.it.scoped('fails with error if mkdir cb has error', () =>
-      Effect.gen(function* ($) {
-        const filePath = './some/path';
-        const result = yield* $(FS.mkdir(filePath), Effect.flip);
-        expect(result).toBeInstanceOf(MkDirError);
-      }).pipe(Effect.provide(FSMock)),
-    );
-  });
-});
-
 describe('writeFileWithDir', () => {
-  V.it.scoped('should write file to path and read it back', () =>
-    Effect.gen(function* ($) {
-      const filePath = './path/to/some/long/path/template5.txt';
-
-      const result = yield* $(
-        FS.writeFileWithDir(filePath, fileContents, null),
+  V.it.scoped('should write file to path and read it back', () => {
+    const tmpPath = tempy.temporaryDirectory();
+    return Effect.gen(function* ($) {
+      const filePath = path.join(
+        tmpPath,
+        './path/to/some/long/path/template5.txt',
       );
+
+      const result = yield* $(FS.writeFileWithDir(filePath, fileContents));
       expect(result).toBe(filePath);
+      const fs = yield* $(FileSystem.FileSystem);
 
       const readResult = yield* $(
-        FS.readFile(path.join('path/to/some/long/path/template5.txt'), null),
+        fs.readFile(path.join(tmpPath, 'path/to/some/long/path/template5.txt')),
       );
       expect(String(readResult)).toEqual(fileContents);
-    }).pipe(Effect.provide(FSMock)),
-  );
+    }).pipe(Effect.provide(Layer.mergeAll(NodeFileSystem.layer)));
+  });
 });

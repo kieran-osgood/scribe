@@ -1,3 +1,4 @@
+import { FileSystem } from '@effect/platform';
 import { Schema } from '@effect/schema';
 import * as Config from '@scribe/config';
 import * as FS from '@scribe/fs';
@@ -48,18 +49,26 @@ function createAbsFilePaths(ctx: ConstructTemplateCtx) {
 export type ConstructTemplateCtx = Ctx & { output: Config.Template };
 
 export function constructTemplate(ctx: ConstructTemplateCtx) {
-  return pipe(
-    createAbsFilePaths(ctx),
-    Effect.map(Array.map(_ => pipe(FS.readFile(_, null), Effect.map(String)))),
-    Effect.flatMap(Effect.all),
-    Effect.map(
-      // TODO: spread in ctx.input.variables
-      Array.map(_ => TemplateFile.render(_, { Name: ctx.name })),
-    ),
-    Effect.flatMap(Effect.all),
-    Effect.map(
-      // TODO: ...ctx.variables
-      Array.map(_ => ({ fileContents: _, ...ctx }) satisfies WriteTemplateCtx),
+  return FileSystem.FileSystem.pipe(
+    Effect.flatMap(fs =>
+      pipe(
+        createAbsFilePaths(ctx),
+        Effect.map(
+          Array.map(path => fs.readFileString(path).pipe(Effect.map(String))),
+        ),
+        Effect.flatMap(Effect.all),
+        Effect.map(
+          // TODO: spread in ctx.input.variables
+          Array.map(_ => TemplateFile.render(_, { Name: ctx.name })),
+        ),
+        Effect.flatMap(Effect.all),
+        Effect.map(
+          // TODO: ...ctx.variables
+          Array.map(
+            _ => ({ fileContents: _, ...ctx }) satisfies WriteTemplateCtx,
+          ),
+        ),
+      ),
     ),
   );
 }
@@ -77,10 +86,7 @@ export const writeTemplate = (_: WriteTemplateCtx) =>
       _.output.output.directory,
       fileName,
     );
-
-    return yield* $(
-      FS.writeFileWithDir(absoluteFilePath, _.fileContents, null),
-    );
+    return yield* $(FS.writeFileWithDir(absoluteFilePath, _.fileContents));
   });
 
 export const writeTemplates = (ctx: {

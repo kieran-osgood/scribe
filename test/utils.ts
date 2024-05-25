@@ -6,7 +6,6 @@ import * as fs from 'fs';
 import path from 'path';
 import * as tempy from 'tempy';
 
-import * as FS from '../packages/fs/index.js';
 import * as Process from '../packages/process/index.js';
 import * as MockConsole from './mock-console.js';
 import * as MockTerminal from './mock-terminal.js';
@@ -20,10 +19,10 @@ export const MainLive = (cwd: string) =>
 
     return Layer.mergeAll(
       NodeFileSystem.layer,
-      FS.layer,
       MockTerminal.layer,
       Process.layer(cwd),
       NodePath.layer,
+
       Console.setConsole(_console),
     );
   }).pipe(Layer.unwrapEffect);
@@ -31,11 +30,7 @@ export const MainLive = (cwd: string) =>
 export const runEffect =
   (cwd: string) =>
   <A, E>(
-    self: Effect.Effect<
-      A,
-      E,
-      CliApp.CliApp.Environment | FS.FS | Process.Process
-    >,
+    self: Effect.Effect<A, E, CliApp.CliApp.Environment | Process.Process>,
   ) =>
     Effect.provide(self, MainLive(cwd));
 

@@ -1,11 +1,13 @@
+import { FileSystem } from '@effect/platform';
+import { SystemError } from '@effect/platform/Error';
+import { NodeFileSystem } from '@effect/platform-node';
 import * as V from '@effect/vitest';
-import { Array, Effect } from 'effect';
-import * as memfs from 'memfs';
-import { vol } from 'memfs';
+import * as FS from '@scribe/fs';
+import * as Process from '@scribe/process';
+import { Array, Effect, Layer } from 'effect';
 import path from 'path';
+import * as tempy from 'tempy';
 
-import * as FS from '../../fs/index.js';
-import * as Process from '../../process/index.js';
 import {
   constructTemplate,
   ConstructTemplateCtx,
@@ -23,16 +25,6 @@ const screenFileContents = `describe('{{Name}}', function() {
 
   });
 });`;
-
-beforeEach(() => {
-  vol.mkdirSync(process.cwd(), { recursive: true });
-  vol.mkdirSync(path.join(process.cwd(), './test/fixtures'), {
-    recursive: true,
-  });
-});
-afterEach(() => {
-  vol.reset();
-});
 
 const mockConfig = {
   options: {
@@ -79,8 +71,10 @@ const templateOutput = {
 };
 
 describe('writeTemplate', () => {
-  V.it.scoped('should write file', () =>
-    Effect.gen(function* ($) {
+  V.it.scoped('should write file', () => {
+    const tmpPath = tempy.temporaryDirectory();
+
+    return Effect.gen(function* ($) {
       const ctx = {
         fileContents,
         output: templateOutput,
@@ -91,22 +85,23 @@ describe('writeTemplate', () => {
       expect(result).toBe(
         path.join(_process.cwd(), '/test/fixtures/config/login.ts'),
       );
-
+      const fs = yield* $(FileSystem.FileSystem);
       const readResult = yield* $(
-        FS.readFile('test/fixtures/config/login.ts', null),
+        fs.readFile(path.join(tmpPath, 'test/fixtures/config/login.ts')),
       );
       expect(String(readResult)).toBe(fileContents);
     }).pipe(
-      Effect.provideService(FS.FS, FS.FSMock),
-      // TODO: ProcessLive in use?
-      Effect.provideService(Process.Process, Process.ProcessLive),
-    ),
-  );
+      Effect.provide(Layer.mergeAll(NodeFileSystem.layer)),
+      Effect.provideService(Process.Process, Process.makeProcessMock(tmpPath)),
+    );
+  });
 });
 
 describe('constructTemplate', () => {
-  V.it.scoped('should return fileContents formatted with variables', () =>
-    Effect.gen(function* ($) {
+  V.it.scoped('should return fileContents formatted with variables', () => {
+    const tmpPath = tempy.temporaryDirectory();
+
+    return Effect.gen(function* ($) {
       const ctx = {
         output: {
           templateFileKey: 'screen',
@@ -118,14 +113,13 @@ describe('constructTemplate', () => {
         ..._ctx,
       } satisfies ConstructTemplateCtx;
 
+      const _process = yield* $(Process.Process);
       yield* $(
         FS.writeFileWithDir(
-          path.join(process.cwd(), './test/fixtures/screen.scribe'),
+          path.join(_process.cwd(), './test/fixtures/screen.scribe'),
           screenFileContents,
-          null,
         ),
       );
-
       const result = yield* $(
         constructTemplate(ctx),
         Effect.map(Array.map(_ => _.fileContents)),
@@ -141,15 +135,16 @@ describe('constructTemplate', () => {
           ]
         `);
     }).pipe(
-      Effect.provideService(FS.FS, FS.FSMock),
-      Effect.provideService(Process.Process, Process.ProcessLive),
-    ),
-  );
+      Effect.provide(Layer.mergeAll(NodeFileSystem.layer)),
+      Effect.provideService(Process.Process, Process.makeProcessMock(tmpPath)),
+    );
+  });
 
   V.it.scoped('should check process root dir for templates', () =>
     Effect.gen(function* ($) {
       const ctx = {
         ..._ctx,
+
         output: {
           templateFileKey: 'screen',
           output: {
@@ -159,28 +154,30 @@ describe('constructTemplate', () => {
         },
         config: {
           templates: _ctx.config.templates,
+          options: {
+            templatesDirectories: ['test/fixtures/templates'],
+            rootOutDir: '',
+          },
         },
       } satisfies ConstructTemplateCtx;
-
-      const rootDirScribePath = path.join(process.cwd(), '', 'screen.scribe');
-      memfs.vol.writeFileSync(rootDirScribePath, screenFileContents);
 
       const result = yield* $(
         constructTemplate(ctx),
         Effect.map(Array.map(_ => _.fileContents)),
       );
 
-      expect(result).toMatchInlineSnapshot(`
-          [
-            "describe('login', function() {
-            it('should ', function() {
+      expect(result[0]).toMatchInlineSnapshot(`
+        "// @ts-ignore
+        import * as React from 'react';
 
-            });
-          });",
-          ]
-        `);
+        type loginProps = {}
+        function loginScreen() {
+
+        }
+        "
+      `);
     }).pipe(
-      Effect.provideService(FS.FS, FS.FSMock),
+      Effect.provide(Layer.mergeAll(NodeFileSystem.layer)),
       Effect.provideService(Process.Process, Process.ProcessLive),
     ),
   );
@@ -200,9 +197,14 @@ describe('constructTemplate', () => {
 
       const result = yield* $(constructTemplate(ctx), Effect.flip);
 
-      expect(result).toBeInstanceOf(FS.ReadFileError);
+      expect(result._tag).toBe('SystemError');
+
+      const error = result as SystemError;
+      expect(error.reason).toBe('NotFound');
+      expect(error.method).toBe('readFile');
+      expect(error.pathOrDescriptor).toContain('BADKEY.scribe');
     }).pipe(
-      Effect.provideService(FS.FS, FS.FSMock),
+      Effect.provide(Layer.mergeAll(NodeFileSystem.layer)),
       Effect.provideService(Process.Process, Process.ProcessLive),
     ),
   );
