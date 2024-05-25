@@ -6,7 +6,7 @@ export default defineConfig({
   dts: true,
   clean: true,
   silent: false,
-  watch: true,
+  watch: false,
   env: { NODE_ENV: 'production' },
   minify: 'terser',
   publicDir: 'public',
