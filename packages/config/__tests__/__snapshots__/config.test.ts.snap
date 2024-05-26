@@ -6,19 +6,19 @@ exports[`readConfig > should return valid config 1`] = `
     "component": [
       {
         "directory": "examples/src/components",
-        "fileName": "{{Name}}.ts",
+        "fileName": "{{Key}}.ts",
         "key": "component",
       },
     ],
     "screen": [
       {
         "directory": "examples/src/screens",
-        "fileName": "{{Name}}.ts",
+        "fileName": "{{Key}}.ts",
         "key": "screen",
       },
       {
         "directory": "examples/src/screens",
-        "fileName": "{{Name}}.test.ts",
+        "fileName": "{{Key}}.test.ts",
         "key": "screen.test",
       },
     ],

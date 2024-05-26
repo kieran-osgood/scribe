@@ -21,7 +21,7 @@ beforeEach(() => {
   V.vitest.restoreAllMocks();
 });
 
-const screenFileContents = `describe('{{Name}}', function() {
+const screenFileContents = `describe('{{Key}}', function() {
   it('should ', function() {
 
   });
@@ -34,12 +34,12 @@ const mockConfig = {
       {
         key: 'screen',
         directory: 'test/fixtures',
-        fileName: '{{Name}}.ts',
+        fileName: '{{Key}}.ts',
       },
       {
         key: 'screen.test',
         directory: 'test/fixtures',
-        fileName: '{{Name}}.test.ts',
+        fileName: '{{Key}}.test.ts',
       },
     ],
   },
@@ -50,13 +50,13 @@ const fileContents = 'TEST';
 const _ctx = {
   config: mockConfig,
   template: 'screen',
-  name: 'login',
+  key: 'login',
   generators: ['screen'],
 } satisfies Ctx;
 
 const templateOutput = {
   key: 'screen',
-  fileName: '{{Name}}.ts', // good-scribe
+  fileName: '{{Key}}.ts', // good-scribe
   directory: 'test/fixtures/config',
 } satisfies GeneratorConfig;
 
@@ -95,7 +95,7 @@ describe('constructTemplate', () => {
       const ctx = {
         output: {
           key: 'screen',
-          fileName: '{{Name}}.ts', // good-scribe
+          fileName: '{{Key}}.ts', // good-scribe
           directory: '',
         },
         ..._ctx,
@@ -135,7 +135,7 @@ describe('constructTemplate', () => {
 
         output: {
           key: 'screen',
-          fileName: '{{Name}}.ts',
+          fileName: '{{Key}}.ts',
           directory: '',
         },
         config: {

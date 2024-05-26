@@ -22,7 +22,7 @@ const args = {
 } satisfies Command.Command.Config;
 
 type ConfigContext = {
-  readonly name: string;
+  readonly key: string;
   readonly template: string;
   readonly config: Schema.Schema.Type<typeof Config.ScribeConfig>;
   readonly generators: string[];
@@ -53,7 +53,7 @@ export const Generate = Command.make('scribe', args, args =>
         const config = yield* $(Config.readConfig(_configPath));
 
         return {
-          name,
+          key: name,
           template,
           config,
           generators: templates,

@@ -7,19 +7,19 @@ const config = {
       {
         key: 'component',
         directory: 'examples/src/components',
-        fileName: '{{Name}}.ts',
+        fileName: '{{Key}}.ts',
       },
     ],
     screen: [
       {
         key: 'screen',
         directory: 'examples/src/screens',
-        fileName: '{{Name}}.ts',
+        fileName: '{{Key}}.ts',
       },
       {
         key: 'screen.test',
         directory: 'examples/src/screens',
-        fileName: '{{Name}}.test.ts',
+        fileName: '{{Key}}.test.ts',
       },
     ],
   },

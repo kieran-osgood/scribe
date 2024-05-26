@@ -9,14 +9,14 @@ const config = {
           key: 'screen',
           output: {
             directory: 'examples/src/screens',
-            fileName: '{{Name}}.ts',
+            fileName: '{{Key}}.ts',
           },
         },
         {
           key: 'screen.test',
           output: {
             directory: 'examples/src/screens',
-            fileName: '{{Name}}.test.ts',
+            fileName: '{{Key}}.test.ts',
           },
         },
       ],

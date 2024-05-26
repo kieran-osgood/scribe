@@ -3,7 +3,6 @@ import { Schema } from '@effect/schema';
 import * as Config from '@scribe/config';
 import * as FS from '@scribe/fs';
 import * as Process from '@scribe/process';
-import { TemplateFile } from '@scribe/renderer';
 import { Array, Data, Effect, Option as O, pipe, Record } from 'effect';
 import path from 'path';
 import * as TF from 'template-file';
@@ -22,7 +21,7 @@ export const render = (
 };
 
 export type Ctx = {
-  name: string;
+  key: string;
   template: string;
   config: Effect.Effect.Success<ReturnType<(typeof Config)['readConfig']>>;
   generators: string[];
@@ -57,7 +56,7 @@ export function constructTemplate(ctx: ConstructTemplateCtx) {
         Effect.flatMap(Effect.all),
         Effect.map(
           // TODO: spread in ctx.input.variables
-          Array.map(_ => TemplateFile.render(_, { Name: ctx.name })),
+          Array.map(_ => render(_, { Key: ctx.key })),
         ),
         Effect.flatMap(Effect.all),
         Effect.map(
@@ -78,7 +77,8 @@ export type WriteTemplateCtx = Ctx & {
 export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
     const _process = yield* $(Process.Process);
-    const fileName = TF.render(_.output.fileName, { Name: _.name });
+    const fileName = TF.render(_.output.fileName, { Key: _.key });
+    // TODO: check if output dir is absoluteFilePath
     const absoluteFilePath = path.join(
       _process.cwd(),
       _.output.directory,
@@ -88,7 +88,7 @@ export const writeTemplate = (_: WriteTemplateCtx) =>
   });
 
 export const writeTemplates = (ctx: {
-  name: string;
+  key: string;
   template: string;
   config: Schema.Schema.Type<typeof Config.ScribeConfig>;
   generators: string[];
