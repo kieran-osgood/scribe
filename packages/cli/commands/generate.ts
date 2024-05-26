@@ -61,7 +61,7 @@ export const Generate = Command.make('scribe', args, args =>
       }),
     ),
 
-    Effect.flatMap(TemplateFile.writeTemplates),
+    Effect.flatMap(TemplateFile.writeFiles),
 
     Effect.map(
       flow(

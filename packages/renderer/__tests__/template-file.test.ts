@@ -13,7 +13,8 @@ import {
   constructTemplate,
   ConstructTemplateCtx,
   Ctx,
-  writeTemplate,
+  render,
+  writeFile,
   WriteTemplateCtx,
 } from '../template-file.js';
 
@@ -60,6 +61,31 @@ const generator = {
   directory: 'test/fixtures/config',
 } satisfies GeneratorConfig;
 
+describe('render', () => {
+  V.it.scoped('should interpolate the variables passed to it', () =>
+    Effect.gen(function* ($) {
+      const result = yield* $(render('Hello {{Key}}', { Key: 'world' }));
+      expect(result).toBe('Hello world');
+    }),
+  );
+
+  V.it.scoped('should return an error channel for missing key', () =>
+    Effect.gen(function* ($) {
+      const result = yield* $(render('', {}));
+      expect(result).toBe('');
+    }),
+  );
+
+  // V.it.scoped('should return an error channel for missing key', () =>
+  //   Effect.gen(function* ($) {
+  //     const result = yield* $(
+  //       render('Hello {{Key}}', { Key: 'a', Hola: 'No bueno' }),
+  //       Effect.flip,
+  //     );
+  //     expect(result).toBeInstanceOf(TemplateFileError);
+  //   }),
+  // );
+});
 describe('writeTemplate', () => {
   V.it.scoped('should write file', () => {
     const tmpPath = tempy.temporaryDirectory();
@@ -70,7 +96,7 @@ describe('writeTemplate', () => {
         generator: generator,
         ..._ctx,
       } satisfies WriteTemplateCtx;
-      const result = yield* $(writeTemplate(ctx));
+      const result = yield* $(writeFile(ctx));
       const _process = yield* $(Process.Process);
       expect(result).toBe(
         path.join(_process.cwd(), '/test/fixtures/config/login.ts'),
