@@ -48,8 +48,30 @@ export const readConfig = (path: string) => {
     }),
   );
 };
+//
+// export const checkForTemplates = (_: [string, readonly GeneratorConfig[]][]) =>
+//   Effect.if(Array.isNonEmptyArray(_), {
+//     onTrue: () => Effect.succeed(_),
+//     onFalse: () =>
+//       Effect.fail(
+//         new CosmicConfigError({ error: 'No template options found' }),
+//       ),
+//   });
 
-export const checkForTemplates = (_: string[]) =>
+/**
+ * Extracts the generator options from a given config
+ */
+// export const pickGeneratorConfigs = (
+//   config: ScribeConfig,
+// ): Effect.Effect<[string, readonly GeneratorConfig[]][], CosmicConfigError> => {
+//   return pipe(
+//     Array.fromRecord(config.generators),
+//     // Array.flatMap(Tuple.getSecond),
+//     checkForTemplates,
+//   );
+// };
+
+export const checkForTemplatesKeys = (_: string[]) =>
   Effect.if(Array.isNonEmptyArray(_), {
     onTrue: () => Effect.succeed(_),
     onFalse: () =>
@@ -58,19 +80,22 @@ export const checkForTemplates = (_: string[]) =>
       ),
   });
 
+export const pickGeneratorKeysConfigs = (
+  config: ScribeConfig,
+): Effect.Effect<string[], CosmicConfigError> => {
+  return pipe(
+    Array.fromRecord(config.generators),
+    Array.map(Tuple.getFirst),
+    checkForTemplatesKeys,
+  );
+};
+
 /**
- * reads the config from readUserConfig and picks out the values
- * which are valid options
+ * Reads the config from the filesystem and extracts generator options
  */
 export const readUserTemplateOptions = flow(
   readConfig,
-  Effect.flatMap(config =>
-    pipe(
-      Array.fromRecord(config.generators),
-      Array.map(Tuple.getFirst),
-      checkForTemplates,
-    ),
-  ),
+  Effect.flatMap(pickGeneratorKeysConfigs),
 );
 
 const isCosmicConfigResultSuccess = (_: CosmiconfigResult) =>

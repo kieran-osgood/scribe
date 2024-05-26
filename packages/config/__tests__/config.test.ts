@@ -2,7 +2,7 @@ import * as V from '@effect/vitest';
 import { Effect } from 'effect';
 
 import {
-  checkForTemplates,
+  checkForTemplatesKeys,
   mapCosmicConfig,
   readConfig,
   readUserTemplateOptions,
@@ -55,14 +55,14 @@ describe('checkForTemplates', () => {
   V.it.scoped('should return input if non empty array', () =>
     Effect.gen(function* ($) {
       const input = [''];
-      const result = yield* $(checkForTemplates(input));
+      const result = yield* $(checkForTemplatesKeys(input));
       expect(result).toBe(input);
     }),
   );
 
   V.it.scoped('should return CosmicConfigError if empty array', () =>
     Effect.gen(function* ($) {
-      const result = yield* $(checkForTemplates([]), Effect.flip);
+      const result = yield* $(checkForTemplatesKeys([]), Effect.flip);
       expect(result).toBeInstanceOf(CosmicConfigError);
     }),
   );

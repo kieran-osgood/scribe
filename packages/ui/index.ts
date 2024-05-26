@@ -29,14 +29,25 @@ const InputFileName = Prompt.text({
     }),
 });
 
+// const SelectTemplate = (s: [string, readonly GeneratorConfig[]][]) =>
+//   Prompt.select({
+//     message: 'Generator File:',
+//     choices: s.map(([key, generator]) => ({
+//       title: `${key}.scribe`,
+//       value: key,
+//       // https://github.com/kieran-osgood/scribe/issues/32
+//       // description: generator.description ?? '',
+//     })),
+//   });
+//
 const SelectTemplate = (s: string[]) =>
   Prompt.select({
-    message: 'Template:',
+    message: 'Generator File:',
     choices: s.map(_ => ({
-      title: _,
+      title: `${_}.scribe`,
       value: _,
       // https://github.com/kieran-osgood/scribe/issues/32
-      // description: 'This is some description of a template',
+      // description: generator.description ?? '',
     })),
   });
 

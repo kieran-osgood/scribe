@@ -26,6 +26,7 @@ type ConfigContext = {
   readonly template: string;
   readonly config: Schema.Schema.Type<typeof Config.ScribeConfig>;
   readonly generators: string[];
+  // readonly generators: Config.GeneratorConfig[];
 };
 export const Generate = Command.make('scribe', args, args =>
   pipe(
@@ -36,11 +37,12 @@ export const Generate = Command.make('scribe', args, args =>
     Effect.flatMap(() =>
       Effect.gen(function* ($) {
         const _configPath = yield* $(createConfigPathAbsolute(args.configPath));
-        const templates = yield* $(Config.readUserTemplateOptions(_configPath));
+        const config = yield* $(Config.readConfig(_configPath));
+        const generators = yield* $(Config.pickGeneratorKeysConfigs(config));
 
         const template = yield* $(
           args.generator,
-          Effect.orElse(() => Prompts.SelectTemplate(templates)),
+          Effect.orElse(() => Prompts.SelectTemplate(generators)),
         );
 
         const name = yield* $(
@@ -48,13 +50,11 @@ export const Generate = Command.make('scribe', args, args =>
           Effect.orElse(() => Prompts.InputFileName),
         );
 
-        const config = yield* $(Config.readConfig(_configPath));
-
         return {
           key: name,
           template,
           config,
-          generators: templates,
+          generators,
         } satisfies ConfigContext;
       }),
     ),

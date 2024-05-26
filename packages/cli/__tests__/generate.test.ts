@@ -39,13 +39,13 @@ describe('[Given] Git clean', () => {
 
         expect(lines).toMatchInlineSnapshot(`
           [
-            "? Template: › 
-          ❯ component 
-            screen ",
-            "? Template: › 
-            component 
-          ❯ screen ",
-            "✔ Template: …  screen
+            "? Generator File: › 
+          ❯ component.scribe 
+            screen.scribe ",
+            "? Generator File: › 
+            component.scribe 
+          ❯ screen.scribe ",
+            "✔ Generator File: …  screen.scribe
           ",
             "",
             "? Name: › ",
@@ -99,13 +99,13 @@ describe('[Given] Git clean', () => {
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
         [
-          "? Template: › 
-        ❯ component 
-          screen ",
-          "? Template: › 
-          component 
-        ❯ screen ",
-          "✔ Template: …  screen
+          "? Generator File: › 
+        ❯ component.scribe 
+          screen.scribe ",
+          "? Generator File: › 
+          component.scribe 
+        ❯ screen.scribe ",
+          "✔ Generator File: …  screen.scribe
         ",
           "",
           " Success ",

@@ -18,6 +18,8 @@ const GeneratorConfig = S.Struct({
    */
   fileName: S.String,
 
+  // description: S.optional(S.String),
+
   // TODO: implement any vars to be passed in
   // variables: S.Record(S.String, S.String)
 });

@@ -25,6 +25,7 @@ export type Ctx = {
   template: string;
   config: Schema.Schema.Type<typeof Config.ScribeConfig>;
   generators: string[];
+  // generators: Config.GeneratorConfig[];
 };
 
 // TODO: should report if templatesDirectories isn't a dir?
