@@ -22,9 +22,6 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: nvim?
-        run: nvim -v
-
       - name: Test
         run: turbo test
 
