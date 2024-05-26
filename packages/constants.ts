@@ -4,6 +4,7 @@ export const URLS = {
   github: {
     issues: `${githubBaseUrl}/issues`,
     newIssue: `${githubBaseUrl}/issues/new`,
+    readme: `${githubBaseUrl}/blob/main/README.md`,
   },
 } as const;
 

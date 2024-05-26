@@ -19,7 +19,9 @@ export const getCosmicExplorer = () =>
     try: () =>
       cosmiconfig(PackageJson.name, { loaders: { '.ts': TypeScriptLoader() } }),
     catch: () =>
-      new CosmicConfigError({ error: 'Cosmic Explorer failed to construct' }),
+      new CosmicConfigError({
+        errorCode: 'COSMIC_CONFIG_CONSTRUCTOR_ERROR',
+      }),
   });
 
 const load = (path: string) =>
@@ -32,7 +34,10 @@ const load = (path: string) =>
           // TODO: if path - load, !path - search
           async () => explorer.load(path),
         catch: _ =>
-          new CosmicConfigError({ error: `[read config failed] ${String(_)}` }),
+          new CosmicConfigError({
+            errorCode: 'READ_FAILED',
+            message: String(_),
+          }),
       }),
     );
   });
@@ -75,9 +80,7 @@ export const checkForTemplatesKeys = (_: string[]) =>
   Effect.if(Array.isNonEmptyArray(_), {
     onTrue: () => Effect.succeed(_),
     onFalse: () =>
-      Effect.fail(
-        new CosmicConfigError({ error: 'No template options found' }),
-      ),
+      Effect.fail(new CosmicConfigError({ errorCode: 'MISSING_GENERATORS' })),
   });
 
 export const pickGeneratorKeysConfigs = (
@@ -105,7 +108,7 @@ export const mapCosmicConfig = (_: CosmiconfigResult) =>
   Effect.if(isCosmicConfigResultSuccess(_), {
     onTrue: () => Effect.succeed(_?.config as unknown),
     onFalse: () =>
-      Effect.fail(new CosmicConfigError({ error: 'Empty Config' })),
+      Effect.fail(new CosmicConfigError({ errorCode: 'EMPTY_CONFIG' })),
   });
 
 export const getConfigPath = (cwd?: string) => {
