@@ -11,18 +11,20 @@ import * as MockConsole from './mock-console.js';
 import * as MockTerminal from './mock-terminal.js';
 
 export const cliPath = path.join(process.cwd(), 'dist', 'index.js');
-export const configFlag = path.join('scribe.config.ts');
+export const configFlag = 'scribe.config.ts';
 
 export const MainLive = (cwd: string) =>
   Effect.gen(function* ($) {
     const _console = yield* $(MockConsole.make);
 
     return Layer.mergeAll(
+      // Built in
       NodeFileSystem.layer,
-      MockTerminal.layer,
-      Process.layer(cwd),
       NodePath.layer,
 
+      // mocks
+      MockTerminal.layer,
+      Process.layer(cwd),
       Console.setConsole(_console),
     );
   }).pipe(Layer.unwrapEffect);
@@ -35,21 +37,12 @@ export const runEffect =
     Effect.provide(self, MainLive(cwd));
 
 type CreateMinimalProjectOptions = {
-  git?: {
-    init: boolean;
-    dirty: boolean;
-  };
-  fixtures?: {
-    configFile: boolean;
-    templateFiles: boolean;
-  };
+  git?: { init: boolean; dirty: boolean };
+  fixtures?: { configFile: boolean; templateFiles: boolean };
 };
 
 const defaultMinimalProjectOptions = {
-  fixtures: {
-    configFile: true,
-    templateFiles: true,
-  },
+  fixtures: { configFile: true, templateFiles: true },
   git: { init: true, dirty: false },
 } satisfies CreateMinimalProjectOptions;
 

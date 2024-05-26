@@ -24,7 +24,7 @@ describe('Formatter', () => {
       effect.pipe(
         Effect.provideService(
           Process.Process,
-          Process.makeProcessMock('/mockdir'),
+          Process.getProcessMock('/mockdir'),
         ),
       );
 

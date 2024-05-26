@@ -1,8 +1,8 @@
 import { Command } from '@effect/cli';
 import { Schema } from '@effect/schema';
 import * as Config from '@scribe/config';
+import { createConfigPathAbsolute } from '@scribe/config';
 import * as Console from '@scribe/console';
-import * as FS from '@scribe/fs';
 import { TemplateFile } from '@scribe/renderer';
 import { Prompts } from '@scribe/ui';
 import { Array, Effect, flow, Logger, pipe } from 'effect';
@@ -35,9 +35,7 @@ export const Generate = Command.make('scribe', args, args =>
 
     Effect.flatMap(() =>
       Effect.gen(function* ($) {
-        const _configPath = yield* $(
-          FS.createConfigPathAbsolute(args.configPath),
-        );
+        const _configPath = yield* $(createConfigPathAbsolute(args.configPath));
         const templates = yield* $(Config.readUserTemplateOptions(_configPath));
 
         const template = yield* $(

@@ -21,9 +21,9 @@ export const ProcessLive: Process = {
     columns: process.stdout.columns,
   },
 };
-export const ProcessMock: Process = makeProcessMock('/mockdir');
+export const ProcessMock: Process = getProcessMock('/mockdir');
 
-export function makeProcessMock(cwd: string): Process {
+export function getProcessMock(cwd: string): Process {
   return {
     cwd: () => cwd,
     exit: (code: number | undefined): never => {
@@ -35,17 +35,17 @@ export function makeProcessMock(cwd: string): Process {
   };
 }
 
-export const getMock = (cwd?: string) => {
+export const getProcess = (cwd?: string) => {
   if (typeof cwd === 'string') {
-    return Process.of(makeProcessMock(cwd));
+    return Process.of(getProcessMock(cwd));
   }
 
   if (process.env.NODE_ENV === 'test') {
-    return Process.of(makeProcessMock('/mockdir'));
+    return Process.of(getProcessMock('/mockdir'));
   }
 
   return Process.of(ProcessLive);
 };
 
 export const layer = (cwd?: string) =>
-  Layer.scoped(Process, Effect.succeed(getMock(cwd)));
+  Layer.scoped(Process, Effect.succeed(getProcess(cwd)));

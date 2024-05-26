@@ -13,6 +13,8 @@ import {
 } from '../../../test/utils.js';
 import * as Cli from '../cli.js';
 
+const createConfigPath = (cwd: string) => path.join(cwd, configFlag);
+
 describe('[Given] Git clean', () => {
   describe('[When] `--config` passed in & fully interactive session', () => {
     V.it.scoped('[Then] creates two files', ({ expect }) => {
@@ -20,7 +22,7 @@ describe('[Given] Git clean', () => {
         git: { init: true, dirty: false },
         fixtures: { templateFiles: true, configFile: true },
       });
-      const configPath = path.join(cwd, configFlag);
+      const configPath = createConfigPath(cwd);
       return Effect.gen(function* ($) {
         const fiber = yield* $(
           Effect.fork(Cli.run(['', '', `--config=${configPath}`])),
@@ -82,7 +84,7 @@ describe('[Given] Git clean', () => {
         git: { init: true, dirty: false },
         fixtures: { templateFiles: true, configFile: true },
       });
-      const configPath = path.join(cwd, configFlag);
+      const configPath = createConfigPath(cwd);
 
       return Effect.gen(function* ($) {
         const fiber = yield* $(
@@ -133,7 +135,7 @@ describe('[Given] Git clean', () => {
         git: { init: true, dirty: false },
         fixtures: { templateFiles: true, configFile: true },
       });
-      const configPath = path.join(cwd, configFlag);
+      const configPath = createConfigPath(cwd);
 
       return Effect.gen(function* ($) {
         const fiber = yield* $(
@@ -186,7 +188,7 @@ describe('[Given] Git clean', () => {
         git: { init: true, dirty: false },
         fixtures: { templateFiles: true, configFile: true },
       });
-      const configPath = path.join(cwd, configFlag);
+      const configPath = createConfigPath(cwd);
 
       return Effect.gen(function* ($) {
         const fiber = yield* $(
@@ -235,7 +237,7 @@ describe('[Given] Git Dirty', function () {
         git: { init: true, dirty: true },
         fixtures: { configFile: true, templateFiles: true },
       });
-      const configPath = path.join(cwd, configFlag);
+      const configPath = createConfigPath(cwd);
 
       return Effect.gen(function* ($) {
         const fiber = yield* $(
@@ -292,7 +294,7 @@ describe('[Given] Git Dirty', function () {
           git: { init: true, dirty: true },
           fixtures: { configFile: true, templateFiles: true },
         });
-        const configPath = path.join(cwd, configFlag);
+        const configPath = createConfigPath(cwd);
 
         return Effect.gen(function* ($) {
           const fiber = yield* $(
@@ -336,7 +338,7 @@ describe('[Given] *Not* Git', function () {
         git: { init: false, dirty: false },
         fixtures: { configFile: true, templateFiles: true },
       });
-      const configPath = path.join(cwd, configFlag);
+      const configPath = createConfigPath(cwd);
 
       return Effect.gen(function* ($) {
         const fiber = yield* $(
@@ -381,7 +383,7 @@ describe('[Given] *Not* Git', function () {
           git: { init: false, dirty: false },
           fixtures: { configFile: true, templateFiles: true },
         });
-        const configPath = path.join(cwd, configFlag);
+        const configPath = createConfigPath(cwd);
         return Effect.gen(function* ($) {
           const fiber = yield* $(
             Effect.fork(

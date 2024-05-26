@@ -6,6 +6,7 @@ import { Data, Effect } from 'effect';
 export class CosmicConfigError extends Data.TaggedClass('CosmicConfigError')<{
   readonly error:
     | `[read config failed] ${string}`
+    | `Cosmic Explorer failed to construct`
     | 'invalid config'
     | 'Empty Config'
     | 'No template options found';

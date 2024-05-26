@@ -12,23 +12,34 @@ import PackageJson from '../../package.json';
 import { ConfigParseError, CosmicConfigError } from './error.js';
 import { ScribeConfig } from './schema.js';
 
-export const getCosmicExplorer = () =>
-  cosmiconfig(PackageJson.name, { loaders: { '.ts': TypeScriptLoader() } });
+export const CONFIG_NAME = 'scribe.config.ts';
 
-export const readConfig = (
-  path: string,
-): Effect.Effect<
-  Schema.Schema.Type<typeof ScribeConfig>,
-  CosmicConfigError | ConfigParseError
-> =>
-  pipe(
-    Effect.tryPromise({
-      try:
-        // TODO: if path - load, !path - search
-        async () => getCosmicExplorer().load(path),
-      catch: _ =>
-        new CosmicConfigError({ error: `[read config failed] ${String(_)}` }),
-    }),
+export const getCosmicExplorer = () =>
+  Effect.try({
+    try: () =>
+      cosmiconfig(PackageJson.name, { loaders: { '.ts': TypeScriptLoader() } }),
+    catch: () =>
+      new CosmicConfigError({ error: 'Cosmic Explorer failed to construct' }),
+  });
+
+const load = (path: string) =>
+  Effect.gen(function* ($) {
+    const explorer = yield* $(getCosmicExplorer());
+
+    return yield* $(
+      Effect.tryPromise({
+        try:
+          // TODO: if path - load, !path - search
+          async () => explorer.load(path),
+        catch: _ =>
+          new CosmicConfigError({ error: `[read config failed] ${String(_)}` }),
+      }),
+    );
+  });
+
+export const readConfig = (path: string) => {
+  return pipe(
+    load(path),
     Effect.flatMap(mapCosmicConfig),
     Effect.flatMap(Schema.decodeUnknown(ScribeConfig)),
     Effect.catchTags({
@@ -36,15 +47,16 @@ export const readConfig = (
         Effect.fail(new ConfigParseError({ parseError, path })),
     }),
   );
+};
 
 export const checkForTemplates = (_: string[]) =>
-  Effect.if({
+  Effect.if(Array.isNonEmptyArray(_), {
     onTrue: () => Effect.succeed(_),
     onFalse: () =>
       Effect.fail(
         new CosmicConfigError({ error: 'No template options found' }),
       ),
-  })(Array.isNonEmptyArray(_));
+  });
 
 /**
  * reads the config from readUserConfig and picks out the values
@@ -65,28 +77,35 @@ const isCosmicConfigResultSuccess = (_: CosmiconfigResult) =>
   _ !== null && _.isEmpty !== true;
 
 export const mapCosmicConfig = (_: CosmiconfigResult) =>
-  Effect.if({
+  Effect.if(isCosmicConfigResultSuccess(_), {
     onTrue: () => Effect.succeed(_?.config as unknown),
     onFalse: () =>
       Effect.fail(new CosmicConfigError({ error: 'Empty Config' })),
-  })(isCosmicConfigResultSuccess(_));
+  });
 
-export const createConfigPath = (_process: Process.Process) =>
-  path.join(_process.cwd(), 'scribe.config.ts');
+export const getConfigPath = (cwd?: string) => {
+  if (cwd) {
+    return Effect.succeed(path.join(cwd, CONFIG_NAME));
+  }
+
+  return Process.Process.pipe(
+    Effect.flatMap(_process =>
+      Effect.succeed(path.join(_process.cwd(), CONFIG_NAME)),
+    ),
+  );
+};
 
 export const copyBaseScribeConfigToPath = () =>
   Effect.gen(function* ($) {
-    const process = yield* $(Process.Process);
     const fs = yield* $(FileSystem.FileSystem);
-    const path = createConfigPath(process);
+    const path = yield* $(getConfigPath());
     yield* $(fs.writeFileString(path, Constants.BASE_CONFIG));
     return path;
   });
 
 export const createConfigFileExistsError = () =>
   Effect.gen(function* ($) {
-    const _process = yield* $(Process.Process);
-    const path = createConfigPath(_process);
+    const path = yield* $(getConfigPath());
 
     yield* $(
       Effect.fail(
@@ -102,28 +121,48 @@ export const createConfigFileExistsError = () =>
   });
 
 export const checkConfigWritePathEmpty = () =>
-  Process.Process.pipe(
-    Effect.flatMap(_process =>
-      pipe(
-        createConfigPath(_process),
-        FS.isFileOrDirectory,
-        Effect.catchTag('SystemError', error => {
-          /**
-           * NotFound indicates the path is clear, and we can safely write there
-           */
-          if (error.reason === 'NotFound') {
-            return Effect.succeed(false);
-          }
+  pipe(
+    getConfigPath(),
+    Effect.flatMap(FS.isFileOrDirectory),
 
-          // TODO: add ignore file exists
-          // TODO: test case that hits this?
-          // Permission error?
-          return Effect.fail(error);
-        }),
-        Effect.if({
-          onTrue: () => createConfigFileExistsError(),
-          onFalse: () => Effect.void,
-        }),
-      ),
-    ),
+    Effect.catchTag('SystemError', error => {
+      /**
+       * NotFound indicates the path is clear, and we can safely write there
+       */
+      if (error.reason === 'NotFound') {
+        return Effect.succeed(false);
+      }
+
+      // TODO: add ignore file exists
+      // TODO: test case that hits this?
+      // Permission error?
+      return Effect.fail(error);
+    }),
+    Effect.if({
+      onTrue: () => createConfigFileExistsError(),
+      onFalse: () => Effect.void,
+    }),
   );
+
+export const createConfigPathAbsolute = (filePath: string) =>
+  Effect.gen(function* ($) {
+    const _process = yield* $(Process.Process);
+    const cwd = _process.cwd();
+
+    return yield* $(
+      path.isAbsolute(filePath),
+      Effect.if({
+        onTrue: () => onAbsolutePath(cwd, filePath),
+        // Joins cwd with relative path argument
+        onFalse: () => Effect.succeed(path.join(cwd, filePath)),
+      }),
+    );
+  });
+
+const onAbsolutePath = (cwd: string, filePath: string) =>
+  Effect.if(FS.isFile(filePath), {
+    onTrue: () => Effect.succeed(filePath),
+    // absolute directory, so set the filePath to default location
+    // TODO: use search from cosmic config to handle this
+    onFalse: () => getConfigPath(cwd),
+  });

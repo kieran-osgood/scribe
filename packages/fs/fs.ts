@@ -1,6 +1,5 @@
 import { FileSystem } from '@effect/platform';
 import { WriteFileOptions } from '@effect/platform/FileSystem';
-import * as Process from '@scribe/process';
 import { Effect, pipe } from 'effect';
 import path from 'path';
 
@@ -36,25 +35,3 @@ export const isDirectory = (pathLike: string) =>
     Effect.flatMap(fs => fs.stat(pathLike)),
     Effect.map(_ => _.type === 'Directory'),
   );
-
-export const createConfigPathAbsolute = (filePath: string) =>
-  Effect.gen(function* ($) {
-    const process = yield* $(Process.Process);
-
-    const onAbsolutePath = () =>
-      Effect.if(isFile(filePath), {
-        onTrue: () => Effect.succeed(filePath),
-        // absolute directory, so set the filePath to default location
-        // TODO: use search from cosmic config to handle this
-        onFalse: () =>
-          Effect.succeed(path.join(process.cwd(), 'scribe.config.ts')),
-      });
-
-    return yield* $(
-      path.isAbsolute(filePath),
-      Effect.if({
-        onTrue: () => onAbsolutePath(),
-        onFalse: () => Effect.succeed(path.join(process.cwd(), filePath)),
-      }),
-    );
-  });

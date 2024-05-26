@@ -108,7 +108,7 @@ describe('writeTemplate', () => {
       expect(String(readResult)).toBe(fileContents);
     }).pipe(
       Effect.provide(Layer.mergeAll(NodeFileSystem.layer)),
-      Effect.provideService(Process.Process, Process.makeProcessMock(tmpPath)),
+      Effect.provideService(Process.Process, Process.getProcessMock(tmpPath)),
     );
   });
 });
@@ -150,7 +150,7 @@ describe('constructTemplate', () => {
         `);
     }).pipe(
       Effect.provide(Layer.mergeAll(NodeFileSystem.layer)),
-      Effect.provideService(Process.Process, Process.makeProcessMock(tmpPath)),
+      Effect.provideService(Process.Process, Process.getProcessMock(tmpPath)),
     );
   });
 

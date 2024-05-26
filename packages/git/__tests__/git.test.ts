@@ -36,7 +36,7 @@ describe('Git', () => {
         }).pipe(
           Effect.provideService(
             Process.Process,
-            Process.getMock('/non-existent-directory'),
+            Process.getProcess('/non-existent-directory'),
           ),
         ),
     );
@@ -50,7 +50,9 @@ describe('Git', () => {
         return Effect.gen(function* ($) {
           const result = yield* $(isWorkingTreeClean());
           expect(result).toBe(true);
-        }).pipe(Effect.provideService(Process.Process, Process.getMock(cwd)));
+        }).pipe(
+          Effect.provideService(Process.Process, Process.getProcess(cwd)),
+        );
       });
 
       // TODO: handle accepting or rejecting continue on dirty
@@ -62,7 +64,9 @@ describe('Git', () => {
         return Effect.gen(function* ($) {
           const result = yield* $(isWorkingTreeClean());
           expect(result).toBe(false);
-        }).pipe(Effect.provideService(Process.Process, Process.getMock(cwd)));
+        }).pipe(
+          Effect.provideService(Process.Process, Process.getProcess(cwd)),
+        );
       });
     });
 
@@ -83,7 +87,9 @@ describe('Git', () => {
             "
           `,
           );
-        }).pipe(Effect.provideService(Process.Process, Process.getMock(cwd)));
+        }).pipe(
+          Effect.provideService(Process.Process, Process.getProcess(cwd)),
+        );
       },
     );
   });

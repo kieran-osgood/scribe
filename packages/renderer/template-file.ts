@@ -11,13 +11,10 @@ import { GetTemplateError, TemplateFileError } from './error.js';
 
 /**
  * Technically the current implementation of template-file
- * doesn't appear that it can throw any errors, but we wrap with
- * try/catch to be safe.
+ * doesn't appear that it can throw any errors here,
+ * but we wrap with try/catch to be safe.
  */
-export const render = (
-  template: string,
-  data: TF.Data,
-): Effect.Effect<string, TemplateFileError> =>
+export const render = (template: string, data: TF.Data) =>
   Effect.try({
     try: () => TF.render(template, data),
     catch: error => new TemplateFileError({ error }),
@@ -52,16 +49,11 @@ export function constructTemplate(ctx: ConstructTemplateCtx) {
     const fs = yield* $(FileSystem.FileSystem);
     const filePaths = yield* $(getFilePaths(ctx));
 
-    const templates = yield* $(
+    const hydratedTemplates = yield* $(
       filePaths,
       Array.map(path => fs.readFileString(path)),
-      Effect.all,
-    );
-
-    // TODO: spread in ctx.input.variables
-    const hydratedTemplates = yield* $(
-      templates,
-      Array.map(_ => render(_, { Key: ctx.key })),
+      // TODO: spread in ctx.input.variables
+      Array.map(Effect.flatMap(_ => render(_, { Key: ctx.key }))),
       Effect.all,
     );
 
@@ -79,14 +71,20 @@ export type WriteTemplateCtx = Ctx & {
 export const writeFile = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
     const _process = yield* $(Process.Process);
-    const fileName = TF.render(_.generator.fileName, { Key: _.key });
+    const fileName = yield* $(render(_.generator.fileName, { Key: _.key }));
+
     // TODO: check if output dir is absoluteFilePath
-    const absoluteFilePath = path.join(
-      _process.cwd(),
-      _.generator.directory,
-      fileName,
-    );
-    return yield* $(FS.writeFileWithDir(absoluteFilePath, _.fileContents));
+    const filePath = path.join(_process.cwd(), _.generator.directory, fileName);
+    // const filePathh = path.join(_.generator.directory, fileName);
+
+    // const p = yield* $(
+    //   Effect.if(path.isAbsolute(_.generator.directory), {
+    //     onTrue: () =>
+    //       Effect.succeed(path.join(_.generator.directory, fileName)),
+    //     onFalse: () => Effect.succeed(path.join(_process.cwd(), filePathh)),
+    //   }),
+    // );
+    return yield* $(FS.writeFileWithDir(filePath, _.fileContents));
   });
 
 export const writeFiles = (ctx: Ctx) =>
