@@ -2,6 +2,7 @@ import { FileSystem } from '@effect/platform';
 import { SystemError } from '@effect/platform/Error';
 import { NodeFileSystem } from '@effect/platform-node';
 import * as V from '@effect/vitest';
+import { ScribeConfig } from '@scribe/config';
 import * as FS from '@scribe/fs';
 import * as Process from '@scribe/process';
 import { Array, Effect, Layer } from 'effect';
@@ -29,26 +30,24 @@ const screenFileContents = `describe('{{Name}}', function() {
 const mockConfig = {
   templatesDirectories: ['test/fixtures'],
   generators: {
-    screen: {
-      outputs: [
-        {
-          templateFileKey: 'screen',
-          output: {
-            directory: 'test/fixtures',
-            fileName: '{{Name}}.ts',
-          },
+    screen: [
+      {
+        templateFileKey: 'screen',
+        output: {
+          directory: 'test/fixtures',
+          fileName: '{{Name}}.ts',
         },
-        {
-          templateFileKey: 'screen.test',
-          output: {
-            directory: 'test/fixtures',
-            fileName: '{{Name}}.test.ts',
-          },
+      },
+      {
+        templateFileKey: 'screen.test',
+        output: {
+          directory: 'test/fixtures',
+          fileName: '{{Name}}.test.ts',
         },
-      ],
-    },
+      },
+    ],
   },
-};
+} satisfies ScribeConfig;
 
 const fileContents = 'TEST';
 

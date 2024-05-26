@@ -46,7 +46,7 @@ function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   });
 }
 
-export type ConstructTemplateCtx = Ctx & { output: Config.Template };
+export type ConstructTemplateCtx = Ctx & { output: Config.GeneratorConfig };
 
 export function constructTemplate(ctx: ConstructTemplateCtx) {
   return FileSystem.FileSystem.pipe(
@@ -75,7 +75,7 @@ export function constructTemplate(ctx: ConstructTemplateCtx) {
 
 export type WriteTemplateCtx = Ctx & {
   fileContents: string;
-  output: Config.Template;
+  output: Config.GeneratorConfig;
 };
 export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
@@ -103,7 +103,6 @@ export const writeTemplates = (ctx: {
         new GetTemplateError({ cause: `Template Missing: ${ctx.template}` }),
       ),
     ),
-    _ => _.outputs,
     Array.map(output =>
       constructTemplate({ output, ...ctx }).pipe(
         Effect.map(Array.map(writeTemplate)),

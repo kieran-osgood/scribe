@@ -3,35 +3,31 @@
 exports[`readConfig > should return valid config 1`] = `
 {
   "generators": {
-    "component": {
-      "outputs": [
-        {
-          "output": {
-            "directory": "examples/src/components",
-            "fileName": "{{Name}}.ts",
-          },
-          "templateFileKey": "component",
+    "component": [
+      {
+        "output": {
+          "directory": "examples/src/components",
+          "fileName": "{{Name}}.ts",
         },
-      ],
-    },
-    "screen": {
-      "outputs": [
-        {
-          "output": {
-            "directory": "examples/src/screens",
-            "fileName": "{{Name}}.ts",
-          },
-          "templateFileKey": "screen",
+        "templateFileKey": "component",
+      },
+    ],
+    "screen": [
+      {
+        "output": {
+          "directory": "examples/src/screens",
+          "fileName": "{{Name}}.ts",
         },
-        {
-          "output": {
-            "directory": "examples/src/screens",
-            "fileName": "{{Name}}.test.ts",
-          },
-          "templateFileKey": "screen.test",
+        "templateFileKey": "screen",
+      },
+      {
+        "output": {
+          "directory": "examples/src/screens",
+          "fileName": "{{Name}}.test.ts",
         },
-      ],
-    },
+        "templateFileKey": "screen.test",
+      },
+    ],
   },
   "templatesDirectories": [
     "./test/fixtures",

@@ -96,23 +96,23 @@ describe('[Given] Git clean', () => {
         yield* $(Fiber.join(fiber));
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
-          [
-            "? Template: › 
-          ❯ component 
-            screen ",
-            "? Template: › 
-            component 
-          ❯ screen ",
-            "✔ Template: …  screen
-          ",
-            "",
-            " Success ",
-            "Output files:
-          - ${cwd}/examples/src/screens/Login.ts
-          - ${cwd}/examples/src/screens/Login.test.ts
-          ",
-          ]
-        `);
+        [
+          "? Template: › 
+        ❯ component 
+          screen ",
+          "? Template: › 
+          component 
+        ❯ screen ",
+          "✔ Template: …  screen
+        ",
+          "",
+          " Success ",
+          "Output files:
+        - ${cwd}/examples/src/screens/Login.ts
+        - ${cwd}/examples/src/screens/Login.test.ts
+        ",
+        ]
+      `);
 
         const loginscreen = fs.readFileSync(
           path.join(cwd, `examples/src/screens/Login.ts`),
@@ -149,23 +149,23 @@ describe('[Given] Git clean', () => {
 
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
-          [
-            "? Name: › ",
-            "? Name: › L",
-            "? Name: › Lo",
-            "? Name: › Log",
-            "? Name: › Logi",
-            "? Name: › Login",
-            "✔ Name: … Login
-          ",
-            "",
-            " Success ",
-            "Output files:
-          - ${cwd}/examples/src/screens/Login.ts
-          - ${cwd}/examples/src/screens/Login.test.ts
-          ",
-          ]
-        `);
+        [
+          "? Name: › ",
+          "? Name: › L",
+          "? Name: › Lo",
+          "? Name: › Log",
+          "? Name: › Logi",
+          "? Name: › Login",
+          "✔ Name: … Login
+        ",
+          "",
+          " Success ",
+          "Output files:
+        - ${cwd}/examples/src/screens/Login.ts
+        - ${cwd}/examples/src/screens/Login.test.ts
+        ",
+        ]
+      `);
 
         const loginscreen = fs.readFileSync(
           path.join(cwd, `examples/src/screens/Login.ts`),
@@ -257,21 +257,21 @@ describe('[Given] Git Dirty', function () {
 
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
-          [
-            "Git working tree dirty - proceed with caution.
-          Recommendation: commit all changes before proceeding.",
-            "? Continue? › yes / no",
-            "? Continue? › yes / no",
-            "✔ Continue? … yes / no
-          ",
-            "",
-            " Success ",
-            "Output files:
-          - ${cwd}/examples/src/screens/Login.ts
-          - ${cwd}/examples/src/screens/Login.test.ts
-          ",
-          ]
-        `);
+  [
+    "Git working tree dirty - proceed with caution.
+  Recommendation: commit all changes before proceeding.",
+    "? Continue? › yes / no",
+    "? Continue? › yes / no",
+    "✔ Continue? … yes / no
+  ",
+    "",
+    " Success ",
+    "Output files:
+  - ${cwd}/examples/src/screens/Login.ts
+  - ${cwd}/examples/src/screens/Login.test.ts
+  ",
+  ]
+`);
 
         const loginscreen = fs.readFileSync(
           path.join(cwd, `examples/src/screens/Login.ts`),
@@ -358,19 +358,19 @@ describe('[Given] *Not* Git', function () {
 
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
-          [
-            "? Continue? › yes / no",
-            "? Continue? › yes / no",
-            "✔ Continue? … yes / no
-          ",
-            "",
-            " Success ",
-            "Output files:
-          - ${cwd}/examples/src/screens/Login.ts
-          - ${cwd}/examples/src/screens/Login.test.ts
-          ",
-          ]
-        `);
+  [
+    "? Continue? › yes / no",
+    "? Continue? › yes / no",
+    "✔ Continue? … yes / no
+  ",
+    "",
+    " Success ",
+    "Output files:
+  - ${cwd}/examples/src/screens/Login.ts
+  - ${cwd}/examples/src/screens/Login.test.ts
+  ",
+  ]
+`);
       }).pipe(runEffect(cwd));
     });
 

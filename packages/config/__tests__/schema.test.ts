@@ -8,14 +8,12 @@ describe('Config', () => {
     const config: ScribeConfig = {
       templatesDirectories: ['.'],
       generators: {
-        screen: {
-          outputs: [
-            {
-              templateFileKey: '',
-              output: { directory: '', fileName: '' },
-            },
-          ],
-        },
+        screen: [
+          {
+            templateFileKey: '',
+            output: { directory: '', fileName: '' },
+          },
+        ],
       },
     };
 
@@ -23,17 +21,15 @@ describe('Config', () => {
     expect(result).toMatchInlineSnapshot(`
       {
         "generators": {
-          "screen": {
-            "outputs": [
-              {
-                "output": {
-                  "directory": "",
-                  "fileName": "",
-                },
-                "templateFileKey": "",
+          "screen": [
+            {
+              "output": {
+                "directory": "",
+                "fileName": "",
               },
-            ],
-          },
+              "templateFileKey": "",
+            },
+          ],
         },
         "templatesDirectories": [
           ".",
@@ -47,7 +43,7 @@ describe('Config', () => {
       S.decodeUnknown(ScribeConfig)({}).pipe(Effect.flip),
     );
     expect(String(result)).toMatchInlineSnapshot(`
-      "{ templatesDirectories: ReadonlyArray<string>; generators: { [x: string]: { output?: { directory?: string | undefined } | undefined; outputs: ReadonlyArray<{ templateFileKey: string; output: { directory: string; fileName: string } }> } } }
+      "{ templatesDirectories: ReadonlyArray<string>; generators: { [x: string]: ReadonlyArray<{ templateFileKey: string; output: { directory: string; fileName: string } }> } }
       └─ ["templatesDirectories"]
          └─ is missing"
     `);
