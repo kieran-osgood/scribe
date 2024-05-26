@@ -24,10 +24,13 @@
   "scripts": {
     "start": "ts-node packages/cli/index.ts",
     "test": "vitest",
+    "test:watch": "vitest --watch",
     "lint": "eslint .",
+    "lint:watch": "esw .",
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write .",
     "tsc": "tsc",
+    "tsc:watch": "tsc --watch",
     "build": "tsup packages/cli/index.ts",
     "publish": "changeset publish",
     "changeset": "changeset",

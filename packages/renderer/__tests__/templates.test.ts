@@ -54,7 +54,7 @@ const _ctx = {
   generators: ['screen'],
 } satisfies Ctx;
 
-const templateOutput = {
+const generator = {
   key: 'screen',
   fileName: '{{Key}}.ts', // good-scribe
   directory: 'test/fixtures/config',
@@ -67,7 +67,7 @@ describe('writeTemplate', () => {
     return Effect.gen(function* ($) {
       const ctx = {
         fileContents,
-        output: templateOutput,
+        generator: generator,
         ..._ctx,
       } satisfies WriteTemplateCtx;
       const result = yield* $(writeTemplate(ctx));
@@ -93,7 +93,7 @@ describe('constructTemplate', () => {
 
     return Effect.gen(function* ($) {
       const ctx = {
-        output: {
+        generator: {
           key: 'screen',
           fileName: '{{Key}}.ts', // good-scribe
           directory: '',
@@ -133,7 +133,7 @@ describe('constructTemplate', () => {
       const ctx = {
         ..._ctx,
 
-        output: {
+        generator: {
           key: 'screen',
           fileName: '{{Key}}.ts',
           directory: '',
@@ -168,7 +168,7 @@ describe('constructTemplate', () => {
   V.it.scoped("should throw if scribe file isn't readable", () =>
     Effect.gen(function* ($) {
       const ctx = {
-        output: {
+        generator: {
           key: 'BADKEY',
           fileName: '', // good-scribe
           directory: '',
