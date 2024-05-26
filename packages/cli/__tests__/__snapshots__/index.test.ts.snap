@@ -104,10 +104,7 @@ exports[`InitCommand > [Given] Git Clean > [When] filepath clear [Then] create f
 "import { ScribeConfig } from '@kieran-osgood/scribe';
 
 export default {
-  options: {
-    rootOutDir: '.',
-    templatesDirectories: ['.'],
-  },
+  templatesDirectories: ['.'],
   templates: {},
 } satisfies ScribeConfig;
 "
@@ -117,10 +114,7 @@ exports[`InitCommand > [Given] Git Clean > [When] filepath full [then] print fai
 "import type { ScribeConfig } from '@scribe/config';
 
 const config = {
-  options: {
-    rootOutDir: '.',
-    templatesDirectories: ['./test/fixtures'],
-  },
+  templatesDirectories: ['./test/fixtures'],
   templates: {
     component: {
       outputs: [
@@ -162,10 +156,7 @@ exports[`InitCommand > [Given] Git dirty > [Then] prompt user to continue > [Whe
 "import { ScribeConfig } from '@kieran-osgood/scribe';
 
 export default {
-  options: {
-    rootOutDir: '.',
-    templatesDirectories: ['.'],
-  },
+  templatesDirectories: ['.'],
   templates: {},
 } satisfies ScribeConfig;
 "

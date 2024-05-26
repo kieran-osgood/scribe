@@ -57,8 +57,8 @@ describe('[Given] Git clean', () => {
             "",
             " Success ",
             "Output files:
-          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/87af1e26c73e70c29f22e8d590409318/examples/src/screens/Login.ts
-          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/87af1e26c73e70c29f22e8d590409318/examples/src/screens/Login.test.ts
+          - ${cwd}/examples/src/screens/Login.ts
+          - ${cwd}/examples/src/screens/Login.test.ts
           ",
           ]
         `);
@@ -108,8 +108,8 @@ describe('[Given] Git clean', () => {
             "",
             " Success ",
             "Output files:
-          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/eb2277338d6517787e7eba3b7cc72298/examples/src/screens/Login.ts
-          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/eb2277338d6517787e7eba3b7cc72298/examples/src/screens/Login.test.ts
+          - ${cwd}/examples/src/screens/Login.ts
+          - ${cwd}/examples/src/screens/Login.test.ts
           ",
           ]
         `);
@@ -161,8 +161,8 @@ describe('[Given] Git clean', () => {
             "",
             " Success ",
             "Output files:
-          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/9a5f36ba2ec6c2e87a6728b2845dc45a/examples/src/screens/Login.ts
-          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/9a5f36ba2ec6c2e87a6728b2845dc45a/examples/src/screens/Login.test.ts
+          - ${cwd}/examples/src/screens/Login.ts
+          - ${cwd}/examples/src/screens/Login.test.ts
           ",
           ]
         `);
@@ -208,8 +208,8 @@ describe('[Given] Git clean', () => {
           [
             " Success ",
             "Output files:
-          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/816fd22960cd12bc2bc866e0ff924c56/examples/src/screens/Login.ts
-          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/816fd22960cd12bc2bc866e0ff924c56/examples/src/screens/Login.test.ts
+          - ${cwd}/examples/src/screens/Login.ts
+          - ${cwd}/examples/src/screens/Login.test.ts
           ",
           ]
         `);
@@ -267,8 +267,8 @@ describe('[Given] Git Dirty', function () {
             "",
             " Success ",
             "Output files:
-          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/cb450915eb2e6499c757d637c1db8681/examples/src/screens/Login.ts
-          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/cb450915eb2e6499c757d637c1db8681/examples/src/screens/Login.test.ts
+          - ${cwd}/examples/src/screens/Login.ts
+          - ${cwd}/examples/src/screens/Login.test.ts
           ",
           ]
         `);
@@ -366,8 +366,8 @@ describe('[Given] *Not* Git', function () {
             "",
             " Success ",
             "Output files:
-          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/66dc87e02fbf922af9cbd1b9d1606a26/examples/src/screens/Login.ts
-          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/66dc87e02fbf922af9cbd1b9d1606a26/examples/src/screens/Login.test.ts
+          - ${cwd}/examples/src/screens/Login.ts
+          - ${cwd}/examples/src/screens/Login.test.ts
           ",
           ]
         `);

@@ -22,10 +22,7 @@ export const SYMBOLS = {
 export const BASE_CONFIG = `import { ScribeConfig } from '@kieran-osgood/scribe';
 
 export default {
-  options: {
-    rootOutDir: '.',
-    templatesDirectories: ['.'],
-  },
+  templatesDirectories: ['.'],
   templates: {},
 } satisfies ScribeConfig;
 `;

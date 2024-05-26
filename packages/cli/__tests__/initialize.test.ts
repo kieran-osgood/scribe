@@ -49,7 +49,7 @@ describe('[Given] Git Clean', () => {
 
         const result = yield* $(readConfig(configPath));
         expect(result).toEqual({
-          options: { rootOutDir: '.', templatesDirectories: ['.'] },
+          templatesDirectories: ['.'],
           templates: {},
         });
       }).pipe(runEffect(cwd));

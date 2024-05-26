@@ -75,10 +75,7 @@ Given a config and scribe files in the root of the repository (See [examples](ht
 import type { ScribeConfig } from '@scribe/config';
 
 const config = {
-  options: {
-    rootOutDir: '.',
-    templatesDirectories: ['./examples'],
-  },
+  templatesDirectories: ['./examples'],
   templates: {
     // Keys within the templates object correspond to what interactive mode will display, or --template flag will accept 
     screen: {

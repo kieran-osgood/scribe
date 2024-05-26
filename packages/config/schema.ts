@@ -23,21 +23,9 @@ export type TemplateSettings = S.Schema.Type<typeof TemplateSettings>;
 
 export const ScribeConfig = S.Struct({
   /**
-   * Global settings that apply to all template options
-   * Overridable within templates
+   * Directories to discover `*.scribe` files
    */
-  options: S.optional(
-    S.Struct({
-      /**
-       * Sets the root for pathing on relative paths
-       */
-      rootOutDir: S.String,
-      /**
-       * Directories to discover `*.scribe` files
-       */
-      templatesDirectories: S.Array(S.String),
-    }),
-  ),
+  templatesDirectories: S.Array(S.String),
   /**
    * List of templates for the CLI to render
    */

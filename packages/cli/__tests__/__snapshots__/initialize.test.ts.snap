@@ -4,10 +4,7 @@ exports[`[Given] Git Clean > [When] filepath full [then] print failure 2`] = `
 "import type { ScribeConfig } from '@scribe/config';
 
 const config = {
-  options: {
-    rootOutDir: '.',
-    templatesDirectories: ['./test/fixtures'],
-  },
+  templatesDirectories: ['./test/fixtures'],
   templates: {
     component: {
       outputs: [
@@ -49,10 +46,7 @@ exports[`[Given] Git Clean > [When] user accepts [Then] create schema compatible
 "import { ScribeConfig } from '@kieran-osgood/scribe';
 
 export default {
-  options: {
-    rootOutDir: '.',
-    templatesDirectories: ['.'],
-  },
+  templatesDirectories: ['.'],
   templates: {},
 } satisfies ScribeConfig;
 "

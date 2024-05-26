@@ -27,10 +27,7 @@ const screenFileContents = `describe('{{Name}}', function() {
 });`;
 
 const mockConfig = {
-  options: {
-    templatesDirectories: ['test/fixtures'],
-    rootOutDir: '',
-  },
+  templatesDirectories: ['test/fixtures'],
   templates: {
     screen: {
       outputs: [
@@ -154,10 +151,7 @@ describe('constructTemplate', () => {
         },
         config: {
           templates: _ctx.config.templates,
-          options: {
-            templatesDirectories: ['test/fixtures/templates'],
-            rootOutDir: '',
-          },
+          templatesDirectories: ['test/fixtures/templates'],
         },
       } satisfies ConstructTemplateCtx;
 

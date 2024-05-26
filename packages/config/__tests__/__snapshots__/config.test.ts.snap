@@ -2,12 +2,9 @@
 
 exports[`config > readConfig > should return valid config 1`] = `
 {
-  "options": {
-    "rootOutDir": ".",
-    "templatesDirectories": [
-      "./test/fixtures",
-    ],
-  },
+  "templatesDirectories": [
+    "./test/fixtures",
+  ],
   "templates": {
     "component": {
       "outputs": [
@@ -39,5 +36,44 @@ exports[`config > readConfig > should return valid config 1`] = `
       ],
     },
   },
+}
+`;
+
+exports[`readConfig > should return valid config 1`] = `
+{
+  "templates": {
+    "component": {
+      "outputs": [
+        {
+          "output": {
+            "directory": "examples/src/components",
+            "fileName": "{{Name}}.ts",
+          },
+          "templateFileKey": "component",
+        },
+      ],
+    },
+    "screen": {
+      "outputs": [
+        {
+          "output": {
+            "directory": "examples/src/screens",
+            "fileName": "{{Name}}.ts",
+          },
+          "templateFileKey": "screen",
+        },
+        {
+          "output": {
+            "directory": "examples/src/screens",
+            "fileName": "{{Name}}.test.ts",
+          },
+          "templateFileKey": "screen.test",
+        },
+      ],
+    },
+  },
+  "templatesDirectories": [
+    "./test/fixtures",
+  ],
 }
 `;

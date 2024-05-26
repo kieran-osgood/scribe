@@ -38,7 +38,7 @@ function createAbsFilePaths(ctx: ConstructTemplateCtx) {
     const _process = yield* $(Process.Process);
 
     return pipe(
-      ctx.config.options?.templatesDirectories ?? [''],
+      ctx.config.templatesDirectories,
       Array.map(_ =>
         path.join(_process.cwd(), _, `${ctx.output.templateFileKey}.scribe`),
       ),

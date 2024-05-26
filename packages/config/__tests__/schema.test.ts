@@ -6,10 +6,7 @@ import { ScribeConfig } from '../schema.js';
 describe('Config', () => {
   it('Parses successfully with templates', () => {
     const config: ScribeConfig = {
-      options: {
-        rootOutDir: '.',
-        templatesDirectories: ['.'],
-      },
+      templatesDirectories: ['.'],
       templates: {
         screen: {
           outputs: [
@@ -25,12 +22,6 @@ describe('Config', () => {
     const result = Effect.runSync(S.decodeUnknown(ScribeConfig)(config));
     expect(result).toMatchInlineSnapshot(`
         {
-          "options": {
-            "rootOutDir": ".",
-            "templatesDirectories": [
-              ".",
-            ],
-          },
           "templates": {
             "screen": {
               "outputs": [
@@ -44,6 +35,9 @@ describe('Config', () => {
               ],
             },
           },
+          "templatesDirectories": [
+            ".",
+          ],
         }
       `);
   });
@@ -53,8 +47,8 @@ describe('Config', () => {
       S.decodeUnknown(ScribeConfig)({}).pipe(Effect.flip),
     );
     expect(String(result)).toMatchInlineSnapshot(`
-      "{ options?: { rootOutDir: string; templatesDirectories: ReadonlyArray<string> } | undefined; templates: { [x: string]: { output?: { directory?: string | undefined } | undefined; outputs: ReadonlyArray<{ templateFileKey: string; output: { directory: string; fileName: string } }> } } }
-      └─ ["templates"]
+      "{ templatesDirectories: ReadonlyArray<string>; templates: { [x: string]: { output?: { directory?: string | undefined } | undefined; outputs: ReadonlyArray<{ templateFileKey: string; output: { directory: string; fileName: string } }> } } }
+      └─ ["templatesDirectories"]
          └─ is missing"
     `);
   });

@@ -2,12 +2,9 @@
 
 exports[`config > readConfig > should return valid config 1`] = `
 {
-  "options": {
-    "rootOutDir": ".",
-    "templatesDirectories": [
-      "./examples",
-    ],
-  },
+  "templatesDirectories": [
+    "./examples",
+  ],
   "templates": {
     "component": {
       "outputs": [
