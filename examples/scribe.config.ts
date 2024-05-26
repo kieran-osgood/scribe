@@ -2,7 +2,7 @@ import type { ScribeConfig } from '@scribe/config';
 
 const config = {
   templatesDirectories: ['./examples'],
-  templates: {
+  generators: {
     screen: {
       outputs: [
         {

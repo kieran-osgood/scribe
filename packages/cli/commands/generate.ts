@@ -17,7 +17,7 @@ import {
 const args = {
   configPath: ConfigPath,
   name: TemplateName,
-  template: Template,
+  generator: Template,
   verboseLogging: VerboseLogging,
 } satisfies Command.Command.Config;
 
@@ -25,7 +25,7 @@ type ConfigContext = {
   readonly name: string;
   readonly template: string;
   readonly config: Schema.Schema.Type<typeof Config.ScribeConfig>;
-  readonly templates: string[];
+  readonly generators: string[];
 };
 export const Generate = Command.make('scribe', args, args =>
   pipe(
@@ -41,7 +41,7 @@ export const Generate = Command.make('scribe', args, args =>
         const templates = yield* $(Config.readUserTemplateOptions(_configPath));
 
         const template = yield* $(
-          args.template,
+          args.generator,
           Effect.orElse(() => Prompts.SelectTemplate(templates)),
         );
 
@@ -52,7 +52,12 @@ export const Generate = Command.make('scribe', args, args =>
 
         const config = yield* $(Config.readConfig(_configPath));
 
-        return { name, template, config, templates } satisfies ConfigContext;
+        return {
+          name,
+          template,
+          config,
+          generators: templates,
+        } satisfies ConfigContext;
       }),
     ),
 

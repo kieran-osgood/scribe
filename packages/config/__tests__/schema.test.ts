@@ -7,7 +7,7 @@ describe('Config', () => {
   it('Parses successfully with templates', () => {
     const config: ScribeConfig = {
       templatesDirectories: ['.'],
-      templates: {
+      generators: {
         screen: {
           outputs: [
             {
@@ -21,25 +21,25 @@ describe('Config', () => {
 
     const result = Effect.runSync(S.decodeUnknown(ScribeConfig)(config));
     expect(result).toMatchInlineSnapshot(`
-        {
-          "templates": {
-            "screen": {
-              "outputs": [
-                {
-                  "output": {
-                    "directory": "",
-                    "fileName": "",
-                  },
-                  "templateFileKey": "",
+      {
+        "generators": {
+          "screen": {
+            "outputs": [
+              {
+                "output": {
+                  "directory": "",
+                  "fileName": "",
                 },
-              ],
-            },
+                "templateFileKey": "",
+              },
+            ],
           },
-          "templatesDirectories": [
-            ".",
-          ],
-        }
-      `);
+        },
+        "templatesDirectories": [
+          ".",
+        ],
+      }
+    `);
   });
 
   it('throws with invalid config', () => {
@@ -47,7 +47,7 @@ describe('Config', () => {
       S.decodeUnknown(ScribeConfig)({}).pipe(Effect.flip),
     );
     expect(String(result)).toMatchInlineSnapshot(`
-      "{ templatesDirectories: ReadonlyArray<string>; templates: { [x: string]: { output?: { directory?: string | undefined } | undefined; outputs: ReadonlyArray<{ templateFileKey: string; output: { directory: string; fileName: string } }> } } }
+      "{ templatesDirectories: ReadonlyArray<string>; generators: { [x: string]: { output?: { directory?: string | undefined } | undefined; outputs: ReadonlyArray<{ templateFileKey: string; output: { directory: string; fileName: string } }> } } }
       └─ ["templatesDirectories"]
          └─ is missing"
     `);

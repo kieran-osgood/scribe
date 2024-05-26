@@ -105,7 +105,7 @@ exports[`InitCommand > [Given] Git Clean > [When] filepath clear [Then] create f
 
 export default {
   templatesDirectories: ['.'],
-  templates: {},
+  generators: {},
 } satisfies ScribeConfig;
 "
 `;
@@ -115,7 +115,7 @@ exports[`InitCommand > [Given] Git Clean > [When] filepath full [then] print fai
 
 const config = {
   templatesDirectories: ['./test/fixtures'],
-  templates: {
+  generators: {
     component: {
       outputs: [
         {
@@ -157,7 +157,7 @@ exports[`InitCommand > [Given] Git dirty > [Then] prompt user to continue > [Whe
 
 export default {
   templatesDirectories: ['.'],
-  templates: {},
+  generators: {},
 } satisfies ScribeConfig;
 "
 `;

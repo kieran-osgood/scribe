@@ -25,7 +25,7 @@ export type Ctx = {
   name: string;
   template: string;
   config: Effect.Effect.Success<ReturnType<(typeof Config)['readConfig']>>;
-  templates: string[];
+  generators: string[];
 };
 
 export class GetTemplateError extends Data.TaggedClass('GetTemplateError')<{
@@ -93,10 +93,10 @@ export const writeTemplates = (ctx: {
   name: string;
   template: string;
   config: Schema.Schema.Type<typeof Config.ScribeConfig>;
-  templates: string[];
+  generators: string[];
 }) =>
   pipe(
-    ctx.config.templates,
+    ctx.config.generators,
     Record.get(ctx.template),
     O.getOrThrowWith(() =>
       Effect.fail(

@@ -50,7 +50,7 @@ describe('[Given] Git Clean', () => {
         const result = yield* $(readConfig(configPath));
         expect(result).toEqual({
           templatesDirectories: ['.'],
-          templates: {},
+          generators: {},
         });
       }).pipe(runEffect(cwd));
     },

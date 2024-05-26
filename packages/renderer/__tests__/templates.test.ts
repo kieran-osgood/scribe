@@ -28,7 +28,7 @@ const screenFileContents = `describe('{{Name}}', function() {
 
 const mockConfig = {
   templatesDirectories: ['test/fixtures'],
-  templates: {
+  generators: {
     screen: {
       outputs: [
         {
@@ -56,7 +56,7 @@ const _ctx = {
   config: mockConfig,
   template: 'screen',
   name: 'login',
-  templates: ['screen'],
+  generators: ['screen'],
 } satisfies Ctx;
 
 const templateOutput = {
@@ -150,7 +150,7 @@ describe('constructTemplate', () => {
           },
         },
         config: {
-          templates: _ctx.config.templates,
+          generators: _ctx.config.generators,
           templatesDirectories: ['test/fixtures/templates'],
         },
       } satisfies ConstructTemplateCtx;

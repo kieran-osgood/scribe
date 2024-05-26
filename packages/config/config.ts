@@ -54,7 +54,7 @@ export const readUserTemplateOptions = flow(
   readConfig,
   Effect.flatMap(config =>
     pipe(
-      Array.fromRecord(config.templates),
+      Array.fromRecord(config.generators),
       Array.map(Tuple.getFirst),
       checkForTemplates,
     ),

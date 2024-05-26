@@ -10,7 +10,7 @@ const Template = S.Struct({
 
 export type Template = S.Schema.Type<typeof Template>;
 
-const TemplateSettings = S.Struct({
+const GeneratorConfig = S.Struct({
   output: S.optional(
     S.Struct({
       directory: S.optional(S.String),
@@ -19,7 +19,7 @@ const TemplateSettings = S.Struct({
   outputs: S.Array(Template),
 });
 
-export type TemplateSettings = S.Schema.Type<typeof TemplateSettings>;
+export type GeneratorConfig = S.Schema.Type<typeof GeneratorConfig>;
 
 export const ScribeConfig = S.Struct({
   /**
@@ -29,6 +29,6 @@ export const ScribeConfig = S.Struct({
   /**
    * List of templates for the CLI to render
    */
-  templates: S.Record(S.String, TemplateSettings),
+  generators: S.Record(S.String, GeneratorConfig),
 });
 export type ScribeConfig = S.Schema.Type<typeof ScribeConfig>;

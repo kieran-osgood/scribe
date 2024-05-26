@@ -76,7 +76,7 @@ import type { ScribeConfig } from '@scribe/config';
 
 const config = {
   templatesDirectories: ['./examples'],
-  templates: {
+  generators: {
     // Keys within the templates object correspond to what interactive mode will display, or --template flag will accept 
     screen: {
       outputs: [
