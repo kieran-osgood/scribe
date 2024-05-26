@@ -1,12 +1,11 @@
 import { Command } from '@effect/cli';
-import { FileSystem } from '@effect/platform';
+import {
+  checkConfigWritePathEmpty,
+  copyBaseScribeConfigToPath,
+} from '@scribe/config';
 import * as Console from '@scribe/console';
-import * as Constants from '@scribe/constants';
-import * as FS from '@scribe/fs';
-import * as Process from '@scribe/process';
 import { Prompts } from '@scribe/ui';
 import { Effect, Logger, pipe } from 'effect';
-import path from 'path';
 
 import { VerboseLogging } from '../arguments.js';
 
@@ -17,10 +16,10 @@ const args = {
 export const Initialize = Command.make('init', args, ({ verboseLogging }) =>
   pipe(
     Console.header(`Init`),
+
     Effect.tap(() =>
       Console.logGroup('info', 'Git')('Checking working tree clean'),
     ),
-
     Effect.flatMap(Prompts.DirtyGitCheck),
 
     Effect.tap(() =>
@@ -61,67 +60,9 @@ export const Initialize = Command.make('init', args, ({ verboseLogging }) =>
         )('Failed to create config. Path not empty.').pipe(
           Effect.tap(() => Console.file(error.message)),
         ),
-    }),
-
-    Effect.catchTags({
       QuitException: () => Effect.void,
     }),
 
     Logger.withMinimumLogLevel(Console.setLogLevel(verboseLogging)),
   ),
 );
-
-const createConfigPath = (_process: Process.Process) =>
-  path.join(_process.cwd(), 'scribe.config.ts');
-
-const checkConfigWritePathEmpty = () =>
-  Process.Process.pipe(
-    Effect.flatMap(_process =>
-      pipe(
-        createConfigPath(_process),
-        FS.isFileOrDirectory,
-        Effect.if({
-          onTrue: () => createFileExistsError(),
-          onFalse: () => Effect.void,
-        }),
-        Effect.catchTag('SystemError', error => {
-          /**
-           * NotFound indicates the path is clear, and we can safely write there
-           */
-          if (error.reason === 'NotFound') {
-            return Effect.succeed(false);
-          }
-
-          // TODO: add ignore file exists
-          // TODO: test case that hits this?
-          return Effect.fail(error);
-        }),
-      ),
-    ),
-  );
-
-const copyBaseScribeConfigToPath = () =>
-  Effect.all([Process.Process, FileSystem.FileSystem]).pipe(
-    Effect.flatMap(([process, fs]) =>
-      pipe(createConfigPath(process), path =>
-        fs
-          .writeFileString(path, Constants.BASE_CONFIG)
-          .pipe(Effect.map(() => path)),
-      ),
-    ),
-  );
-
-const createFileExistsError = () =>
-  Process.Process.pipe(
-    Effect.flatMap(_process =>
-      Effect.fail(
-        new FS.FileExistsError({
-          error: new FS.AccessError({
-            error: new Error(`${createConfigPath(_process)} already exists.`),
-            path: createConfigPath(_process),
-            mode: 0,
-          }),
-        }),
-      ),
-    ),
-  );

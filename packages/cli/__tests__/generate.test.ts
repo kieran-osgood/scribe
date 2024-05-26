@@ -36,33 +36,32 @@ describe('[Given] Git clean', () => {
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
 
         expect(lines).toMatchInlineSnapshot(`
-            [
-              "? Template: › 
-            ❯ component 
-              screen ",
-              "? Template: › 
-              component 
-            ❯ screen ",
-              "✔ Template: …  screen
-            ",
-              "",
-              "? Name: › ",
-              "? Name: › L",
-              "? Name: › Lo",
-              "? Name: › Log",
-              "? Name: › Logi",
-              "? Name: › Login",
-              "✔ Name: … Login
-            ",
-              "",
-              "✅",
-              "Success",
-              "Output files:
-            - ${cwd}/examples/src/screens/Login.ts
-            - ${cwd}/examples/src/screens/Login.test.ts
-            ",
-            ]
-          `);
+          [
+            "? Template: › 
+          ❯ component 
+            screen ",
+            "? Template: › 
+            component 
+          ❯ screen ",
+            "✔ Template: …  screen
+          ",
+            "",
+            "? Name: › ",
+            "? Name: › L",
+            "? Name: › Lo",
+            "? Name: › Log",
+            "? Name: › Logi",
+            "? Name: › Login",
+            "✔ Name: … Login
+          ",
+            "",
+            " Success ",
+            "Output files:
+          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/87af1e26c73e70c29f22e8d590409318/examples/src/screens/Login.ts
+          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/87af1e26c73e70c29f22e8d590409318/examples/src/screens/Login.test.ts
+          ",
+          ]
+        `);
 
         const loginscreen = fs.readFileSync(
           path.join(cwd, `examples/src/screens/Login.ts`),
@@ -97,24 +96,23 @@ describe('[Given] Git clean', () => {
         yield* $(Fiber.join(fiber));
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
-            [
-              "? Template: › 
-            ❯ component 
-              screen ",
-              "? Template: › 
-              component 
-            ❯ screen ",
-              "✔ Template: …  screen
-            ",
-              "",
-              "✅",
-              "Success",
-              "Output files:
-            - ${cwd}/examples/src/screens/Login.ts
-            - ${cwd}/examples/src/screens/Login.test.ts
-            ",
-            ]
-          `);
+          [
+            "? Template: › 
+          ❯ component 
+            screen ",
+            "? Template: › 
+            component 
+          ❯ screen ",
+            "✔ Template: …  screen
+          ",
+            "",
+            " Success ",
+            "Output files:
+          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/eb2277338d6517787e7eba3b7cc72298/examples/src/screens/Login.ts
+          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/eb2277338d6517787e7eba3b7cc72298/examples/src/screens/Login.test.ts
+          ",
+          ]
+        `);
 
         const loginscreen = fs.readFileSync(
           path.join(cwd, `examples/src/screens/Login.ts`),
@@ -151,24 +149,23 @@ describe('[Given] Git clean', () => {
 
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
-            [
-              "? Name: › ",
-              "? Name: › L",
-              "? Name: › Lo",
-              "? Name: › Log",
-              "? Name: › Logi",
-              "? Name: › Login",
-              "✔ Name: … Login
-            ",
-              "",
-              "✅",
-              "Success",
-              "Output files:
-            - ${cwd}/examples/src/screens/Login.ts
-            - ${cwd}/examples/src/screens/Login.test.ts
-            ",
-            ]
-          `);
+          [
+            "? Name: › ",
+            "? Name: › L",
+            "? Name: › Lo",
+            "? Name: › Log",
+            "? Name: › Logi",
+            "? Name: › Login",
+            "✔ Name: … Login
+          ",
+            "",
+            " Success ",
+            "Output files:
+          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/9a5f36ba2ec6c2e87a6728b2845dc45a/examples/src/screens/Login.ts
+          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/9a5f36ba2ec6c2e87a6728b2845dc45a/examples/src/screens/Login.test.ts
+          ",
+          ]
+        `);
 
         const loginscreen = fs.readFileSync(
           path.join(cwd, `examples/src/screens/Login.ts`),
@@ -208,15 +205,14 @@ describe('[Given] Git clean', () => {
 
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
-            [
-              "✅",
-              "Success",
-              "Output files:
-            - ${cwd}/examples/src/screens/Login.ts
-            - ${cwd}/examples/src/screens/Login.test.ts
-            ",
-            ]
-          `);
+          [
+            " Success ",
+            "Output files:
+          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/816fd22960cd12bc2bc866e0ff924c56/examples/src/screens/Login.ts
+          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/816fd22960cd12bc2bc866e0ff924c56/examples/src/screens/Login.test.ts
+          ",
+          ]
+        `);
 
         const loginscreen = fs.readFileSync(
           path.join(cwd, `examples/src/screens/Login.ts`),
@@ -261,22 +257,21 @@ describe('[Given] Git Dirty', function () {
 
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
-            [
-              "Git working tree dirty - proceed with caution.
-            Recommendation: commit all changes before proceeding.",
-              "? Continue? › yes / no",
-              "? Continue? › yes / no",
-              "✔ Continue? … yes / no
-            ",
-              "",
-              "✅",
-              "Success",
-              "Output files:
-            - ${cwd}/examples/src/screens/Login.ts
-            - ${cwd}/examples/src/screens/Login.test.ts
-            ",
-            ]
-          `);
+          [
+            "Git working tree dirty - proceed with caution.
+          Recommendation: commit all changes before proceeding.",
+            "? Continue? › yes / no",
+            "? Continue? › yes / no",
+            "✔ Continue? … yes / no
+          ",
+            "",
+            " Success ",
+            "Output files:
+          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/cb450915eb2e6499c757d637c1db8681/examples/src/screens/Login.ts
+          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/cb450915eb2e6499c757d637c1db8681/examples/src/screens/Login.test.ts
+          ",
+          ]
+        `);
 
         const loginscreen = fs.readFileSync(
           path.join(cwd, `examples/src/screens/Login.ts`),
@@ -363,20 +358,19 @@ describe('[Given] *Not* Git', function () {
 
         const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
         expect(lines).toMatchInlineSnapshot(`
-            [
-              "? Continue? › yes / no",
-              "? Continue? › yes / no",
-              "✔ Continue? … yes / no
-            ",
-              "",
-              "✅",
-              "Success",
-              "Output files:
-            - ${cwd}/examples/src/screens/Login.ts
-            - ${cwd}/examples/src/screens/Login.test.ts
-            ",
-            ]
-          `);
+          [
+            "? Continue? › yes / no",
+            "? Continue? › yes / no",
+            "✔ Continue? … yes / no
+          ",
+            "",
+            " Success ",
+            "Output files:
+          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/66dc87e02fbf922af9cbd1b9d1606a26/examples/src/screens/Login.ts
+          - /private/var/folders/vf/pdvmry710gncdjlmpr7pr97m0000gn/T/66dc87e02fbf922af9cbd1b9d1606a26/examples/src/screens/Login.test.ts
+          ",
+          ]
+        `);
       }).pipe(runEffect(cwd));
     });
 
