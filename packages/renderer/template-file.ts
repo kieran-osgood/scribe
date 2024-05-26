@@ -3,11 +3,11 @@ import { Schema } from '@effect/schema';
 import * as Config from '@scribe/config';
 import * as FS from '@scribe/fs';
 import * as Process from '@scribe/process';
-import { Array, Data, Effect, Option as O, pipe, Record } from 'effect';
+import { Array, Effect, Option as O, pipe, Record } from 'effect';
 import path from 'path';
 import * as TF from 'template-file';
 
-import { TemplateFileError } from './error.js';
+import { GetTemplateError, TemplateFileError } from './error.js';
 
 // TODO: Add tests
 export const render = (
@@ -23,13 +23,9 @@ export const render = (
 export type Ctx = {
   key: string;
   template: string;
-  config: Effect.Effect.Success<ReturnType<(typeof Config)['readConfig']>>;
+  config: Schema.Schema.Type<typeof Config.ScribeConfig>;
   generators: string[];
 };
-
-export class GetTemplateError extends Data.TaggedClass('GetTemplateError')<{
-  readonly cause?: string;
-}> {}
 
 function createAbsFilePaths(ctx: ConstructTemplateCtx) {
   return Effect.gen(function* ($) {
@@ -87,12 +83,7 @@ export const writeTemplate = (_: WriteTemplateCtx) =>
     return yield* $(FS.writeFileWithDir(absoluteFilePath, _.fileContents));
   });
 
-export const writeTemplates = (ctx: {
-  key: string;
-  template: string;
-  config: Schema.Schema.Type<typeof Config.ScribeConfig>;
-  generators: string[];
-}) =>
+export const writeTemplates = (ctx: Ctx) =>
   pipe(
     ctx.config.generators,
     Record.get(ctx.template),
