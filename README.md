@@ -1,6 +1,5 @@
 # scribe
 
-
 Bootstrap your common files with [Mustache](https://github.com/mustache/mustache.github.com) templates.
 
 <div align='center'>
@@ -78,26 +77,18 @@ const config = {
   templatesDirectories: ['./examples'],
   generators: {
     // Keys within the templates object correspond to what interactive mode will display, or --template flag will accept 
-    screen: {
-      outputs: [
+    screen: [
         {
-          // the key screen corresponds to the template `screen.scribe` shown below 
-          key: 'screen',
-          output: {
-            directory: 'examples/src/screens',
-            fileName: '{{Name}}.ts',
-          },
+          // the {{ Key }} corresponds to the template `screen` key in config.generators<Key, {}>
+          fileName: '{{Key}}.ts',
+          directory: 'examples/src/screens',
         },
         {
-          // the key screen corresponds to the template `screen.test.scribe` shown below 
-          key: 'screen.test',
-          output: {
-            directory: 'examples/src/screens',
-            fileName: '{{Name}}.test.ts',
-          },
+        // the key screen corresponds to the template `screen.test` shown below 
+        fileName: '{{Name}}.test.ts',
+          directory: 'examples/src/screens',
         },
-      ],
-    },
+    ],
   },
 } satisfies ScribeConfig;
 

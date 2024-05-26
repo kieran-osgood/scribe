@@ -39,7 +39,7 @@ const InputFileName = Prompt.text({
 //       // description: generator.description ?? '',
 //     })),
 //   });
-//
+
 const SelectTemplate = (s: string[]) =>
   Prompt.select({
     message: 'Generator File:',
