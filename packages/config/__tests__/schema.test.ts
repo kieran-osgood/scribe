@@ -11,7 +11,8 @@ describe('Config', () => {
         screen: [
           {
             key: '',
-            output: { directory: '', fileName: '' },
+            directory: '',
+            fileName: '',
           },
         ],
       },
@@ -23,11 +24,9 @@ describe('Config', () => {
         "generators": {
           "screen": [
             {
+              "directory": "",
+              "fileName": "",
               "key": "",
-              "output": {
-                "directory": "",
-                "fileName": "",
-              },
             },
           ],
         },
@@ -43,7 +42,7 @@ describe('Config', () => {
       S.decodeUnknown(ScribeConfig)({}).pipe(Effect.flip),
     );
     expect(String(result)).toMatchInlineSnapshot(`
-      "{ templatesDirectories: ReadonlyArray<string>; generators: { [x: string]: ReadonlyArray<{ key: string; output: { directory: string; fileName: string } }> } }
+      "{ templatesDirectories: ReadonlyArray<string>; generators: { [x: string]: ReadonlyArray<{ key: string; directory: string; fileName: string }> } }
       └─ ["templatesDirectories"]
          └─ is missing"
     `);

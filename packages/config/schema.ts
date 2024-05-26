@@ -2,10 +2,8 @@ import * as S from '@effect/schema/Schema';
 
 const GeneratorConfig = S.Struct({
   key: S.String,
-  output: S.Struct({
-    directory: S.String,
-    fileName: S.String,
-  }),
+  directory: S.String,
+  fileName: S.String,
 });
 
 export type GeneratorConfig = S.Schema.Type<typeof GeneratorConfig>;

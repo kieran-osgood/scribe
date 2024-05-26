@@ -78,10 +78,10 @@ export type WriteTemplateCtx = Ctx & {
 export const writeTemplate = (_: WriteTemplateCtx) =>
   Effect.gen(function* ($) {
     const _process = yield* $(Process.Process);
-    const fileName = TF.render(_.output.output.fileName, { Name: _.name });
+    const fileName = TF.render(_.output.fileName, { Name: _.name });
     const absoluteFilePath = path.join(
       _process.cwd(),
-      _.output.output.directory,
+      _.output.directory,
       fileName,
     );
     return yield* $(FS.writeFileWithDir(absoluteFilePath, _.fileContents));

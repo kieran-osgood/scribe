@@ -2,7 +2,7 @@ import { FileSystem } from '@effect/platform';
 import { SystemError } from '@effect/platform/Error';
 import { NodeFileSystem } from '@effect/platform-node';
 import * as V from '@effect/vitest';
-import { ScribeConfig } from '@scribe/config';
+import { GeneratorConfig, ScribeConfig } from '@scribe/config';
 import * as FS from '@scribe/fs';
 import * as Process from '@scribe/process';
 import { Array, Effect, Layer } from 'effect';
@@ -33,17 +33,13 @@ const mockConfig = {
     screen: [
       {
         key: 'screen',
-        output: {
-          directory: 'test/fixtures',
-          fileName: '{{Name}}.ts',
-        },
+        directory: 'test/fixtures',
+        fileName: '{{Name}}.ts',
       },
       {
         key: 'screen.test',
-        output: {
-          directory: 'test/fixtures',
-          fileName: '{{Name}}.test.ts',
-        },
+        directory: 'test/fixtures',
+        fileName: '{{Name}}.test.ts',
       },
     ],
   },
@@ -60,11 +56,9 @@ const _ctx = {
 
 const templateOutput = {
   key: 'screen',
-  output: {
-    fileName: '{{Name}}.ts', // good-scribe
-    directory: 'test/fixtures/config',
-  },
-};
+  fileName: '{{Name}}.ts', // good-scribe
+  directory: 'test/fixtures/config',
+} satisfies GeneratorConfig;
 
 describe('writeTemplate', () => {
   V.it.scoped('should write file', () => {
@@ -101,10 +95,8 @@ describe('constructTemplate', () => {
       const ctx = {
         output: {
           key: 'screen',
-          output: {
-            fileName: '{{Name}}.ts', // good-scribe
-            directory: '',
-          },
+          fileName: '{{Name}}.ts', // good-scribe
+          directory: '',
         },
         ..._ctx,
       } satisfies ConstructTemplateCtx;
@@ -143,10 +135,8 @@ describe('constructTemplate', () => {
 
         output: {
           key: 'screen',
-          output: {
-            fileName: '{{Name}}.ts',
-            directory: '',
-          },
+          fileName: '{{Name}}.ts',
+          directory: '',
         },
         config: {
           generators: _ctx.config.generators,
@@ -180,10 +170,8 @@ describe('constructTemplate', () => {
       const ctx = {
         output: {
           key: 'BADKEY',
-          output: {
-            fileName: '', // good-scribe
-            directory: '',
-          },
+          fileName: '', // good-scribe
+          directory: '',
         },
         ..._ctx,
       } satisfies ConstructTemplateCtx;

@@ -9,26 +9,20 @@ const config = {
     component: [
       {
         key: 'component',
-        output: {
-          directory: 'examples/src/components',
-          fileName: '{{Name}}.ts',
-        },
+        directory: 'examples/src/components',
+        fileName: '{{Name}}.ts',
       },
     ],
     screen: [
       {
         key: 'screen',
-        output: {
-          directory: 'examples/src/screens',
-          fileName: '{{Name}}.ts',
-        },
+        directory: 'examples/src/screens',
+        fileName: '{{Name}}.ts',
       },
       {
         key: 'screen.test',
-        output: {
-          directory: 'examples/src/screens',
-          fileName: '{{Name}}.test.ts',
-        },
+        directory: 'examples/src/screens',
+        fileName: '{{Name}}.test.ts',
       },
     ],
   },

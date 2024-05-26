@@ -5,27 +5,21 @@ exports[`readConfig > should return valid config 1`] = `
   "generators": {
     "component": [
       {
+        "directory": "examples/src/components",
+        "fileName": "{{Name}}.ts",
         "key": "component",
-        "output": {
-          "directory": "examples/src/components",
-          "fileName": "{{Name}}.ts",
-        },
       },
     ],
     "screen": [
       {
+        "directory": "examples/src/screens",
+        "fileName": "{{Name}}.ts",
         "key": "screen",
-        "output": {
-          "directory": "examples/src/screens",
-          "fileName": "{{Name}}.ts",
-        },
       },
       {
+        "directory": "examples/src/screens",
+        "fileName": "{{Name}}.test.ts",
         "key": "screen.test",
-        "output": {
-          "directory": "examples/src/screens",
-          "fileName": "{{Name}}.test.ts",
-        },
       },
     ],
   },
