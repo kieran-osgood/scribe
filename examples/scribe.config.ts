@@ -6,14 +6,14 @@ const config = {
     screen: {
       outputs: [
         {
-          templateFileKey: 'screen',
+          key: 'screen',
           output: {
             directory: 'examples/src/screens',
             fileName: '{{Name}}.ts',
           },
         },
         {
-          templateFileKey: 'screen.test',
+          key: 'screen.test',
           output: {
             directory: 'examples/src/screens',
             fileName: '{{Name}}.test.ts',

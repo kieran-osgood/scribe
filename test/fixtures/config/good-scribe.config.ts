@@ -5,7 +5,7 @@ const config = {
   generators: {
     component: [
       {
-        templateFileKey: 'component',
+        key: 'component',
         output: {
           directory: 'examples/src/components',
           fileName: '{{Name}}.ts',
@@ -14,14 +14,14 @@ const config = {
     ],
     screen: [
       {
-        templateFileKey: 'screen',
+        key: 'screen',
         output: {
           directory: 'examples/src/screens',
           fileName: '{{Name}}.ts',
         },
       },
       {
-        templateFileKey: 'screen.test',
+        key: 'screen.test',
         output: {
           directory: 'examples/src/screens',
           fileName: '{{Name}}.test.ts',

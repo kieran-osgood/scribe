@@ -1,7 +1,7 @@
 import * as S from '@effect/schema/Schema';
 
 const GeneratorConfig = S.Struct({
-  templateFileKey: S.String,
+  key: S.String,
   output: S.Struct({
     directory: S.String,
     fileName: S.String,

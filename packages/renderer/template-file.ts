@@ -39,9 +39,7 @@ function createAbsFilePaths(ctx: ConstructTemplateCtx) {
 
     return pipe(
       ctx.config.templatesDirectories,
-      Array.map(_ =>
-        path.join(_process.cwd(), _, `${ctx.output.templateFileKey}.scribe`),
-      ),
+      Array.map(_ => path.join(_process.cwd(), _, `${ctx.output.key}.scribe`)),
     );
   });
 }

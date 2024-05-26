@@ -81,16 +81,16 @@ const config = {
     screen: {
       outputs: [
         {
-          // the templateFileKey screen corresponds to the template `screen.scribe` shown below 
-          templateFileKey: 'screen',
+          // the key screen corresponds to the template `screen.scribe` shown below 
+          key: 'screen',
           output: {
             directory: 'examples/src/screens',
             fileName: '{{Name}}.ts',
           },
         },
         {
-          // the templateFileKey screen corresponds to the template `screen.test.scribe` shown below 
-          templateFileKey: 'screen.test',
+          // the key screen corresponds to the template `screen.test.scribe` shown below 
+          key: 'screen.test',
           output: {
             directory: 'examples/src/screens',
             fileName: '{{Name}}.test.ts',

@@ -32,14 +32,14 @@ const mockConfig = {
   generators: {
     screen: [
       {
-        templateFileKey: 'screen',
+        key: 'screen',
         output: {
           directory: 'test/fixtures',
           fileName: '{{Name}}.ts',
         },
       },
       {
-        templateFileKey: 'screen.test',
+        key: 'screen.test',
         output: {
           directory: 'test/fixtures',
           fileName: '{{Name}}.test.ts',
@@ -59,7 +59,7 @@ const _ctx = {
 } satisfies Ctx;
 
 const templateOutput = {
-  templateFileKey: 'screen',
+  key: 'screen',
   output: {
     fileName: '{{Name}}.ts', // good-scribe
     directory: 'test/fixtures/config',
@@ -100,7 +100,7 @@ describe('constructTemplate', () => {
     return Effect.gen(function* ($) {
       const ctx = {
         output: {
-          templateFileKey: 'screen',
+          key: 'screen',
           output: {
             fileName: '{{Name}}.ts', // good-scribe
             directory: '',
@@ -142,7 +142,7 @@ describe('constructTemplate', () => {
         ..._ctx,
 
         output: {
-          templateFileKey: 'screen',
+          key: 'screen',
           output: {
             fileName: '{{Name}}.ts',
             directory: '',
@@ -179,7 +179,7 @@ describe('constructTemplate', () => {
     Effect.gen(function* ($) {
       const ctx = {
         output: {
-          templateFileKey: 'BADKEY',
+          key: 'BADKEY',
           output: {
             fileName: '', // good-scribe
             directory: '',
