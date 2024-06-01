@@ -3,7 +3,7 @@ import { Schema } from '@effect/schema';
 import * as Config from '@scribe/config';
 import * as FS from '@scribe/fs';
 import * as Process from '@scribe/process';
-import { Array, Effect, Option as O, pipe, Record } from 'effect';
+import { Array, Effect, pipe } from 'effect';
 import path from 'path';
 import * as TF from 'template-file';
 
@@ -87,21 +87,30 @@ export function writeFile(_: WriteTemplateCtx) {
 
 export function writeFiles(ctx: Ctx) {
   return pipe(
-    ctx.config.generators,
-    Record.get(ctx.template),
-    O.getOrThrowWith(() =>
-      Effect.fail(
-        new GetTemplateError({ cause: `Template Missing: ${ctx.template}` }),
-      ),
+    Effect.succeed(ctx.config.generators[ctx.template]),
+
+    Effect.flatMap(_ =>
+      Effect.if(typeof _ === 'undefined', {
+        onTrue: () =>
+          Effect.fail(
+            new GetTemplateError({
+              cause: `Template Missing: ${ctx.template}`,
+            }),
+          ),
+        onFalse: () => Effect.succeed(_ as unknown as Config.GeneratorConfig[]),
+      }),
     ),
-    Array.map(generator =>
-      constructTemplate({ generator, ...ctx }).pipe(
-        Effect.map(Array.map(writeFile)),
-        Effect.flatMap(Effect.all),
+
+    Effect.map(
+      Array.map(generator =>
+        constructTemplate({ generator, ...ctx }).pipe(
+          Effect.map(Array.map(writeFile)),
+          Effect.flatMap(Effect.all),
+        ),
       ),
     ),
 
-    Effect.all,
+    Effect.flatMap(Effect.all),
     Effect.map(Array.flatten),
   );
 }

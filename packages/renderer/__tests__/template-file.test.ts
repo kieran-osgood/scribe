@@ -186,11 +186,14 @@ describe('writeFiles', () => {
   });
 
   V.it.scoped(
-    '[Given] template key A [When] template Key A doesnt exist [Then] returns GetTemplateError',
+    `[Given] template key 'blah'
+         [When] 'blah' is invalid generator 
+           [Then] returns GetTemplateError`,
     () => {
       const cwd = createMinimalProject({
         fixtures: { templateFiles: true, configFile: true },
       });
+
       return Effect.gen(function* ($) {
         const ctx = {
           ..._ctx,
