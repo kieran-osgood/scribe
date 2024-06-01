@@ -8,25 +8,23 @@ import * as Process from '@scribe/process';
 import { Array, Effect, Layer } from 'effect';
 import path from 'path';
 import * as tempy from 'tempy';
+import { createMinimalProject } from 'test/utils.js';
 
+import { GetTemplateError } from '../error.js';
 import {
   constructTemplate,
   ConstructTemplateCtx,
   Ctx,
+  getFilePaths,
   render,
   writeFile,
+  writeFiles,
   WriteTemplateCtx,
 } from '../template-file.js';
 
 beforeEach(() => {
   V.vitest.restoreAllMocks();
 });
-
-const screenFileContents = `describe('{{Key}}', function() {
-  it('should ', function() {
-
-  });
-});`;
 
 const mockConfig = {
   templatesDirectories: ['test/fixtures'],
@@ -45,8 +43,6 @@ const mockConfig = {
     ],
   },
 } satisfies ScribeConfig;
-
-const fileContents = 'TEST';
 
 const _ctx = {
   config: mockConfig,
@@ -75,20 +71,47 @@ describe('render', () => {
       expect(result).toBe('');
     }),
   );
-
-  // V.it.scoped('should return an error channel for missing key', () =>
-  //   Effect.gen(function* ($) {
-  //     const result = yield* $(
-  //       render('Hello {{Key}}', { Key: 'a', Hola: 'No bueno' }),
-  //       Effect.flip,
-  //     );
-  //     expect(result).toBeInstanceOf(TemplateFileError);
-  //   }),
-  // );
 });
-describe('writeTemplate', () => {
+
+describe('getFilePaths', () => {
+  V.it.scoped('should default to empty array for no directories', () => {
+    const tmpPath = tempy.temporaryDirectory();
+
+    return Effect.gen(function* ($) {
+      const paths = yield* $(
+        getFilePaths({
+          ..._ctx,
+          config: { ..._ctx.config, templatesDirectories: [] },
+          generator,
+        }),
+      );
+      expect(paths).toEqual([]);
+    }).pipe(
+      Effect.provideService(Process.Process, Process.getProcessMock(tmpPath)),
+    );
+  });
+
+  V.it.scoped(
+    'should map the directories with the key to a scribe file',
+    () => {
+      const tmpPath = tempy.temporaryDirectory();
+
+      return Effect.gen(function* ($) {
+        const paths = yield* $(getFilePaths({ ..._ctx, generator }));
+        expect(paths).toEqual([
+          `${tmpPath}/${_ctx.config.templatesDirectories[0]}/${generator.key}.scribe`,
+        ]);
+      }).pipe(
+        Effect.provideService(Process.Process, Process.getProcessMock(tmpPath)),
+      );
+    },
+  );
+});
+
+describe('writeFile', () => {
   V.it.scoped('should write file', () => {
     const tmpPath = tempy.temporaryDirectory();
+    const fileContents = 'TEST';
 
     return Effect.gen(function* ($) {
       const ctx = {
@@ -113,7 +136,84 @@ describe('writeTemplate', () => {
   });
 });
 
+describe('writeFiles', () => {
+  V.it.scoped('should write files', () => {
+    const cwd = createMinimalProject({
+      fixtures: { templateFiles: true, configFile: true },
+    });
+    return Effect.gen(function* ($) {
+      const ctx = {
+        ..._ctx,
+        generators: ['screen', 'screen.test'],
+      } satisfies Ctx;
+
+      const result = yield* $(writeFiles(ctx));
+      expect(result).toStrictEqual([
+        path.join(cwd, '/test/fixtures/login.ts'),
+        path.join(cwd, '/test/fixtures/login.test.ts'),
+      ]);
+
+      const fs = yield* $(FileSystem.FileSystem);
+      const readResult = yield* $(
+        fs.readFile(path.join(cwd, 'test/fixtures/login.ts')),
+      );
+
+      expect(String(readResult)).toMatchInlineSnapshot(`
+        "// @ts-ignore
+        import * as React from 'react';
+
+        type loginProps = {}
+        function loginScreen() {
+
+        }
+        "
+      `);
+      const readResultTest = yield* $(
+        fs.readFile(path.join(cwd, 'test/fixtures/login.test.ts')),
+      );
+      expect(String(readResultTest)).toMatchInlineSnapshot(`
+        "describe('login', function() {
+          it('should ', function() {
+
+          });
+        });
+        "
+      `);
+    }).pipe(
+      Effect.provide(Layer.mergeAll(NodeFileSystem.layer)),
+      Effect.provideService(Process.Process, Process.getProcessMock(cwd)),
+    );
+  });
+
+  V.it.scoped(
+    '[Given] template key A [When] template Key A doesnt exist [Then] returns GetTemplateError',
+    () => {
+      const cwd = createMinimalProject({
+        fixtures: { templateFiles: true, configFile: true },
+      });
+      return Effect.gen(function* ($) {
+        const ctx = {
+          ..._ctx,
+          generators: ['screen', 'screen.test'],
+          template: 'blah',
+        } satisfies Ctx;
+
+        const error = yield* $(writeFiles(ctx), Effect.flip);
+        expect(error).toBeInstanceOf(GetTemplateError);
+      }).pipe(
+        Effect.provide(Layer.mergeAll(NodeFileSystem.layer)),
+        Effect.provideService(Process.Process, Process.getProcessMock(cwd)),
+      );
+    },
+  );
+});
+
 describe('constructTemplate', () => {
+  const screenFileContents = `describe('{{Key}}', function() {
+  it('should ', function() {
+
+  });
+});`;
   V.it.scoped('should return fileContents formatted with variables', () => {
     const tmpPath = tempy.temporaryDirectory();
 
