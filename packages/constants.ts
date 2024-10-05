@@ -1,10 +1,20 @@
-const githubBaseUrl = 'https://github.com/kieran-osgood/scribe';
+import packageJson from '../package.json';
 
 export const URLS = {
   github: {
-    issues: `${githubBaseUrl}/issues`,
-    newIssue: `${githubBaseUrl}/issues/new`,
-    readme: `${githubBaseUrl}/blob/main/README.md`,
+    BASE: 'https://github.com',
+    get repo() {
+      return `${this.BASE}/kieran-osgood/scribe`;
+    },
+    get issues() {
+      return `${this.repo}/issues`;
+    },
+    get newIssue() {
+      return `${this.repo}/issues/new`;
+    },
+    get readme() {
+      return `${this.repo}/blob/main/README.md`;
+    },
   },
 } as const;
 
@@ -20,7 +30,7 @@ export const SYMBOLS = {
   directory: '📁',
 } as const;
 
-export const BASE_CONFIG = `import { ScribeConfig } from '@kieran-osgood/scribe';
+export const BASE_CONFIG = `import { ScribeConfig } from '${packageJson.name}';
 
 export default {
   templatesDirectories: ['.'],
