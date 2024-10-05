@@ -22,7 +22,7 @@
     "typescript"
   ],
   "scripts": {
-    "start": "ts-node packages/cli/index.ts",
+    "start": "tsx packages/cli/index.ts",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "lint": "eslint .",
@@ -73,9 +73,9 @@
     "size-limit": "^11.0.1",
     "tempy": "^3.1.0",
     "terser": "^5.26.0",
-    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "tsup": "^8.0.1",
+    "tsx": "^4.19.1",
     "typescript": "^5.3.3",
     "vite": "^5.0.10",
     "vite-node": "^1.1.0",
