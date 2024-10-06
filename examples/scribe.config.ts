@@ -1,4 +1,4 @@
-import type { ScribeConfig } from '@kieran-osgood/scribe/config';
+import type { ScribeConfig } from '@kieran-osgood/scribe';
 
 const config = {
   templatesDirectories: ['./examples'],
