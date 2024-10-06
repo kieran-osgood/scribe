@@ -57,9 +57,9 @@ const DirtyGitCheck = () =>
       Effect.if({
         onTrue: () => Effect.void,
         onFalse: () =>
-          Effect.gen(function* ($) {
-            yield* $(Console.warn(Constants.WARNINGS.gitWorkingDirectoryDirty));
-            yield* $(Prompts.ToggleContinueOrQuit);
+          Effect.gen(function* () {
+            yield* Console.warn(Constants.WARNINGS.gitWorkingDirectoryDirty);
+            yield* Prompts.ToggleContinueOrQuit;
           }),
       }),
     ),

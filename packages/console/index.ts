@@ -46,13 +46,13 @@ export const header = flow(
 
 export const logGroup = (logLevel: LogLevel, groupName: string) => {
   return (message?: string) =>
-    Effect.gen(function* ($) {
+    Effect.gen(function* () {
       const groupPrinter = getLogGroupPrinter(logLevel);
-      yield* $(groupPrinter(Formatters.spacer(groupName)));
+      yield* groupPrinter(Formatters.spacer(groupName));
 
       if (message) {
         const printer = getLogPrinter(logLevel);
-        yield* $(printer(message));
+        yield* printer(message);
       }
     });
 };

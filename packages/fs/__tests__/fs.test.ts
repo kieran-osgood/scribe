@@ -12,18 +12,18 @@ const fileContents = 'super secret file';
 describe('writeFileWithDir', () => {
   V.it.scoped('should write file to path and read it back', () => {
     const tmpPath = tempy.temporaryDirectory();
-    return Effect.gen(function* ($) {
+    return Effect.gen(function* () {
       const filePath = path.join(
         tmpPath,
         './path/to/some/long/path/template5.txt',
       );
 
-      const result = yield* $(FS.writeFileWithDir(filePath, fileContents));
+      const result = yield* FS.writeFileWithDir(filePath, fileContents);
       expect(result).toBe(filePath);
-      const fs = yield* $(FileSystem.FileSystem);
+      const fs = yield* FileSystem.FileSystem;
 
-      const readResult = yield* $(
-        fs.readFile(path.join(tmpPath, 'path/to/some/long/path/template5.txt')),
+      const readResult = yield* fs.readFile(
+        path.join(tmpPath, 'path/to/some/long/path/template5.txt'),
       );
       expect(String(readResult)).toEqual(fileContents);
     }).pipe(Effect.provide(Layer.mergeAll(NodeFileSystem.layer)));

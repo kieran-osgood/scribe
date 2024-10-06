@@ -25,21 +25,19 @@ export const getCosmicExplorer = () =>
   });
 
 const load = (path: string) =>
-  Effect.gen(function* ($) {
-    const explorer = yield* $(getCosmicExplorer());
+  Effect.gen(function* () {
+    const explorer = yield* getCosmicExplorer();
 
-    return yield* $(
-      Effect.tryPromise({
-        try:
-          // TODO: if path - load, !path - search
-          async () => explorer.load(path),
-        catch: _ =>
-          new CosmicConfigError({
-            errorCode: 'READ_FAILED',
-            message: String(_),
-          }),
-      }),
-    );
+    return yield* Effect.tryPromise({
+      try:
+        // TODO: if path - load, !path - search
+        async () => explorer.load(path),
+      catch: _ =>
+        new CosmicConfigError({
+          errorCode: 'READ_FAILED',
+          message: String(_),
+        }),
+    });
   });
 
 export const readConfig = (path: string) => {
@@ -124,27 +122,25 @@ export const getConfigPath = (cwd?: string) => {
 };
 
 export const copyBaseScribeConfigToPath = () =>
-  Effect.gen(function* ($) {
-    const fs = yield* $(FileSystem.FileSystem);
-    const path = yield* $(getConfigPath());
-    yield* $(fs.writeFileString(path, Constants.BASE_CONFIG));
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem;
+    const path = yield* getConfigPath();
+    yield* fs.writeFileString(path, Constants.BASE_CONFIG);
     return path;
   });
 
 export const createConfigFileExistsError = () =>
-  Effect.gen(function* ($) {
-    const path = yield* $(getConfigPath());
+  Effect.gen(function* () {
+    const path = yield* getConfigPath();
 
-    yield* $(
-      Effect.fail(
-        new FS.FileExistsError({
-          error: new FS.AccessError({
-            error: new Error(`${path} already exists.`),
-            path,
-            mode: 0,
-          }),
+    yield* Effect.fail(
+      new FS.FileExistsError({
+        error: new FS.AccessError({
+          error: new Error(`${path} already exists.`),
+          path,
+          mode: 0,
         }),
-      ),
+      }),
     );
   });
 
@@ -173,18 +169,16 @@ export const checkConfigWritePathEmpty = () =>
   );
 
 export const createConfigPathAbsolute = (filePath: string) =>
-  Effect.gen(function* ($) {
-    const _process = yield* $(Process.Process);
+  Effect.gen(function* () {
+    const _process = yield* Process.Process;
     const cwd = _process.cwd();
 
-    return yield* $(
-      path.isAbsolute(filePath),
-      Effect.if({
-        onTrue: () => onAbsolutePath(cwd, filePath),
-        // Joins cwd with relative path argument
-        onFalse: () => Effect.succeed(path.join(cwd, filePath)),
-      }),
-    );
+    const result = path.isAbsolute(filePath);
+    return yield* Effect.if(result, {
+      onTrue: () => onAbsolutePath(cwd, filePath),
+      // Joins cwd with relative path argument
+      onFalse: () => Effect.succeed(path.join(cwd, filePath)),
+    });
   });
 
 const onAbsolutePath = (cwd: string, filePath: string) =>

@@ -59,15 +59,15 @@ const generator = {
 
 describe('render', () => {
   V.it.scoped('should interpolate the variables passed to it', () =>
-    Effect.gen(function* ($) {
-      const result = yield* $(render('Hello {{Key}}', { Key: 'world' }));
+    Effect.gen(function* () {
+      const result = yield* render('Hello {{Key}}', { Key: 'world' });
       expect(result).toBe('Hello world');
     }),
   );
 
   V.it.scoped('should return an error channel for missing key', () =>
-    Effect.gen(function* ($) {
-      const result = yield* $(render('', {}));
+    Effect.gen(function* () {
+      const result = yield* render('', {});
       expect(result).toBe('');
     }),
   );
@@ -77,14 +77,12 @@ describe('getFilePaths', () => {
   V.it.scoped('should default to empty array for no directories', () => {
     const tmpPath = tempy.temporaryDirectory();
 
-    return Effect.gen(function* ($) {
-      const paths = yield* $(
-        getFilePaths({
-          ..._ctx,
-          config: { ..._ctx.config, templatesDirectories: [] },
-          generator,
-        }),
-      );
+    return Effect.gen(function* () {
+      const paths = yield* getFilePaths({
+        ..._ctx,
+        config: { ..._ctx.config, templatesDirectories: [] },
+        generator,
+      });
       expect(paths).toEqual([]);
     }).pipe(
       Effect.provideService(Process.Process, Process.getProcessMock(tmpPath)),
@@ -96,8 +94,8 @@ describe('getFilePaths', () => {
     () => {
       const tmpPath = tempy.temporaryDirectory();
 
-      return Effect.gen(function* ($) {
-        const paths = yield* $(getFilePaths({ ..._ctx, generator }));
+      return Effect.gen(function* () {
+        const paths = yield* getFilePaths({ ..._ctx, generator });
         expect(paths).toEqual([
           `${tmpPath}/${_ctx.config.templatesDirectories[0]}/${generator.key}.scribe`,
         ]);

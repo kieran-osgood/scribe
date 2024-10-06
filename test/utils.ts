@@ -14,8 +14,8 @@ export const cliPath = path.join(process.cwd(), 'dist', 'index.js');
 export const configFlag = 'scribe.config.ts';
 
 export const MainLive = (cwd: string) =>
-  Effect.gen(function* ($) {
-    const _console = yield* $(MockConsole.make);
+  Effect.gen(function* () {
+    const _console = yield* MockConsole.make;
 
     return Layer.mergeAll(
       // Built in

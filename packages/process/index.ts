@@ -14,6 +14,7 @@ export interface Process {
 }
 
 export const Process = Context.GenericTag<Process>('Process');
+
 export const ProcessLive: Process = {
   cwd: () => process.cwd(),
   exit: (code: number | undefined) => process.exit(code),
@@ -21,6 +22,7 @@ export const ProcessLive: Process = {
     columns: process.stdout.columns,
   },
 };
+
 export const ProcessMock: Process = getProcessMock('/mockdir');
 
 export function getProcessMock(cwd: string): Process {

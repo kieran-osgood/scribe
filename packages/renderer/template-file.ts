@@ -32,8 +32,8 @@ export type Ctx = {
 export type ConstructTemplateCtx = Ctx & { generator: Config.GeneratorConfig };
 
 export function getFilePaths(ctx: ConstructTemplateCtx) {
-  return Effect.gen(function* ($) {
-    const _process = yield* $(Process.Process);
+  return Effect.gen(function* () {
+    const _process = yield* Process.Process;
 
     // TODO: should report if templatesDirectories isn't a dir?
     return Array.map(ctx.config.templatesDirectories, dir =>

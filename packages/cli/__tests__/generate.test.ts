@@ -23,19 +23,19 @@ describe('[Given] Git clean', () => {
         fixtures: { templateFiles: true, configFile: true },
       });
       const configPath = createConfigPath(cwd);
-      return Effect.gen(function* ($) {
-        const fiber = yield* $(
-          Effect.fork(Cli.run(['', '', `--config=${configPath}`])),
+      return Effect.gen(function* () {
+        const fiber = yield* Effect.fork(
+          Cli.run(['', '', `--config=${configPath}`]),
         );
 
-        yield* $(MockTerminal.inputKey('down'));
-        yield* $(MockTerminal.inputKey('enter'));
-        yield* $(MockTerminal.inputText('Login'));
-        yield* $(MockTerminal.inputKey('enter'));
+        yield* MockTerminal.inputKey('down');
+        yield* MockTerminal.inputKey('enter');
+        yield* MockTerminal.inputText('Login');
+        yield* MockTerminal.inputKey('enter');
 
-        yield* $(Fiber.join(fiber));
+        yield* Fiber.join(fiber);
 
-        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        const lines = yield* MockConsole.getLines({ stripAnsi: true });
 
         expect(lines).toMatchInlineSnapshot(`
           [
@@ -86,17 +86,15 @@ describe('[Given] Git clean', () => {
       });
       const configPath = createConfigPath(cwd);
 
-      return Effect.gen(function* ($) {
-        const fiber = yield* $(
-          Effect.fork(
-            Cli.run(['', '', `--config=${configPath}`, '--name=Login']),
-          ),
+      return Effect.gen(function* () {
+        const fiber = yield* Effect.fork(
+          Cli.run(['', '', `--config=${configPath}`, '--name=Login']),
         );
 
-        yield* $(MockTerminal.inputKey('down'));
-        yield* $(MockTerminal.inputKey('enter'));
-        yield* $(Fiber.join(fiber));
-        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        yield* MockTerminal.inputKey('down');
+        yield* MockTerminal.inputKey('enter');
+        yield* Fiber.join(fiber);
+        const lines = yield* MockConsole.getLines({ stripAnsi: true });
         expect(lines).toMatchInlineSnapshot(`
         [
           "? Generator File: › 
@@ -137,19 +135,17 @@ describe('[Given] Git clean', () => {
       });
       const configPath = createConfigPath(cwd);
 
-      return Effect.gen(function* ($) {
-        const fiber = yield* $(
-          Effect.fork(
-            Cli.run(['', '', `--config=${configPath}`, '--template=screen']),
-          ),
+      return Effect.gen(function* () {
+        const fiber = yield* Effect.fork(
+          Cli.run(['', '', `--config=${configPath}`, '--template=screen']),
         );
 
-        yield* $(MockTerminal.inputText('Login'));
-        yield* $(MockTerminal.inputKey('enter'));
+        yield* MockTerminal.inputText('Login');
+        yield* MockTerminal.inputKey('enter');
 
-        yield* $(Fiber.join(fiber));
+        yield* Fiber.join(fiber);
 
-        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        const lines = yield* MockConsole.getLines({ stripAnsi: true });
         expect(lines).toMatchInlineSnapshot(`
         [
           "? Name: › ",
@@ -190,22 +186,20 @@ describe('[Given] Git clean', () => {
       });
       const configPath = createConfigPath(cwd);
 
-      return Effect.gen(function* ($) {
-        const fiber = yield* $(
-          Effect.fork(
-            Cli.run([
-              '',
-              '',
-              `--config=${configPath}`,
-              '--name=Login',
-              '--template=screen',
-            ]),
-          ),
+      return Effect.gen(function* () {
+        const fiber = yield* Effect.fork(
+          Cli.run([
+            '',
+            '',
+            `--config=${configPath}`,
+            '--name=Login',
+            '--template=screen',
+          ]),
         );
 
-        yield* $(Fiber.join(fiber));
+        yield* Fiber.join(fiber);
 
-        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        const lines = yield* MockConsole.getLines({ stripAnsi: true });
         expect(lines).toMatchInlineSnapshot(`
           [
             " Success ",
@@ -239,25 +233,23 @@ describe('[Given] Git Dirty', function () {
       });
       const configPath = createConfigPath(cwd);
 
-      return Effect.gen(function* ($) {
-        const fiber = yield* $(
-          Effect.fork(
-            Cli.run([
-              '',
-              '',
-              `--config=${configPath}`,
-              '--name=Login',
-              '--template=screen',
-            ]),
-          ),
+      return Effect.gen(function* () {
+        const fiber = yield* Effect.fork(
+          Cli.run([
+            '',
+            '',
+            `--config=${configPath}`,
+            '--name=Login',
+            '--template=screen',
+          ]),
         );
 
-        yield* $(MockTerminal.inputKey('left'));
-        yield* $(MockTerminal.inputKey('enter'));
+        yield* MockTerminal.inputKey('left');
+        yield* MockTerminal.inputKey('enter');
 
-        yield* $(Fiber.join(fiber));
+        yield* Fiber.join(fiber);
 
-        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        const lines = yield* MockConsole.getLines({ stripAnsi: true });
         expect(lines).toMatchInlineSnapshot(`
   [
     "Git working tree dirty - proceed with caution.
@@ -296,24 +288,22 @@ describe('[Given] Git Dirty', function () {
         });
         const configPath = createConfigPath(cwd);
 
-        return Effect.gen(function* ($) {
-          const fiber = yield* $(
-            Effect.fork(
-              Cli.run([
-                '',
-                '',
-                `--config=${configPath}`,
-                '--name=Login',
-                '--template=screen',
-              ]),
-            ),
+        return Effect.gen(function* () {
+          const fiber = yield* Effect.fork(
+            Cli.run([
+              '',
+              '',
+              `--config=${configPath}`,
+              '--name=Login',
+              '--template=screen',
+            ]),
           );
 
-          yield* $(MockTerminal.inputKey('enter'));
+          yield* MockTerminal.inputKey('enter');
 
-          yield* $(Fiber.join(fiber));
+          yield* Fiber.join(fiber);
 
-          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+          const lines = yield* MockConsole.getLines({ stripAnsi: true });
           expect(lines).toMatchInlineSnapshot(`
             [
               "Git working tree dirty - proceed with caution.
@@ -340,25 +330,23 @@ describe('[Given] *Not* Git', function () {
       });
       const configPath = createConfigPath(cwd);
 
-      return Effect.gen(function* ($) {
-        const fiber = yield* $(
-          Effect.fork(
-            Cli.run([
-              '',
-              '',
-              `--config=${configPath}`,
-              '--name=Login',
-              '--template=screen',
-            ]),
-          ),
+      return Effect.gen(function* () {
+        const fiber = yield* Effect.fork(
+          Cli.run([
+            '',
+            '',
+            `--config=${configPath}`,
+            '--name=Login',
+            '--template=screen',
+          ]),
         );
 
-        yield* $(MockTerminal.inputKey('left'));
-        yield* $(MockTerminal.inputKey('enter'));
+        yield* MockTerminal.inputKey('left');
+        yield* MockTerminal.inputKey('enter');
 
-        yield* $(Fiber.join(fiber));
+        yield* Fiber.join(fiber);
 
-        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        const lines = yield* MockConsole.getLines({ stripAnsi: true });
         expect(lines).toMatchInlineSnapshot(`
   [
     "? Continue? › yes / no",
@@ -384,24 +372,22 @@ describe('[Given] *Not* Git', function () {
           fixtures: { configFile: true, templateFiles: true },
         });
         const configPath = createConfigPath(cwd);
-        return Effect.gen(function* ($) {
-          const fiber = yield* $(
-            Effect.fork(
-              Cli.run([
-                '',
-                '',
-                `--config=${configPath}`,
-                '--name=Login',
-                '--template=screen',
-              ]),
-            ),
+        return Effect.gen(function* () {
+          const fiber = yield* Effect.fork(
+            Cli.run([
+              '',
+              '',
+              `--config=${configPath}`,
+              '--name=Login',
+              '--template=screen',
+            ]),
           );
 
-          yield* $(MockTerminal.inputKey('enter'));
+          yield* MockTerminal.inputKey('enter');
 
-          yield* $(Fiber.join(fiber));
+          yield* Fiber.join(fiber);
 
-          const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+          const lines = yield* MockConsole.getLines({ stripAnsi: true });
 
           expect(lines).toMatchInlineSnapshot(`
             [
@@ -423,10 +409,10 @@ V.it.scoped(
   ({ expect }) => {
     const cwd = createMinimalProject();
 
-    return Effect.gen(function* ($) {
-      const fiber = yield* $(Effect.fork(Cli.run(['', '', '--help'])));
-      yield* $(Fiber.join(fiber));
-      const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+    return Effect.gen(function* () {
+      const fiber = yield* Effect.fork(Cli.run(['', '', '--help']));
+      yield* Fiber.join(fiber);
+      const lines = yield* MockConsole.getLines({ stripAnsi: true });
       expect(lines).toMatchInlineSnapshot(`
         [
           "Scribe

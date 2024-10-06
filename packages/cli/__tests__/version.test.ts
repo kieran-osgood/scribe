@@ -10,13 +10,13 @@ describe('VersionCommand', () => {
   V.it.scoped(
     '[Given] --version flag [Then] print version from package.json',
     () => {
-      return Effect.gen(function* ($) {
+      return Effect.gen(function* () {
         const args = Array.make('', '', '--version');
-        const fiber = yield* $(Effect.fork(Cli.run(args)));
+        const fiber = yield* Effect.fork(Cli.run(args));
 
-        yield* $(Fiber.join(fiber));
+        yield* Fiber.join(fiber);
 
-        const lines = yield* $(MockConsole.getLines({ stripAnsi: true }));
+        const lines = yield* MockConsole.getLines({ stripAnsi: true });
 
         expect(lines).toHaveLength(1);
         expect(lines[0]).toContain(packageJson.version);

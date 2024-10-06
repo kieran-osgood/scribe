@@ -35,21 +35,17 @@ export const Generate = Command.make('scribe', args, args =>
     Effect.catchTag('GitStatusError', () => Prompts.ToggleContinueOrQuit),
 
     Effect.flatMap(() =>
-      Effect.gen(function* ($) {
-        const _configPath = yield* $(createConfigPathAbsolute(args.configPath));
-        const config = yield* $(Config.readConfig(_configPath));
-        const generators = yield* $(Config.pickGeneratorKeysConfigs(config));
+      Effect.gen(function* () {
+        const _configPath = yield* createConfigPathAbsolute(args.configPath);
+        const config = yield* Config.readConfig(_configPath);
+        const generators = yield* Config.pickGeneratorKeysConfigs(config);
 
-        const template = yield* $(
-          args.generator,
+        const template = yield* args.generator.pipe(
           Effect.orElse(() => Prompts.SelectTemplate(generators)),
         );
-
-        const name = yield* $(
-          args.name,
+        const name = yield* args.name.pipe(
           Effect.orElse(() => Prompts.InputFileName),
         );
-
         return {
           key: name,
           template,

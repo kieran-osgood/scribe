@@ -10,8 +10,8 @@ import * as MockConsole from 'test/mock-console.js';
 
 import * as Console from '../index.js';
 
-export const MainLive = Effect.gen(function* ($) {
-  const _console = yield* $(MockConsole.make);
+export const MainLive = Effect.gen(function* () {
+  const _console = yield* MockConsole.make;
   return Layer.mergeAll(EffectConsole.setConsole(_console));
 }).pipe(Layer.unwrapEffect);
 
@@ -27,17 +27,17 @@ describe('Console', () => {
    * @see {@link Colors.logColors logColors}
    */
   V.it.scoped('should print statements with colors', () =>
-    Effect.gen(function* ($) {
-      yield* $(Console.debug('debugs are cyan'));
-      yield* $(Console.log('logs are plain'));
-      yield* $(Console.info('infos are blue'));
-      yield* $(Console.warn('warns are yellow'));
-      yield* $(Console.error('errors are red'));
-      yield* $(Console.success('success is green'));
-      yield* $(Console.successWithSymbol('success is green'));
-      yield* $(Console.file('files are 🤷'));
+    Effect.gen(function* () {
+      yield* Console.debug('debugs are cyan');
+      yield* Console.log('logs are plain');
+      yield* Console.info('infos are blue');
+      yield* Console.warn('warns are yellow');
+      yield* Console.error('errors are red');
+      yield* Console.success('success is green');
+      yield* Console.successWithSymbol('success is green');
+      yield* Console.file('files are 🤷');
 
-      const lines = yield* $(MockConsole.getLines({ stripAnsi: false }));
+      const lines = yield* MockConsole.getLines({ stripAnsi: false });
       expect(lines).toMatchInlineSnapshot(
         `
         [
@@ -61,42 +61,36 @@ describe('Console', () => {
    * @see {@link Colors.logGroupColors logGroupColors}
    */
   V.it.scoped('should print group headers with backgrounds', () =>
-    Effect.gen(function* ($) {
-      yield* $(
-        Console.logGroup(
-          'debug',
-          'debugs are cyan',
-        )('And so are their subtitles'),
-      );
-      yield* $(
-        Console.logGroup('log', 'logs are plain')('And so are their subtitles'),
-      );
-      yield* $(
-        Console.logGroup(
-          'info',
-          'infos are blue',
-        )('And so are their subtitles'),
-      );
-      yield* $(
-        Console.logGroup(
-          'warn',
-          'warns are yellow',
-        )('And so are their subtitles'),
-      );
-      yield* $(
-        Console.logGroup(
-          'error',
-          'errors are red',
-        )('And so are their subtitles'),
-      );
-      yield* $(
-        Console.logGroup(
-          'success',
-          'success is green',
-        )('And so are their subtitles'),
-      );
+    Effect.gen(function* () {
+      yield* Console.logGroup(
+        'debug',
+        'debugs are cyan',
+      )('And so are their subtitles');
+      yield* Console.logGroup(
+        'log',
+        'logs are plain',
+      )('And so are their subtitles');
 
-      const lines = yield* $(MockConsole.getLines({ stripAnsi: false }));
+      yield* Console.logGroup(
+        'info',
+        'infos are blue',
+      )('And so are their subtitles');
+
+      yield* Console.logGroup(
+        'warn',
+        'warns are yellow',
+      )('And so are their subtitles');
+
+      yield* Console.logGroup(
+        'error',
+        'errors are red',
+      )('And so are their subtitles');
+      yield* Console.logGroup(
+        'success',
+        'success is green',
+      )('And so are their subtitles');
+
+      const lines = yield* MockConsole.getLines({ stripAnsi: false });
       expect(lines).toMatchInlineSnapshot(`
         [
           "[30m[44m debugs are cyan [49m[39m",
