@@ -1,6 +1,6 @@
 # scribe
 
-Bootstrap your common files with [Mustache](https://github.com/mustache/mustache.github.com) templates.
+Automate your boilerplate with [Mustache](https://github.com/mustache/mustache.github.com) templates.
 
 <div align='center'>
   <img src="docs/usage.png" alt="scribe usage example" style='margin-bottom: 25px; margin-top: 20px; height: 450px;'>
@@ -18,7 +18,6 @@ Bootstrap your common files with [Mustache](https://github.com/mustache/mustache
     <img src="https://img.shields.io/npm/dm/@kieran-osgood/scribe.svg" alt="npm downloads" height="20">
   </a>
 </p>
-
 
 [//]: # (Look into why this doesnt work)
 
@@ -41,8 +40,6 @@ Bootstrap your common files with [Mustache](https://github.com/mustache/mustache
 
 ## Quick Start
 
-We can handle setup via built in commands to bootstrap out the initial config, you'll need to edit it to add in some of your domains file requirements before your first run (see below, or [examples](https://github.com/kieran-osgood/scribe/tree/main/examples))
-
 ### Install
 
 ```shell
@@ -53,17 +50,20 @@ bun i -D @kieran-osgood/scribe
 ```
 
 ### Initialise Config file
+To begin templating you're going to need two things, a config file and some templates
 
+Setting up a config file can be achieved with the following command:
 ```shell
 scribe init
 ```
 
+Then to get some templates take a look at our examples for some ideas on what would be useful for your environment ([examples](https://github.com/kieran-osgood/scribe/tree/main/examples)).
+
+> See below for a step by step walk through of how config + templates come together
+
 ## Getting Started
 
-A simple use-case is a creating a single file from a template, but each CLI run can be configured to output multiple files.
-
-As an example, if you're creating a React Component, you can output test files, sub-component barrel files, storybook files
-etc.
+A simple use-case is a creating a single file from a template, but each run can be configured to output multiple files (e.g. if you're creating a React Component, you can output test files, sub-component barrel files, storybook files etc.).
 
 ### Example
 
