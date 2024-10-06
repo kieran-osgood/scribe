@@ -30,8 +30,10 @@ export const status = (options?: TaskOptions) =>
         void _.status(options, (error, status) => {
           if (error) {
             resume(Effect.fail(new GitStatusError({ status, error })));
-            return;
-          } else resume(Effect.succeed(status));
+            // return;
+          }
+
+          resume(Effect.succeed(status));
         });
       }),
     ),
