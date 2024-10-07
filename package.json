@@ -35,7 +35,7 @@
     "build": "tsup packages/cli/index.ts",
     "publish": "changeset publish",
     "changeset": "changeset",
-    "size": "run-s build size-limit",
+    "size": "npm run build && size-limit",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -88,8 +88,9 @@
   },
   "size-limit": [
     {
-      "path": "dist/index.js",
-      "limit": "80 kb"
+      "path": "dist/index.cjs",
+      "limit": "15 kb",
+      "brotli": false
     }
   ],
   "prettier": {
