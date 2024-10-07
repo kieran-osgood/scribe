@@ -29,7 +29,7 @@ export function getProcessMock(cwd: string): Process {
   return {
     cwd: () => cwd,
     exit: (code: number | undefined): never => {
-      throw new Error(`Exiting ${code ?? ''}`);
+      throw new Error(`Exiting ${String(code ?? '')}`);
     },
     stdout: {
       columns: 69,

@@ -96,8 +96,13 @@ describe('getFilePaths', () => {
 
       return Effect.gen(function* () {
         const paths = yield* getFilePaths({ ..._ctx, generator });
+
+        const [pathSegment] = _ctx.config.templatesDirectories;
+        expect(pathSegment).toBeTypeOf('string');
+
         expect(paths).toEqual([
-          `${tmpPath}/${_ctx.config.templatesDirectories[0]}/${generator.key}.scribe`,
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          `${tmpPath}/${pathSegment}/${generator.key}.scribe`,
         ]);
       }).pipe(
         Effect.provideService(Process.Process, Process.getProcessMock(tmpPath)),
