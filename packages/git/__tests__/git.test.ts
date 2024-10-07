@@ -112,7 +112,7 @@ describe(status.name, () => {
     });
   });
 
-  describe.only('[Given] cwd *not* a git repository', () => {
+  describe('[Given] cwd *not* a git repository', () => {
     V.it.scoped('[Then] return NOT_A_GIT_REPO SimpleGitError', () => {
       const cwd = createMinimalProject({
         git: { init: false },
@@ -160,7 +160,8 @@ describe(create.name, () => {
         const result = yield* Effect.tryPromise(
           async () => await git.status(),
         ).pipe(Effect.flip);
-        expect(result.message).toBe(
+        expect(result.error).toHaveProperty('message');
+        expect((result.error as { message: string }).message).toBe(
           `fatal: not a git repository (or any of the parent directories): .git
 `,
         );
