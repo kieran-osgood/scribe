@@ -22,7 +22,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint / TSC / Test
-        run: turbo build
+        run: turbo build --no-color
 
       - name: Create Release Pull Request or Publish
         id: changesets
