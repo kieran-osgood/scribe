@@ -100,5 +100,6 @@
     "singleQuote": true,
     "arrowParens": "avoid",
     "trailingComma": "all"
-  }
+  },
+  "packageManager": "pnpm@9.12.0"
 }

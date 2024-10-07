@@ -1,0 +1,20 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "start": {
+      "cache": false,
+      "persistent": true
+    },
+    "tsc": {},
+    "lint": {},
+    "prettier:check": {},
+    "test": {},
+    "build": {
+      "outputs": ["dist/**"],
+      "dependsOn": ["prettier:check", "lint", "tsc", "test"]
+    },
+    "publish": {
+      "dependsOn": ["build"]
+    }
+  }
+}
