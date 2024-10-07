@@ -35,6 +35,9 @@ export const ScribeConfig = S.Struct({
    * Map of Generators.
    * Each Map Key will be used to identify it within the CLI.
    */
-  generators: S.Record(S.String, S.Array(GeneratorConfig)),
+  generators: S.Record({
+    key: S.String,
+    value: S.Array(GeneratorConfig),
+  }),
 });
 export type ScribeConfig = S.Schema.Type<typeof ScribeConfig>;

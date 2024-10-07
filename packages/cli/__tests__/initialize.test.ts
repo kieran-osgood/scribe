@@ -113,7 +113,9 @@ describe('[Given] Git dirty', () => {
             "Git working tree dirty - proceed with caution.
           Recommendation: commit all changes before proceeding.",
             "? Continue? › yes / no",
+            "",
             "? Continue? › yes / no",
+            "",
             "✔ Continue? … yes / no
           ",
             "",
@@ -154,6 +156,7 @@ describe('[Given] Git dirty', () => {
               "Git working tree dirty - proceed with caution.
             Recommendation: commit all changes before proceeding.",
               "? Continue? › yes / no",
+              "",
               "✔ Continue? … yes / no
             ",
               "",
@@ -205,7 +208,15 @@ V.it.scoped('[Given] --help flag [Then] print help information', () => {
 
         One of the following: sh, bash, fish, zsh
 
-        Generate a completion script for a specific shell
+        Generate a completion script for a specific shell.
+      
+        This setting is optional.
+      
+      --log-level all | trace | debug | info | warning | error | fatal | none
+      
+        One of the following: all, trace, debug, info, warning, error, fatal, none
+
+        Sets the minimum log level for a command.
 
         This setting is optional.
 
@@ -213,7 +224,7 @@ V.it.scoped('[Given] --help flag [Then] print help information', () => {
 
         A true or false value.
 
-        Show the help documentation for a command
+        Show the help documentation for a command.
 
         This setting is optional.
 
@@ -221,7 +232,7 @@ V.it.scoped('[Given] --help flag [Then] print help information', () => {
 
         A true or false value.
 
-        Start wizard mode for a command
+        Start wizard mode for a command.
 
         This setting is optional.
 
@@ -229,7 +240,7 @@ V.it.scoped('[Given] --help flag [Then] print help information', () => {
 
         A true or false value.
 
-        Show the version of the application
+        Show the version of the application.
 
         This setting is optional.
       ",

@@ -42,18 +42,26 @@ describe('[Given] Git clean', () => {
             "? Generator File: › 
           ❯ component.scribe 
             screen.scribe ",
+            "",
             "? Generator File: › 
             component.scribe 
           ❯ screen.scribe ",
+            "",
             "✔ Generator File: …  screen.scribe
           ",
             "",
             "? Name: › ",
+            "",
             "? Name: › L",
+            "",
             "? Name: › Lo",
+            "",
             "? Name: › Log",
+            "",
             "? Name: › Logi",
+            "",
             "? Name: › Login",
+            "",
             "✔ Name: … Login
           ",
             "",
@@ -100,9 +108,11 @@ describe('[Given] Git clean', () => {
           "? Generator File: › 
         ❯ component.scribe 
           screen.scribe ",
+          "",
           "? Generator File: › 
           component.scribe 
         ❯ screen.scribe ",
+          "",
           "✔ Generator File: …  screen.scribe
         ",
           "",
@@ -149,11 +159,17 @@ describe('[Given] Git clean', () => {
         expect(lines).toMatchInlineSnapshot(`
         [
           "? Name: › ",
+          "",
           "? Name: › L",
+          "",
           "? Name: › Lo",
+          "",
           "? Name: › Log",
+          "",
           "? Name: › Logi",
+          "",
           "? Name: › Login",
+          "",
           "✔ Name: … Login
         ",
           "",
@@ -255,7 +271,9 @@ describe('[Given] Git Dirty', function () {
     "Git working tree dirty - proceed with caution.
   Recommendation: commit all changes before proceeding.",
     "? Continue? › yes / no",
+    "",
     "? Continue? › yes / no",
+    "",
     "✔ Continue? … yes / no
   ",
     "",
@@ -309,6 +327,7 @@ describe('[Given] Git Dirty', function () {
               "Git working tree dirty - proceed with caution.
             Recommendation: commit all changes before proceeding.",
               "? Continue? › yes / no",
+              "",
               "✔ Continue? … yes / no
             ",
               "",
@@ -325,7 +344,7 @@ describe('[Given] *Not* Git', function () {
   describe('[Given] prompts to continue', () => {
     V.it.scoped('[Then] user answers y, creates two files', ({ expect }) => {
       const cwd = createMinimalProject({
-        git: { init: false, dirty: false },
+        git: { init: false },
         fixtures: { configFile: true, templateFiles: true },
       });
       const configPath = createConfigPath(cwd);
@@ -350,7 +369,9 @@ describe('[Given] *Not* Git', function () {
         expect(lines).toMatchInlineSnapshot(`
   [
     "? Continue? › yes / no",
+    "",
     "? Continue? › yes / no",
+    "",
     "✔ Continue? … yes / no
   ",
     "",
@@ -368,7 +389,7 @@ describe('[Given] *Not* Git', function () {
       '[Then] user answers `n`, cli aborts without writing file',
       ({ expect }) => {
         const cwd = createMinimalProject({
-          git: { init: false, dirty: false },
+          git: { init: false },
           fixtures: { configFile: true, templateFiles: true },
         });
         const configPath = createConfigPath(cwd);
@@ -392,6 +413,7 @@ describe('[Given] *Not* Git', function () {
           expect(lines).toMatchInlineSnapshot(`
             [
               "? Continue? › yes / no",
+              "",
               "✔ Continue? … yes / no
             ",
               "",
@@ -463,15 +485,23 @@ V.it.scoped(
 
           One of the following: sh, bash, fish, zsh
 
-          Generate a completion script for a specific shell
+          Generate a completion script for a specific shell.
 
+          This setting is optional.
+
+        --log-level all | trace | debug | info | warning | error | fatal | none
+        
+          One of the following: all, trace, debug, info, warning, error, fatal, none
+        
+          Sets the minimum log level for a command.
+        
           This setting is optional.
 
         (-h, --help)
 
           A true or false value.
 
-          Show the help documentation for a command
+          Show the help documentation for a command.
 
           This setting is optional.
 
@@ -479,7 +509,7 @@ V.it.scoped(
 
           A true or false value.
 
-          Start wizard mode for a command
+          Start wizard mode for a command.
 
           This setting is optional.
 
@@ -487,7 +517,7 @@ V.it.scoped(
 
           A true or false value.
 
-          Show the version of the application
+          Show the version of the application.
 
           This setting is optional.
 

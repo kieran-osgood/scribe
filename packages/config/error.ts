@@ -1,7 +1,6 @@
-import { TreeFormatter } from '@effect/schema';
 import { ParseError } from '@effect/schema/ParseResult';
 import { URLS } from '@scribe/constants';
-import { Data, Effect } from 'effect';
+import { Data } from 'effect';
 
 export const CHECK_CONFIG_TIP = `Check your 'scribe.config.ts' and read the documentation for more information: ${URLS.github.readme}`;
 
@@ -41,8 +40,8 @@ export class ConfigParseError extends Data.TaggedClass('ConfigParseError')<{
   readonly path: string;
 }> {
   override toString() {
-    const s = Effect.runSync(TreeFormatter.formatIssue(this.parseError.error));
     return `⚠️ Config parsing error: '${this.path}' 
- ${s}`;
+${this.parseError.message}`;
   }
 }
+// eslint: -32603: Request textDocument/diagnostic failed with message: Config (unnamed): Key "ignores": Expected array to only contain strings and functions at user-defined index 7.

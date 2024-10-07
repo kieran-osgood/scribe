@@ -1,5 +1,6 @@
 import { defineConfig } from 'tsup';
 
+// consider pkgroll as alternative
 export default defineConfig({
   treeshake: 'smallest',
   format: ['cjs'],

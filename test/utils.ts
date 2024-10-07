@@ -37,7 +37,7 @@ export const runEffect =
     Effect.provide(self, MainLive(cwd));
 
 type CreateMinimalProjectOptions = {
-  git?: { init: boolean; dirty: boolean };
+  git?: { init: true; dirty: boolean } | { init: false };
   fixtures?: { configFile: boolean; templateFiles: boolean };
 };
 
