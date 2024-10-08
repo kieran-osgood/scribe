@@ -40,7 +40,6 @@ export const Initialize = Command.make('init', args, ({ verboseLogging }) =>
             'Scribe init complete. Edit the config to begin templating.',
           ),
         ),
-        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         Effect.tap(() => Console.file(fileDescriptor.toString())),
       );
     }),

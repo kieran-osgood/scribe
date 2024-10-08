@@ -80,7 +80,7 @@ describe(isWorkingTreeClean.name, () => {
   describe('[Given] cwd is not a git repository', () => {
     V.it.scoped('[Then] returns GitStatusError', () => {
       const cwd = createMinimalProject({
-        git: { init: false, dirty: false },
+        git: { init: false },
       });
 
       return Effect.gen(function* () {
@@ -115,7 +115,7 @@ describe(status.name, () => {
   describe('[Given] cwd *not* a git repository', () => {
     V.it.scoped('[Then] return NOT_A_GIT_REPO SimpleGitError', () => {
       const cwd = createMinimalProject({
-        git: { init: false, dirty: false },
+        git: { init: false },
       });
 
       return Effect.gen(function* () {
@@ -152,7 +152,7 @@ describe(create.name, () => {
   describe('[Given] cwd *not* a git repo', () => {
     V.it.scoped('[Then] return NOT_A_GIT_REPO SimpleGitError', () => {
       const cwd = createMinimalProject({
-        git: { init: false, dirty: false },
+        git: { init: false },
       });
 
       return Effect.gen(function* () {
@@ -160,7 +160,8 @@ describe(create.name, () => {
         const result = yield* Effect.tryPromise(
           async () => await git.status(),
         ).pipe(Effect.flip);
-        expect(result.message).toBe(
+        expect(result.error).toHaveProperty('message');
+        expect((result.error as { message: string }).message).toBe(
           `fatal: not a git repository (or any of the parent directories): .git
 `,
         );

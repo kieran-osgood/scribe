@@ -42,7 +42,7 @@ describe('Config', () => {
       S.decodeUnknown(ScribeConfig)({}).pipe(Effect.flip),
     );
     expect(String(result)).toMatchInlineSnapshot(`
-      "{ templatesDirectories: ReadonlyArray<string>; generators: { [x: string]: ReadonlyArray<{ key: string; directory: string; fileName: string }> } }
+      "{ readonly templatesDirectories: ReadonlyArray<string>; readonly generators: { readonly [x: string]: ReadonlyArray<{ readonly key: string; readonly directory: string; readonly fileName: string }> } }
       └─ ["templatesDirectories"]
          └─ is missing"
     `);

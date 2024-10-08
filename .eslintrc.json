@@ -1,0 +1,42 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/strict-type-checked",
+    "plugin:@typescript-eslint/stylistic-type-checked"
+  ],
+  "ignorePatterns": [
+    "examples",
+    "dist",
+    "node_modules",
+    "html",
+    "scribe.config.ts",
+    "public"
+  ],
+  "root": true,
+  "overrides": [],
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "project": true
+  },
+  "plugins": ["@typescript-eslint", "communist-spelling", "simple-import-sort"],
+  "rules": {
+    "@typescript-eslint/no-unnecessary-boolean-literal-compare": "off",
+    "@typescript-eslint/no-misused-promises": "error",
+    "@typescript-eslint/promise-function-async": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/consistent-type-definitions": "off",
+    "@typescript-eslint/no-unused-vars": "error",
+    "array-bracket-spacing": ["error", "never"],
+    "communist-spelling/communist-spelling": "error",
+    "no-unused-vars": "off",
+    "object-curly-spacing": ["error", "always"],
+    "semi": ["error", "always"],
+    "simple-import-sort/exports": "error",
+    "simple-import-sort/imports": "error"
+  }
+}
