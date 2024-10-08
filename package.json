@@ -31,11 +31,12 @@
     "prettier:write": "prettier --write .",
     "tsc": "tsc",
     "tsc:watch": "tsc --watch",
-    "check": "run-p tsc lint prettier:check test",
+    "size": "npm run build && size-limit",
+    "check": "run-p tsc lint prettier:check test size",
     "build": "tsup packages/cli/index.ts",
+    "ci:build": "run-p check build",
     "publish": "changeset publish",
     "changeset": "changeset",
-    "size": "npm run build && size-limit",
     "prepare": "husky install"
   },
   "dependencies": {

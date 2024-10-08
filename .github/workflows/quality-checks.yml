@@ -23,7 +23,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: turbo build --no-color
+        run: pnpm run ci:build
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v4
